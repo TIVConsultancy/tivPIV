@@ -49,7 +49,7 @@ public class SVG {
         out.close();
     }
     
-    public static SVGGraphics2D paintVectors(String sOutput, List<? extends Vector> loVelo, Colorbar oColorbar, int iStretch) throws IOException {
+    public static SVGGraphics2D paintVectors(List<? extends Vector> loVelo, Colorbar oColorbar, int iStretch) throws IOException {
         
         SVGGraphics2D g = getGraphics();                        
         
@@ -70,7 +70,12 @@ public class SVG {
                 g.drawLine(v1.dlefttip[1].intValue(), v1.dlefttip[0].intValue(), v1.dtip[1].intValue(), v1.dtip[0].intValue());
             }
         }
-
+        return g;
+    }
+    
+    public static SVGGraphics2D paintVectors(String sOutput, List<? extends Vector> loVelo, Colorbar oColorbar, int iStretch) throws IOException {
+        
+        SVGGraphics2D g = paintVectors(loVelo, oColorbar, iStretch);
         writeOut(sOutput, g);
         return g;
     }

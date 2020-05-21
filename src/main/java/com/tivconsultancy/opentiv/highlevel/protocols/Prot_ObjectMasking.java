@@ -12,6 +12,7 @@ import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.masking.main.OpenTIV_Masking;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,8 +57,8 @@ public class Prot_ObjectMasking extends Protocol {
     }
 
     @Override
-    public ImageInt getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
+    public BufferedImage getView(String identFromViewer) {
+        return outPutImages.get(identFromViewer).getBuffImage();
     }
 
     @Override
