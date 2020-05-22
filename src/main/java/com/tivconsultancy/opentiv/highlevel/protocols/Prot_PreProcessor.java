@@ -41,7 +41,7 @@ public class Prot_PreProcessor extends Protocol {
     
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, preproc));
+        outPutImages.add(new NameObject<>(name, preproc.getBuffImage()));
     }
     
     @Override
@@ -56,7 +56,7 @@ public class Prot_PreProcessor extends Protocol {
 
     @Override
     public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer).getBuffImage();
+        return outPutImages.get(identFromViewer);
     }
 
     @Override

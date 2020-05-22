@@ -47,7 +47,7 @@ public class Prot_EdgeDetect extends Protocol {
 
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, imgEdges));
+        outPutImages.add(new NameObject<>(name, imgEdges.getBuffImage()));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class Prot_EdgeDetect extends Protocol {
 
     @Override
     public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer).getBuffImage();
+        return outPutImages.get(identFromViewer);
     }
 
     @Override

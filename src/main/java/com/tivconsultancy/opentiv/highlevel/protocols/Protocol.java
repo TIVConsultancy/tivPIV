@@ -22,7 +22,7 @@ import java.util.List;
  */
 public abstract class Protocol extends Settings implements Hints {
 
-    protected LookUp<ImageInt> outPutImages;
+    protected LookUp<BufferedImage> outPutImages;
 
     public Protocol() {
         outPutImages = new LookUp<>();
@@ -37,7 +37,13 @@ public abstract class Protocol extends Settings implements Hints {
     public abstract List<String> getIdentForViews();
 
     public BufferedImage getView(String identFromViewer) {        
-        return outPutImages.get(identFromViewer).getBuffImage();
+        return outPutImages.get(identFromViewer);
+    }
+    
+    public void setImage(BufferedImage bi){
+        for(String s : getIdentForViews()){
+            outPutImages.set(s, bi);
+        }        
     }
 
     public abstract Double getOverTimesResult(NameSpaceProtocolResults1D ident);

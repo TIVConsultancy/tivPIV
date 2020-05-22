@@ -43,7 +43,7 @@ public class Prot_ObjectMasking extends Protocol {
 
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, totMask));
+        outPutImages.add(new NameObject<>(name, totMask.getBuffImage()));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Prot_ObjectMasking extends Protocol {
 
     @Override
     public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer).getBuffImage();
+        return outPutImages.get(identFromViewer);
     }
 
     @Override

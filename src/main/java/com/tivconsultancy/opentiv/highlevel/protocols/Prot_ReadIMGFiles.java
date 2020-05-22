@@ -49,7 +49,7 @@ public class Prot_ReadIMGFiles extends Protocol {
 
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, imgRead));
+        outPutImages.add(new NameObject<>(name, imgRead.getBuffImage()));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class Prot_ReadIMGFiles extends Protocol {
 
     @Override
     public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer).getBuffImage();
+        return outPutImages.get(identFromViewer);
     }
 
     @Override
