@@ -41,6 +41,10 @@ public class LookUp<T> {
         }
         return -1;
     }
+    
+    public NameObject<T> get(int index) {
+        return lo.get(index);
+    }
 
     public T get(String input) {
         if (input == null) {
@@ -92,7 +96,7 @@ public class LookUp<T> {
     }
     
     public boolean addDuplFree(NameObject<T> o) {
-        if(get(o.name) == null){
+        if(LookUp.this.get(o.name) == null){
             lo.add(o);
             return true;
         }        

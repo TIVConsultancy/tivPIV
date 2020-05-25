@@ -65,6 +65,21 @@ public class IndexedResults {
     public Result1D get(int i) {
         return this.get(i + "");
     }
+    
+    public Result1D getIndexBased(int i) {
+        return resultsOverTime.get(i).o;
+    }
+    
+    public int getEntry(int i) {
+        return Integer.valueOf(resultsOverTime.get(i).name);
+    }
+        
+    public Double getIndexBased(int i, String name) {
+        if(this.getIndexBased(i) == null || this.getIndexBased(i).getRes(name) == null){
+            return 0.0;
+        }
+        return this.getIndexBased(i).getRes(name);
+    }
 
     public Double get(int i, String name) {
         if(this.get(i) == null || this.get(i).getRes(name) == null){
