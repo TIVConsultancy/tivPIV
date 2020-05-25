@@ -16,13 +16,13 @@ public abstract class Settings {
     public List<SettingsCluster> lsClusters = new ArrayList<>();
 
     public Settings() {
-        setDefaultSetttings();        
+        setDefaultSetttings();
     }
 
     private void setDefaultSetttings() {
     }
-    
-    public List<SettingObject> getAllSettings(){
+
+    public List<SettingObject> getAllSettings() {
         return loSettings;
     }
 
@@ -57,7 +57,9 @@ public abstract class Settings {
     public final List<Object> getALLSettingsValues(String sSettingName) {
         List<Object> lo = new ArrayList<>();
         for (SettingObject oS : loSettings) {
-            if(oS == null) continue;
+            if (oS == null) {
+                continue;
+            }
             Object o = oS.getValue(sSettingName);
             if (o != null) {
                 lo.add(o);
@@ -95,6 +97,29 @@ public abstract class Settings {
 
     public List<SettingObject> getOutput() {
         return loSettings;
+    }
+
+    public List<String> getForFile() {
+        List<SettingObject> ol = getOutput();
+        List<String> ls = new ArrayList<>();
+        for (SettingObject o : ol) {
+            ls.add(o.getForFile());
+        }
+        return ls;
+    }
+
+    public void setFromFile(List<String[]> lsIn) {
+        List<SettingObject> settings = new ArrayList<>();
+        for (String[] sa : lsIn) {
+            settings.add(getSettings(sa));
+        }
+        setReadIn(settings);
+    }
+
+    public SettingObject getSettings(String[] sa) {
+        SettingObject o = new SettingObject(sa[0], sa[1].replaceAll("\\s+",""), null, (SettingObject.SettingsType) SettingObject.getSettingsType(sa[3]));
+        o.setValue(sa[2].replaceAll("\\s+",""));
+        return o;
     }
 
     public void setReadIn(List<SettingObject> lsIn) {

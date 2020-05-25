@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package com.tivconsultancy.opentiv.helpfunctions.settings;
 
+import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
 import java.io.Serializable;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class SettingObject implements Serializable {
         this.sValue = sValue;
         this.ident = ident;
     }
-    
+
     public SettingObject(String viewName, String sName, Object sValue, SettingsType ident) {
         this.sName = sName;
         this.sValue = sValue;
@@ -41,40 +42,57 @@ public class SettingObject implements Serializable {
     public String getName() {
         return this.sName;
     }
-    
+
     public String getViewName() {
-        if(viewName == null){
+        if (viewName == null) {
             return getName();
         }
         return this.viewName;
     }
 
     public void setValue(Object sValue) {
-        if(sValue instanceof String){
+        if (sValue == null || ident == null) {
+            System.out.println(this.toString());
+            return;
+        }
+        if (sValue instanceof String) {
             String s = sValue.toString();
-            if(ident.equals(SettingsType.String)){
+            if (ident.equals(SettingsType.String)) {
                 this.sValue = s;
             }
-            if(ident.equals(SettingsType.Double)){
+            if (ident.equals(SettingsType.Double)) {
                 this.sValue = Double.valueOf((String) s);
             }
-            if(ident.equals(SettingsType.Integer)){
+            if (ident.equals(SettingsType.Integer)) {
                 this.sValue = Double.valueOf((String) s).intValue();
             }
-            if(ident.equals(SettingsType.Boolean)){
+            if (ident.equals(SettingsType.Boolean)) {
                 this.sValue = Boolean.valueOf((String) s);
             }
 //            this.sValue = sValue;
         }
-        
+
     }
 
     public String toString() {
         return sName + "," + sValue.toString();
     }
-    
-    public String getValueAsString(){
+
+    public String getForFile() {
+        return viewName + ";" + sName + ";" + sValue.toString() + ";" + ident.toString();
+    }
+
+    public String getValueAsString() {
         return sValue.toString();
+    }
+
+    public static Enum getSettingsType(String s) {
+        for (Enum e : SettingsType.values()) {
+            if (s.equals(e.toString())) {
+                return e;
+            }
+        }
+        return null;
     }
 
     public enum SettingsType {
