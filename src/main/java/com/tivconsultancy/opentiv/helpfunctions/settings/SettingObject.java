@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class SettingObject implements Serializable {
 
+    private static final long serialVersionUID = -4390760382951116997L;
+
     protected String sName = "";
     public String viewName = null;
     public Object sValue = "";

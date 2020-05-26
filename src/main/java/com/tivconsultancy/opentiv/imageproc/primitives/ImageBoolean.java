@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.imageproc.primitives;
 
+import java.io.Serializable;
+
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class ImageBoolean {
+public class ImageBoolean implements Serializable{
+
+    private static final long serialVersionUID = -6968251207131438590L;
 
     public boolean[][] baMarker;
     public String sIdent;

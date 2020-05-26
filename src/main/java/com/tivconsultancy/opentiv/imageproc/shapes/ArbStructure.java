@@ -18,6 +18,7 @@ package com.tivconsultancy.opentiv.imageproc.shapes;
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class ArbStructure implements Shape{
+public class ArbStructure implements Shape, Serializable{
+
+    private static final long serialVersionUID = -8299568128551323389L;
     public List<ImagePoint> loPoints = new ArrayList<>();
     
     public ArbStructure(List<?> loInput){

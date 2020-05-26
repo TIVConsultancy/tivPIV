@@ -16,12 +16,15 @@
 package com.tivconsultancy.opentiv.helpfunctions.colorspaces;
 
 import java.awt.color.ColorSpace;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ColorspaceMSH extends ColorSpace {
+public class ColorspaceMSH extends ColorSpace implements Serializable{
+
+    private static final long serialVersionUID = -7627389647698311097L;
 
     /*
     https://github.com/kennethmoreland-com/kennethmoreland-com.github.io/blob/master/color-advice/smooth-cool-warm/smooth-cool-warm.ipynb

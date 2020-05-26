@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class OrderedPair implements Serializable, Additionable<OrderedPair>,Substractable<OrderedPair> ,Normable<OrderedPair> ,Multipliable<OrderedPair> , Position, Value {
 
+    private static final long serialVersionUID = -2432094969948054078L;
+
     public double x;
     public double y;
     public Double dValue;

@@ -17,12 +17,15 @@ package com.tivconsultancy.opentiv.imageproc.shapes;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class Rectangle {
+public class Rectangle implements Serializable{
+
+    private static final long serialVersionUID = -8912756112435594630L;
     public MatrixEntry oTopLeft;
     public MatrixEntry oTopRight;
     public MatrixEntry oBottomLeft;

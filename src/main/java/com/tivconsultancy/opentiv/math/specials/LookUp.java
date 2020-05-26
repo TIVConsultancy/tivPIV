@@ -15,6 +15,7 @@
  */
 package com.tivconsultancy.opentiv.math.specials;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,10 @@ import java.util.List;
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  * @param <T>
  */
-public class LookUp<T> {
+public class LookUp<T> implements Serializable {
 
+    private static final long serialVersionUID = 11234151L;
+    
     private List<NameObject<T>> lo;
 
     public LookUp(List<String> names, List<T> content) {

@@ -18,13 +18,16 @@ package com.tivconsultancy.opentiv.masking.help;
 import com.tivconsultancy.opentiv.helpfunctions.hpc.Stopwatch;
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class SimpleShapes {
+public class SimpleShapes implements Serializable{
+
+    private static final long serialVersionUID = 3530343965411910131L;
 
     public int iPosX = 0;
     public int iPosY = 0;

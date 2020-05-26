@@ -17,6 +17,7 @@ package com.tivconsultancy.opentiv.helpfunctions.statistics;
 
 import com.tivconsultancy.opentiv.helpfunctions.io.Writer;
 import com.tivconsultancy.opentiv.math.interfaces.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class Histogram {
+public class Histogram implements Serializable{
+
+    private static final long serialVersionUID = 9012662222213151893L;
     public List<HistogramClass> loClasses = new ArrayList<>();
     double dStart = 0;
     double dEnd = 0;

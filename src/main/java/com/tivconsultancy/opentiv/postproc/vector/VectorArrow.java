@@ -19,12 +19,15 @@ import static com.tivconsultancy.opentiv.math.primitives.BasicMathLib.SecondCart
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.primitives.Vector;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class VectorArrow {
+public class VectorArrow implements Serializable{
+
+    private static final long serialVersionUID = 5642230743964655607L;
 
     public Double[] dmid;
     public Double[] dtip;

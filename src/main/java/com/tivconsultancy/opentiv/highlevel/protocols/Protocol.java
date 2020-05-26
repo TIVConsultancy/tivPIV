@@ -22,6 +22,7 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,9 @@ import java.util.List;
  * @author Thomas Ziegenhein
  * @param <T>
  */
-public abstract class Protocol extends Settings implements Hints {
+public abstract class Protocol extends Settings implements Hints, Serializable {
+
+    private static final long serialVersionUID = -6114709214102901996L;
 
     protected LookUp<BufferedImage> outPutImages;
 

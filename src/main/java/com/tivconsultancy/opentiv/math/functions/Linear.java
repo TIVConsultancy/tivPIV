@@ -17,12 +17,15 @@ package com.tivconsultancy.opentiv.math.functions;
 
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class Linear {
+public class Linear implements Serializable{
+
+    private static final long serialVersionUID = 3987942574959070411L;
     
     public Double dydx;    
     public OrderedPair opStart;

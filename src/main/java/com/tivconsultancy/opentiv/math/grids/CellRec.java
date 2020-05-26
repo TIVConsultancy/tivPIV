@@ -18,6 +18,7 @@ package com.tivconsultancy.opentiv.math.grids;
 import com.tivconsultancy.opentiv.math.interfaces.*;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
 import com.tivconsultancy.opentiv.math.sets.Set2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class CellRec extends Set2D {
+public class CellRec extends Set2D implements Serializable {
+
+    private static final long serialVersionUID = 6427708836157549071L;
 
     public List<Position> loContent = new ArrayList<>();
     public Double dAverage = null;

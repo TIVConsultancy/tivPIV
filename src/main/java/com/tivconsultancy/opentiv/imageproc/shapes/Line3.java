@@ -20,6 +20,7 @@ import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.NeighborIterat
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.math.interfaces.Normable;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class Line3 implements Normable<MatrixEntry> {
+public class Line3 implements Normable<MatrixEntry>, Serializable {
+
+    private static final long serialVersionUID = 7419251794086924592L;
 
     public MatrixEntry meStart;
     public MatrixEntry meEnd;

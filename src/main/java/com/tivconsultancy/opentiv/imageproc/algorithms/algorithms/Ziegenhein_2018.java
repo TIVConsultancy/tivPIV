@@ -26,6 +26,7 @@ import com.tivconsultancy.opentiv.math.exceptions.EmptySetException;
 import com.tivconsultancy.opentiv.math.interfaces.SideCondition;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.specials.EnumObject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -706,7 +707,9 @@ public class Ziegenhein_2018 {
 
     }
 
-    public static class CNCP {
+    public static class CNCP implements Serializable {
+
+        private static final long serialVersionUID = 936753173613431007L;
 
         public ArrayList<ImagePoint> lo = new ArrayList<>();
         public ImagePoint oStart = null;

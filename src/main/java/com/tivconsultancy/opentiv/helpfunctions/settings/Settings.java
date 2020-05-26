@@ -15,6 +15,7 @@
  */
 package com.tivconsultancy.opentiv.helpfunctions.settings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public abstract class Settings {
+public abstract class Settings implements Serializable{
+
+    private static final long serialVersionUID = -3299716352828881633L;
 
     public List<SettingObject> loSettings = new ArrayList<>();
     public List<SettingsCluster> lsClusters = new ArrayList<>();

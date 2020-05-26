@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas
  */
-public class Tensor3D {
+public class Tensor3D implements Serializable{
+
+    private static final long serialVersionUID = 1L;
     
      public double a11 = 0.0;
      public double a12 = 0.0;

@@ -17,6 +17,7 @@ package com.tivconsultancy.opentiv.imageproc.shapes;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +26,9 @@ import java.util.Objects;
  *
  * @author ziegen60
  */
-public class Line {
+public class Line implements Serializable{
+
+    private static final long serialVersionUID = -2531816652298683872L;
 
     public MatrixEntry meStart;
     public MatrixEntry meEnd;

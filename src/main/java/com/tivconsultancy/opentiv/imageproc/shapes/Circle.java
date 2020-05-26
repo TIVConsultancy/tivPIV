@@ -21,6 +21,7 @@ import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,9 @@ import java.util.List;
  *
  * @author Thomas
  */
-public class Circle implements Shape {
+public class Circle implements Shape, Serializable {
+
+    private static final long serialVersionUID = 8093116653258390116L;
 
     public MatrixEntry meCenter;
     public OrderedPair opSubPixelCenter;

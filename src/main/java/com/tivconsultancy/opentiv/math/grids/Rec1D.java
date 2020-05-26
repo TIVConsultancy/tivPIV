@@ -16,6 +16,7 @@
 package com.tivconsultancy.opentiv.math.grids;
 
 import com.tivconsultancy.opentiv.math.interfaces.*;
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +26,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class Rec1D {
+public class Rec1D implements Serializable{
+
+    private static final long serialVersionUID = 7053731468304358700L;
 
     CellRec1D[] oCells;
     List<Object> loContent = new ArrayList<>();

@@ -23,6 +23,7 @@ import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +31,9 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PreProcessor extends Protocol {
+public class Prot_PreProcessor extends Protocol implements Serializable {
+
+    private static final long serialVersionUID = -2641616187467748870L;
 
     ImageInt preproc;
     private String name = "Image Correction";

@@ -16,6 +16,7 @@
 package com.tivconsultancy.opentiv.imageproc.primitives;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,9 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class ImageMarker {
+public class ImageMarker implements Serializable{
+
+    private static final long serialVersionUID = 4076072844216720580L;
     public boolean[][] ba;
     
     public ImageMarker(boolean[][] ba){

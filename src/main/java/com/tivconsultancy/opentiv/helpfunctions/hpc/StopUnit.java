@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.helpfunctions.hpc;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class StopUnit {
+public class StopUnit implements Serializable{
+
+    private static final long serialVersionUID = 395147403072810306L;
 
     long fStartTime = 0;
     long fEndTime = 0;

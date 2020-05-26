@@ -16,13 +16,17 @@
 package com.tivconsultancy.opentiv.math.specials;
 
 import com.tivconsultancy.opentiv.math.interfaces.Normable;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class NameObject<T> implements Normable<NameObject>{
+public class NameObject<T> implements Normable<NameObject>, Serializable{
+    
+    private static final long serialVersionUID = 46123491L;
+    
     public String name;
     public T o;
     

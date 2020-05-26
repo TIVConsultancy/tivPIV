@@ -31,6 +31,7 @@ import com.tivconsultancy.opentiv.postproc.vector.PaintVectors;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,7 +41,9 @@ import java.util.logging.Logger;
  *
  * @author Thomas Ziegenhein
  */
-public class VelocityGrid {
+public class VelocityGrid implements Serializable {
+
+    private static final long serialVersionUID = 4600722142141334933L;
 
     public RecOrtho2D GridVeloX;
     public RecOrtho2D GridVeloY;

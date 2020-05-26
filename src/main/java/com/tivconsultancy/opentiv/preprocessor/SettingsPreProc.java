@@ -18,12 +18,15 @@ package com.tivconsultancy.opentiv.preprocessor;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class SettingsPreProc extends Settings {
+public class SettingsPreProc extends Settings implements Serializable{
+
+    private static final long serialVersionUID = -6649328924847991538L;
 
     public SettingsPreProc() {
         /*

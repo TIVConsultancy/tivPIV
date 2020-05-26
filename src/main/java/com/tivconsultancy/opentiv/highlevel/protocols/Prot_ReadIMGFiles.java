@@ -25,6 +25,7 @@ import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +33,9 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_ReadIMGFiles extends Protocol {
+public class Prot_ReadIMGFiles extends Protocol implements Serializable {
+
+    private static final long serialVersionUID = -1394639842255399516L;
 
     File imgFile;
     ImageInt imgRead;

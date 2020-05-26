@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas
  */
-public class Vector3D extends OrderdTripplet {
+public class Vector3D extends OrderdTripplet implements Serializable{
+
+    private static final long serialVersionUID = 3030096958408788079L;
 
     public Vector3D(double x, double y, double z) {
         super(x, y, z);

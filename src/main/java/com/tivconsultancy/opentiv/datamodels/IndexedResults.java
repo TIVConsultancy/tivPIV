@@ -18,6 +18,7 @@ package com.tivconsultancy.opentiv.datamodels;
 import com.tivconsultancy.opentiv.highlevel.protocols.Result1D;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;

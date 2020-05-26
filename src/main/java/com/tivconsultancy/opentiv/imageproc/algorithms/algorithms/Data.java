@@ -15,6 +15,7 @@
  */
 package com.tivconsultancy.opentiv.imageproc.algorithms.algorithms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public final class Data {
+public final class Data implements Serializable{
     public static List<Ziegenhein_2018.CNCP> loCNCPs = new ArrayList<>();
+    private static final long serialVersionUID = -1071693988356461656L;
 }

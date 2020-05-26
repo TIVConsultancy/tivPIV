@@ -17,6 +17,7 @@ package com.tivconsultancy.opentiv.math.functions;
 
 import com.tivconsultancy.opentiv.math.interfaces.*;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class PLF {
+public class PLF implements Serializable{
+
+    private static final long serialVersionUID = -794507681708488105L;
 
     List<Linear> loFunction = new ArrayList<>();
     List<OrderedPair> lopPoints;

@@ -15,6 +15,7 @@
  */
 package com.tivconsultancy.opentiv.helpfunctions.hpc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,9 +25,10 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public final class Stopwatch {
+public final class Stopwatch implements Serializable{
     
     public static List<StopUnit> loUnits = new ArrayList<>();
+    private static final long serialVersionUID = -6451469104259335385L;
     
     
     public static void clearUnits(){

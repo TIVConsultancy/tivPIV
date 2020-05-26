@@ -15,16 +15,15 @@
  */
 package com.tivconsultancy.opentiv.helpfunctions.hpc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,9 +31,10 @@ import java.util.logging.Logger;
  *
  * @author Thomas Ziegenhein
  */
-public class Parallel {
+public class Parallel implements Serializable{
 
     private static final int NUM_CORES_Max = Runtime.getRuntime().availableProcessors();
+    private static final long serialVersionUID = 7418688585504351922L;
     private int NUM_CORES = 2;
 
     private static final ExecutorService forPool_Max = Executors.newFixedThreadPool(NUM_CORES_Max * 2, (Runnable r) -> new Thread(r));

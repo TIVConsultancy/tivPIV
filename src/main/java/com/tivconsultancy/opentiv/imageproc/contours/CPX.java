@@ -28,6 +28,7 @@ import com.tivconsultancy.opentiv.math.functions.PLF;
 import com.tivconsultancy.opentiv.math.interfaces.*;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.specials.EnumObject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,7 +43,9 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
  *
  * @author Thomas Ziegenhein
  */
-public class CPX implements Normable<CPX> {
+public class CPX implements Normable<CPX>, Serializable {
+
+    private static final long serialVersionUID = -8523294306720673934L;
 
     public ArrayList<ImagePoint> lo = new ArrayList<>();
     public ImagePoint oStart = null;

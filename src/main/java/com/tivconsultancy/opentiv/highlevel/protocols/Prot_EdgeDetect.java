@@ -17,18 +17,14 @@ package com.tivconsultancy.opentiv.highlevel.protocols;
 
 import com.tivconsultancy.opentiv.helpfunctions.settings.FactorySettingsCluster;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
-import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.BasicIMGOper;
 import static com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.EdgeDetections.getThinEdge;
 import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.NoiseReduction;
 import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.Ziegenhein_2018;
-import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Reader;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
-import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

@@ -15,7 +15,7 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +23,9 @@ import java.util.List;
  *
  * @author Thomas
  */
-public class OrderdTripplet {
+public class OrderdTripplet implements Serializable {
+
+    private static final long serialVersionUID = 4265610105250816641L;
 
     public double x;
     public double y;

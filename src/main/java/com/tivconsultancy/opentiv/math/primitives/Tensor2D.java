@@ -15,12 +15,16 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
+import java.io.Serializable;
+
 
 /**
  *
  * @author Thomas
  */
-public class Tensor2D {
+public class Tensor2D implements Serializable{
+
+    private static final long serialVersionUID = 2774436619577630422L;
     
     public double a11 = 0.0;
      public double a12 = 0.0;

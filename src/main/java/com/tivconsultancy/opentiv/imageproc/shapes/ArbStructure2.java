@@ -19,6 +19,7 @@ import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
 import com.tivconsultancy.opentiv.math.sets.Set2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class ArbStructure2 implements Shape {
+public class ArbStructure2 implements Shape, Serializable {
+
+    private static final long serialVersionUID = -6387066610382197860L;
 
     public List<MatrixEntry> loPoints = new ArrayList<>();
 

@@ -17,24 +17,22 @@ package com.tivconsultancy.opentiv.highlevel.protocols;
 
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
-import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Writer;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.masking.main.OpenTIV_Masking;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_ObjectMasking extends Protocol {
+public class Prot_ObjectMasking extends Protocol implements Serializable {
+
+    private static final long serialVersionUID = -8838277891302598461L;
 
     ImageInt masking1;
     ImageInt masking2;

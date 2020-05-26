@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ObjectPair {
+public class ObjectPair implements Serializable {
+
+    private static final long serialVersionUID = 5430662495860047788L;
     public Object o1;
     public Object o2;
 

@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.math.sets;
 
+import java.io.Serializable;
+
 /**
  * Mathematical structure of a (closed) set
  * @author Thomas Ziegenhein
  */
-public class Set1D {
+public class Set1D implements Serializable {
+
+    private static final long serialVersionUID = 4478410534901231506L;
     
     public double dLeftBorder;
     public double dRightBorder;

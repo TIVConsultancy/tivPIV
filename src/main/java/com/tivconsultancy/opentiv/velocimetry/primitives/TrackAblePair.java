@@ -21,6 +21,7 @@ import com.tivconsultancy.opentiv.physics.interfaces.Trackable;
 import com.tivconsultancy.opentiv.physics.interfaces.Velocity;
 import com.tivconsultancy.opentiv.velocimetry.iterativemethods.LostVelocity;
 import com.tivconsultancy.opentiv.velocimetry.iterativemethods.TwoTrackablePairCriteria;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class TrackAblePair {
+public class TrackAblePair implements Serializable{
+
+    private static final long serialVersionUID = 301234384516429951L;    
 
     public Trackable oVFrame1;
     public Trackable oVFrame2;

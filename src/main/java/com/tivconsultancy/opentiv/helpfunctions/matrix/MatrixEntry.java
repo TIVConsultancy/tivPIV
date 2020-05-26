@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class MatrixEntry implements Serializable, Additionable<MatrixEntry>,Substractable<MatrixEntry> ,Normable<MatrixEntry> ,Multipliable<MatrixEntry> , Position, Value {
 
+    private static final long serialVersionUID = 111132151L;
+    
     public int i;
     public int j;
     public double dValue;

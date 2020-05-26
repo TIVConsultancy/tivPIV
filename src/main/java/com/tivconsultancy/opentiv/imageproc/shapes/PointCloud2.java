@@ -22,6 +22,7 @@ import com.tivconsultancy.opentiv.imageproc.primitives.ImagePointInt;
 import com.tivconsultancy.opentiv.math.algorithms.Sorting;
 import com.tivconsultancy.opentiv.math.exceptions.EmptySetException;
 import com.tivconsultancy.opentiv.math.specials.EnumObject;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class PointCloud2 implements Shape {
+public class PointCloud2 implements Shape, Serializable {
+
+    private static final long serialVersionUID = 6742209117330123769L;
 
     protected HashSet<ImagePointInt> lop;
 

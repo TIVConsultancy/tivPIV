@@ -24,6 +24,7 @@ import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
 import com.tivconsultancy.opentiv.imageproc.shapes.Line2;
 import com.tivconsultancy.opentiv.math.interfaces.SideCondition;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,9 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
  *
  * @author Thomas Ziegenhein
  */
-public class Morphology {
+public class Morphology implements Serializable{
+
+    private static final long serialVersionUID = 433814034743056550L;
 
     public final List<ImagePoint> loHelp = new ArrayList<>();
     public List<List<ImagePoint>> lloHelp = new ArrayList<>();

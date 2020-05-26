@@ -15,14 +15,16 @@
  */
 package com.tivconsultancy.opentiv.math.primitives;
 
-import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.math.interfaces.*;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class Vector extends OrderedPair implements VectorNorm {
+public class Vector extends OrderedPair implements VectorNorm, Serializable {
+
+    private static final long serialVersionUID = 3027566421645978610L;
     public OrderedPair opUnitTangent;    
     
     public Vector(OrderedPair opPosition, OrderedPair opDirection, double dLength){

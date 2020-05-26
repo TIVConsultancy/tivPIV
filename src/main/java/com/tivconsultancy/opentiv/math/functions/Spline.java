@@ -16,6 +16,7 @@
 package com.tivconsultancy.opentiv.math.functions;
 
 import com.tivconsultancy.opentiv.math.sets.Set1D;
+import java.io.Serializable;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
@@ -23,7 +24,9 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
  *
  * @author Thomas Ziegenhein
  */
-public class Spline {
+public class Spline implements Serializable{
+
+    private static final long serialVersionUID = 4972141954276655645L;
 
     public SplineInterpolator o = new SplineInterpolator();
     public PolynomialSplineFunction oSpline = null;

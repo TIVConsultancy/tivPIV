@@ -16,6 +16,7 @@
 package com.tivconsultancy.opentiv.math.sets;
 
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +25,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class Set2D {
+public class Set2D implements Serializable {
+
+    private static final long serialVersionUID = -8608716579078619124L;
     public Set1D oIntervalX;
     public Set1D oIntervalY;
 

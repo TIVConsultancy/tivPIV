@@ -15,11 +15,15 @@
  */
 package com.tivconsultancy.opentiv.velocimetry.helpfunctions;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class Mask {
+public class Mask implements Serializable {
+
+    private static final long serialVersionUID = -4490154106416211193L;
     boolean[][] baMask;
     
 }

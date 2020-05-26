@@ -16,12 +16,10 @@
 package com.tivconsultancy.opentiv.imageproc.shapes;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
-import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.N8;
-import com.tivconsultancy.opentiv.imageproc.primitives.ImageGrid;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
-import com.tivconsultancy.opentiv.math.algorithms.Sorting;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +28,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class PointCloud implements Shape {
+public class PointCloud implements Shape, Serializable {
+
+    private static final long serialVersionUID = 913609036006428960L;
 
     protected HashSet<ImagePoint> lop;
 

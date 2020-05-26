@@ -23,6 +23,7 @@ import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.sets.Set2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +33,9 @@ import javax.imageio.ImageIO;
  *
  * @author Thomas Ziegenhein
  */
-public class ImageGrid {
+public class ImageGrid implements Serializable{
+
+    private static final long serialVersionUID = 98231744434220894L;
 
     public int iLength;
     public int jLength;

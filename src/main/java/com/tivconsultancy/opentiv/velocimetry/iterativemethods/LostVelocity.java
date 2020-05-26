@@ -17,13 +17,16 @@ package com.tivconsultancy.opentiv.velocimetry.iterativemethods;
 
 import com.tivconsultancy.opentiv.physics.interfaces.Trackable;
 import com.tivconsultancy.opentiv.velocimetry.primitives.TrackAblePair;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class LostVelocity extends TrackAblePair {
+public class LostVelocity extends TrackAblePair implements Serializable{
+
+    private static final long serialVersionUID = -3243367477422368369L;
 
     public LostVelocity(Trackable oVFrame1, Trackable oVFrame2) {
         super(oVFrame1, oVFrame2);

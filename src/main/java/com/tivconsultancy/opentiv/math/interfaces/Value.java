@@ -20,6 +20,6 @@ package com.tivconsultancy.opentiv.math.interfaces;
  * @author Thomas Ziegenhein
  * @param <T>
  */
-public interface Value<T> {
+public interface Value<T> {    
     public Double getValue(T pParameter);    
 }

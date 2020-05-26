@@ -19,6 +19,7 @@ import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.math.interfaces.*;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,11 +28,13 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class RecOrtho2D {
+public class RecOrtho2D implements Serializable{
+
+    private static final long serialVersionUID = -2661796203394511986L;
 
     public CellRec[][] oCells;
-    public Value oValue = (Value<OrderedPair>) (OrderedPair pParameter) -> pParameter.getValue(pParameter);
-    public Value oWeight = (Value<OrderedPair>) (OrderedPair pParameter) -> 1.0;
+    public Value oValue = (Value<OrderedPair> & Serializable) (OrderedPair pParameter) -> pParameter.getValue(pParameter);
+    public Value oWeight = (Value<OrderedPair> & Serializable) (OrderedPair pParameter) -> 1.0;
     public Double dCellSizeX;
     public Double dCellSizeY;
     public double dLeftBorder;

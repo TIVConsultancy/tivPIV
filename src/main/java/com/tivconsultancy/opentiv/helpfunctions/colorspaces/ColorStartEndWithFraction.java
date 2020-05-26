@@ -17,12 +17,15 @@ package com.tivconsultancy.opentiv.helpfunctions.colorspaces;
 
 import com.tivconsultancy.opentiv.math.sets.Set1D;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ColorStartEndWithFraction {
+public class ColorStartEndWithFraction implements Serializable {
+
+    private static final long serialVersionUID = 2714203826504243215L;
 
     public Set1D oStartEnd;
     public float[] fColorStart;

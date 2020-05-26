@@ -17,12 +17,15 @@ package com.tivconsultancy.opentiv.imageproc.shapes;
 
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageGrid;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class Rectangle2 {
+public class Rectangle2 implements Serializable{
+
+    private static final long serialVersionUID = 605952500409976565L;
     public ImagePoint oTopLeft;
     public ImagePoint oTopRight;
     public ImagePoint oBottomLeft;

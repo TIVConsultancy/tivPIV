@@ -24,6 +24,7 @@ import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.velocimetry.directtracking.Positioning;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,9 @@ import java.util.List;
  *
  * @author Hendrik Hessenkemper and Thomas Ziegenhein
  */
-public class FFT {
+public class FFT implements Serializable {
 
+    private static final long serialVersionUID = 676134122L;
     public MatrixEntryWithDouble meDisplacment = new MatrixEntryWithDouble();
     public double dXcorrCoeff;
     public double dXcorrCoeffRatio;

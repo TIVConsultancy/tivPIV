@@ -38,6 +38,8 @@ import java.util.List;
  */
 public class VelocityVec extends Vector implements Velocity, Serializable {
 
+    private static final long serialVersionUID = 3694579688340543059L;
+
     public Trackable VelocityObject1;
     public Trackable VelocityObject2;
 

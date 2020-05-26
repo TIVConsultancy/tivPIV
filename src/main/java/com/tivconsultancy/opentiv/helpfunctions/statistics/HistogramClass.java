@@ -17,6 +17,7 @@ package com.tivconsultancy.opentiv.helpfunctions.statistics;
 
 import com.tivconsultancy.opentiv.math.interfaces.*;
 import com.tivconsultancy.opentiv.math.sets.Set1D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class HistogramClass extends Set1D implements Iterator<Object> {
+public class HistogramClass extends Set1D implements Iterator<Object>, Serializable {
+
+    private static final long serialVersionUID = 7872589908163277150L;
     public List<Object> loContent = new ArrayList<>(); //~
     public Double dHelp = null; // Helpparameter that helps for easily implement many algorithms
     

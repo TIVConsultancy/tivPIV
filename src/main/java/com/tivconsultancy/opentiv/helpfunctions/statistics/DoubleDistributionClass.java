@@ -16,6 +16,7 @@
 package com.tivconsultancy.opentiv.helpfunctions.statistics;
 
 import com.tivconsultancy.opentiv.math.interfaces.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class DoubleDistributionClass implements DistributionClass<Double> {
+public class DoubleDistributionClass implements DistributionClass<Double>, Serializable {
+
+    private static final long serialVersionUID = -1315226299443400356L;
 
     public List<Double> loContent = new ArrayList<Double>();
     Double dMinBorder;

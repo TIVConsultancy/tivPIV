@@ -17,6 +17,7 @@ package com.tivconsultancy.opentiv.imageproc.shapes;
 
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageGrid;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class Line2 {
+public class Line2 implements Serializable{
+
+    private static final long serialVersionUID = -7494543856849414365L;
 
     ImagePoint meStart;
     ImagePoint meEnd;

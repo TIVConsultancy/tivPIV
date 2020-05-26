@@ -20,13 +20,16 @@ import com.tivconsultancy.opentiv.math.grids.CellRec;
 import com.tivconsultancy.opentiv.math.grids.RecOrtho2D;
 import com.tivconsultancy.opentiv.math.interfaces.Position;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class NeighborIterator {
+public class NeighborIterator implements Serializable{
+
+    private static final long serialVersionUID = 5564609847517367020L;
     
     public RecOrtho2D grid;
     

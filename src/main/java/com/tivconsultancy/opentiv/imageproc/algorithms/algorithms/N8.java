@@ -19,6 +19,7 @@ import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageGrid;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImagePoint;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,9 @@ import java.util.Objects;
  *
  * @author Thomas Ziegenhein
  */
-public class N8 {
+public class N8 implements Serializable {
+
+    private static final long serialVersionUID = -3662377633796688271L;
 
     ArrayList<Integer> lo = new ArrayList<>();
 

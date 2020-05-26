@@ -16,12 +16,15 @@
 package com.tivconsultancy.opentiv.preprocessor;
 
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageGrid;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class PreProcData {
+public class PreProcData implements Serializable{
+
+    private static final long serialVersionUID = -6264516077206016509L;
     ImageGrid Input;
     ImageGrid Output;
 }

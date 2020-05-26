@@ -16,13 +16,17 @@
 package com.tivconsultancy.opentiv.velocimetry.helpfunctions;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
+import java.io.Serializable;
 
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class MatrixEntryWithDouble extends MatrixEntry {
+public class MatrixEntryWithDouble extends MatrixEntry implements Serializable {
+    
+    private static final long serialVersionUID = 112480151L;
+    
     public double x = 0;
     public double y = 0;
     public MatrixEntryWithDouble(){

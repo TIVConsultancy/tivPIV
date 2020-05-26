@@ -25,20 +25,20 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ImageInt extends ImageBoolean {
+public class ImageInt extends ImageBoolean implements Serializable {
+
+    private static final long serialVersionUID = -3978520008605049954L;
 
     public int[][] iaPixels;
     public File origin = null;

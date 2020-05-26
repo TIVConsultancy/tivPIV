@@ -17,13 +17,16 @@ package com.tivconsultancy.opentiv.highlevel.protocols;
 
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Result1D {
+public class Result1D implements Serializable {
+    
+    private static final long serialVersionUID = 46132151L;
     
     private LookUp<Double> result;
     

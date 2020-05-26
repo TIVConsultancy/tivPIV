@@ -16,12 +16,15 @@
 package com.tivconsultancy.opentiv.math.specials;
 
 import com.tivconsultancy.opentiv.math.interfaces.Value;
+import java.io.Serializable;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class ValuePair {
+public class ValuePair implements Serializable{
+
+    private static final long serialVersionUID = -1171650191125622414L;
 
     Value o1;
     Value o2;

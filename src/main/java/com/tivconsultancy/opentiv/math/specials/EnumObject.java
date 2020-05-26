@@ -16,12 +16,15 @@
 package com.tivconsultancy.opentiv.math.specials;
 
 import com.tivconsultancy.opentiv.math.interfaces.Normable;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class EnumObject implements Normable<EnumObject>{
+public class EnumObject implements Normable<EnumObject>, Serializable{
+
+    private static final long serialVersionUID = -6982847300053745602L;
     public Double dEnum;
     public Object o;
     

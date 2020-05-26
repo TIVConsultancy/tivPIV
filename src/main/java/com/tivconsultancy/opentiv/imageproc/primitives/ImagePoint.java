@@ -26,6 +26,8 @@ import java.util.Objects;
  */
 public class ImagePoint implements Serializable, Additionable<ImagePoint>, Substractable<ImagePoint>, Normable<ImagePoint>, Multipliable<ImagePoint> {
 
+    private static final long serialVersionUID = 1752513465508047826L;
+
     public Integer i;
     public Integer iValue;
     public boolean bMarker = false;

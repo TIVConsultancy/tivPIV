@@ -19,6 +19,7 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.masking.help.SimpleShapes;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class SettingsMasking extends Settings {
+public class SettingsMasking extends Settings implements Serializable {
+
+    private static final long serialVersionUID = 5026376913137739541L;
     
     public List<SimpleShapes> loShapes = new ArrayList<>();
     

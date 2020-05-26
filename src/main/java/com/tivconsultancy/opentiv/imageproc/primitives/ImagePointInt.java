@@ -16,12 +16,15 @@
 package com.tivconsultancy.opentiv.imageproc.primitives;
 
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ImagePointInt extends MatrixEntry {
+public class ImagePointInt extends MatrixEntry implements Serializable{
+
+    private static final long serialVersionUID = -6921653534671180391L;
 
     public boolean bMarker = false;
 

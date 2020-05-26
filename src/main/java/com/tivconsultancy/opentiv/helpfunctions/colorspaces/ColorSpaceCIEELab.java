@@ -20,8 +20,9 @@ package com.tivconsultancy.opentiv.helpfunctions.colorspaces;
  * @author Thomas Ziegenhein
  */
 import java.awt.color.ColorSpace;
+import java.io.Serializable;
 
-public class ColorSpaceCIEELab extends ColorSpace {
+public class ColorSpaceCIEELab extends ColorSpace implements Serializable {
 
     public static ColorSpaceCIEELab getInstance() {
         return Holder.INSTANCE;

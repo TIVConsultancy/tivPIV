@@ -17,13 +17,12 @@ package com.tivconsultancy.opentiv.postproc.pixelplot;
 
 import com.tivconsultancy.opentiv.imageproc.shapes.Line;
 import com.tivconsultancy.opentiv.math.interfaces.Position;
-import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class PixelDiagram {
+public class PixelDiagram implements Serializable {
+
+    private static final long serialVersionUID = -7190012393493762611L;
 
     public int iStartX = 0;
     public int iStartY = 0;

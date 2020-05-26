@@ -17,12 +17,15 @@ package com.tivconsultancy.opentiv.helpfunctions.colorspaces;
 
 import java.awt.Color;
 import java.awt.color.ColorSpace;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class ColorSpaceHSB extends ColorSpace {
+public class ColorSpaceHSB extends ColorSpace implements Serializable {
+
+    private static final long serialVersionUID = 4458369078784888130L;
     
     public ColorSpaceHSB(){
         super(ColorSpace.TYPE_HSV, 3);
