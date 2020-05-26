@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class MatrixEntryShort implements Serializable ,Additionable<MatrixEntryShort>, Substractable<MatrixEntryShort>, Normable<MatrixEntryShort>, Multipliable<MatrixEntryShort>, Position, Value {
 
+    private static final long serialVersionUID = -4865201592031946577L;
+
     public short i;
     public short j;
     public double dValue;

@@ -26,6 +26,7 @@ import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_EdgeDetect extends Protocol {
+public class Prot_EdgeDetect extends Protocol implements Serializable{
 
     ImageInt imgEdges;
     private String name = "Edge Detect";
