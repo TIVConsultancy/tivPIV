@@ -5,8 +5,6 @@
  */
 package com.tivconsultancy.tivpiv.protocols;
 
-import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
-import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
@@ -16,10 +14,8 @@ import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.physics.vectors.VelocityVec;
 import com.tivconsultancy.tivGUI.StaticReferences;
-import com.tivconsultancy.tivGUI.startup.StartUpProtocol;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
-import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;

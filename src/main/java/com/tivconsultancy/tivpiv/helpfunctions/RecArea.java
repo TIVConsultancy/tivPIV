@@ -12,12 +12,16 @@ import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.helpfunctions.DataTypes.getDataBoolean;
 import com.tivconsultancy.tivpiv.helpfunctions.DataTypes.getDataDouble;
 import com.tivconsultancy.tivpiv.helpfunctions.DataTypes.getDataInt;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class RecArea implements AreaInSecondFrame {
+public class RecArea implements AreaInSecondFrame, Serializable {
+
+    private static final long serialVersionUID = 4715414473315970970L;
+
 
     Set1D oIntervalX;
     Set1D oIntervalY;

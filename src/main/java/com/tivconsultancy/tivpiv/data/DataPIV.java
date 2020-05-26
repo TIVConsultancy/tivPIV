@@ -3,7 +3,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package com.tivconsultancy.tivpiv.data;
 
+import com.tivconsultancy.opentiv.highlevel.protocols.Result1D;
 import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,12 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public final class DataPIV {        
+public final class DataPIV implements Serializable {        
+
+    private static final long serialVersionUID = 7041378570022471115L;
+    
+    // 1D Data
+    public Result1D results1D;
     
     //Data
     public int[][] iaReadInFirst;

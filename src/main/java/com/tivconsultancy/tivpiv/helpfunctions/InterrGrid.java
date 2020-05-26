@@ -20,6 +20,7 @@ import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,9 @@ import java.util.List;
  *
  * @author Thomas Ziegenhein
  */
-public class InterrGrid implements Grid {
+public class InterrGrid implements Grid, Serializable {
+
+    private static final long serialVersionUID = -1420517670312162142L;
 
     public InterrArea[][] oaContent;
     public boolean bSortedGrid = true;

@@ -21,18 +21,18 @@ import com.tivconsultancy.tivpiv.helpfunctions.DataTypes.getDataDouble;
 import com.tivconsultancy.tivpiv.helpfunctions.DataTypes.getDataInt;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * InterrArea is by default a rectangular shape by extending the CellRec class
  * @author Thomas Ziegenhein
  */
-public class InterrArea extends CellRec implements Area {
+public class InterrArea extends CellRec implements Area, Serializable {
 
-    /*
-     InterrArea is by default a rectangular shape by extending the CellRec class
-     */
+    private static final long serialVersionUID = -8921264415788907575L;
+
     FFT fftDisp;
     boolean bMasked = false;
     MatrixEntry mePosInGrid = null;
