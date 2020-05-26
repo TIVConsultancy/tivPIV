@@ -1,0 +1,5 @@
+rootProject.name = 'tivPIV'
+include ":openTIV"
+//project(":openTIV").projectDir = file("D:\\_Repos\\public\\tivconsultancy\\openTIV")
+//include ":tivGUI"
+//project(":tivGUI").projectDir = file("D:\\Sync\\TIVConsultancy\\openTIV\\publish\\tivGUI")
