@@ -55,17 +55,17 @@ public class SettingsPIV extends Settings {
     }
     
     public DataPIV setSettingsToPIV(DataPIV Data){
-        Data.cutyTop = Integer.valueOf(this.getSettingsValue("cutPIVyTop").toString());
-        Data.cutyBottom = Integer.valueOf(this.getSettingsValue("cutPIVyBottom").toString());
-        Data.cutxLeft = Integer.valueOf(this.getSettingsValue("cutPIVxLeft").toString());
-        Data.cutxRight = Integer.valueOf(this.getSettingsValue("cutPIVxRight").toString());
-        Data.bsharpen = Boolean.valueOf(this.getSettingsValue("bsharpen").toString());
-        Data.iHistCut = Integer.valueOf(this.getSettingsValue("iHistCut").toString());
-        Data.iThresholdSharp = Integer.valueOf(this.getSettingsValue("iThresholdSharp").toString());
-        Data.bBinarize = Boolean.valueOf(this.getSettingsValue("bBinarize").toString());
-        Data.imax = Integer.valueOf(this.getSettingsValue("imax").toString());
-        Data.bhighcont = Boolean.valueOf(this.getSettingsValue("bhighcont").toString());
-        Data.PIV_WindowSize = Integer.valueOf(this.getSettingsValue("PIV_WindowSize").toString());
+//        Data.cutyTop = Integer.valueOf(this.getSettingsValue("cutPIVyTop").toString());
+//        Data.cutyBottom = Integer.valueOf(this.getSettingsValue("cutPIVyBottom").toString());
+//        Data.cutxLeft = Integer.valueOf(this.getSettingsValue("cutPIVxLeft").toString());
+//        Data.cutxRight = Integer.valueOf(this.getSettingsValue("cutPIVxRight").toString());
+//        Data.bsharpen = Boolean.valueOf(this.getSettingsValue("bsharpen").toString());
+//        Data.iHistCut = Integer.valueOf(this.getSettingsValue("iHistCut").toString());
+//        Data.iThresholdSharp = Integer.valueOf(this.getSettingsValue("iThresholdSharp").toString());
+//        Data.bBinarize = Boolean.valueOf(this.getSettingsValue("bBinarize").toString());
+//        Data.imax = Integer.valueOf(this.getSettingsValue("imax").toString());
+//        Data.bhighcont = Boolean.valueOf(this.getSettingsValue("bhighcont").toString());
+//        Data.PIV_WindowSize = Integer.valueOf(this.getSettingsValue("PIV_WindowSize").toString());
         Data.bValidate = Boolean.valueOf(this.getSettingsValue("bValidate").toString());
         Data.sValidationType = this.getSettingsValue("sValidationtype").toString();
         Data.bMultipass = Boolean.valueOf(this.getSettingsValue("bMultipass").toString());
@@ -80,8 +80,8 @@ public class SettingsPIV extends Settings {
         Data.AutoStretch = Boolean.valueOf(this.getSettingsValue("AutoStretch").toString());
         Data.AutoStretchFactor = Double.valueOf(this.getSettingsValue("dStretch").toString());
         Data.sSubPixelType = this.getSettingsValue("SubPixType").toString();
-        Data.sGridType = this.getSettingsValue("GridType").toString();
-        Data.bMask = Boolean.valueOf(this.getSettingsValue("Mask").toString());
+//        Data.sGridType = this.getSettingsValue("GridType").toString();
+//        Data.bMask = Boolean.valueOf(this.getSettingsValue("Mask").toString());
         return Data;
     }
 

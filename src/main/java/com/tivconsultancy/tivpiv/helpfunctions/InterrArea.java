@@ -223,16 +223,19 @@ public class InterrArea extends CellRec implements Area {
                 oOverlapRight = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder + this.oIntervalX.getSize() / iDivider, this.oIntervalX.dRightBorder + this.oIntervalX.getSize() / iDivider), new Set1D(this.oIntervalY.dLeftBorder, this.oIntervalY.dRightBorder));
                 oOverlapRight.checkIfMasked(Data);
             }
+            
             InterrArea oOverlapLeft = null;
             if (this.oIntervalX.dLeftBorder - this.oIntervalX.getSize() / iDivider > 0) {
                 oOverlapLeft = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder - this.oIntervalX.getSize() / iDivider, this.oIntervalX.dRightBorder - this.oIntervalX.getSize() / iDivider), new Set1D(this.oIntervalY.dLeftBorder, this.oIntervalY.dRightBorder));
                 oOverlapLeft.checkIfMasked(Data);
             }
+            
             InterrArea oOverlappTop = null;
             if (this.oIntervalY.dLeftBorder - this.oIntervalX.getSize() / iDivider > 0) {
                 oOverlappTop = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder - this.oIntervalY.getSize() / iDivider, this.oIntervalY.dRightBorder - this.oIntervalX.getSize() / iDivider));
                 oOverlappTop.checkIfMasked(Data);
             }
+            
             InterrArea oOverlappBottom = null;
             if (this.oIntervalY.dRightBorder + this.oIntervalX.getSize() / iDivider < Data.iaGreyIntensity1.length) {
                 oOverlappBottom = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder + this.oIntervalY.getSize() / iDivider, this.oIntervalY.dRightBorder + this.oIntervalX.getSize() / iDivider));

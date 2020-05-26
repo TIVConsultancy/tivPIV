@@ -1,12 +1,13 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-//mainClassName = 'com.tivconsultancy.tivpiv.Main'
-//if (!hasProperty('mainClass')) {
-//    ext.mainClass = ''
-//}
+mainClassName = 'com.tivconsultancy.tivpiv.Main'
+if (!hasProperty('mainClass')) {
+    ext.mainClass = ''
+}
 
 repositories {
     mavenCentral()

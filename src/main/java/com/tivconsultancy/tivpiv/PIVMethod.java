@@ -10,17 +10,23 @@ import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
 import com.tivconsultancy.opentiv.highlevel.methods.Method;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.Prot_ObjectMasking;
-import com.tivconsultancy.opentiv.highlevel.protocols.Prot_PreProcessor;
-import com.tivconsultancy.opentiv.highlevel.protocols.Prot_ReadIMGFiles;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.Result1D;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
-import com.tivconsultancy.tivpiv.protocols.Prot_TIVPreProcessor;
-import com.tivconsultancy.tivpiv.protocols.Prot_TIVRead2IMGFiles;
+import com.tivconsultancy.tivGUI.MainFrame;
+import com.tivconsultancy.tivGUI.StaticReferences;
+import com.tivconsultancy.tivpiv.protocols.Prot_tivPIV1DPostProc;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVCalcDisplacement;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVDisplay;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVInterrAreas;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVObjectMasking;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVPreProcessor;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVRead2IMGFiles;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.embed.swing.SwingFXUtils;
 
 /**
  *
@@ -41,9 +47,13 @@ public class PIVMethod implements Method {
 
     private void initProtocols() {
         methods = new LookUp<>();
-        methods.add(new NameObject<>("read", new Prot_TIVRead2IMGFiles("Read")));
-        methods.add(new NameObject<>("preproc", new Prot_TIVPreProcessor()));
-        methods.add(new NameObject<>("mask", new Prot_ObjectMasking()));
+        methods.add(new NameObject<>("read", new Prot_PIVRead2IMGFiles()));
+        methods.add(new NameObject<>("preproc", new Prot_PIVPreProcessor()));
+        methods.add(new NameObject<>("mask", new Prot_PIVObjectMasking()));
+        methods.add(new NameObject<>("inter areas", new Prot_PIVInterrAreas()));
+        methods.add(new NameObject<>("calculate", new Prot_PIVCalcDisplacement()));
+        methods.add(new NameObject<>("display", new Prot_PIVDisplay()));
+        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
     }
 
     private void startNewTimeStep() {
@@ -52,6 +62,10 @@ public class PIVMethod implements Method {
             for (NameSpaceProtocolResults1D e : pro.get1DResultsNames()) {
                 results1D.addResult(e.toString(), Double.NaN);
             }
+            if (MainFrame.loadGif != null) {
+                pro.setImage(SwingFXUtils.fromFXImage(MainFrame.loadGif, null));
+            }
+
         }
     }
 
@@ -84,7 +98,7 @@ public class PIVMethod implements Method {
         if (nameOfFileSep.contains("png") || nameOfFileSep.contains("jpg") || nameOfFileSep.contains("jpeg") || nameOfFileSep.contains("bmp")) {
             for (Protocol p : getProtocols()) {
                 try {
-                    if (p instanceof Prot_TIVRead2IMGFiles) {
+                    if (p instanceof Prot_PIVRead2IMGFiles) {
                         p.run(f);
                     }
                 } catch (Exception ex) {
@@ -104,20 +118,34 @@ public class PIVMethod implements Method {
     public void run() throws Exception {
 
         startNewTimeStep();
+        StaticReferences.controller.getViewController(null).update();
 
-            try {
-                getProtocol("read").run(new Object[]{imageFile1, imageFile2});
-                getProtocol("preproc").run(getProtocol("read").getResults());
-                getProtocol("mask").run(getProtocol("preproc").getResults());
-                
-            } catch (Exception ex) {
-                throw ex;
+        try {
+            getProtocol("read").run(new Object[]{imageFile1, imageFile2});
+            getProtocol("preproc").run(getProtocol("read").getResults());
+            getProtocol("mask").run(getProtocol("preproc").getResults());
+            PIVStaticReferences.calcIntensityValues(((PIVController) StaticReferences.controller).getDataPIV());
+            getProtocol("inter areas").run();
+            getProtocol("calculate").run();
+            getProtocol("display").run();
+            getProtocol("postproc").run();
+
+            for (NameSpaceProtocolResults1D e : getProtocol("postproc").get1DResultsNames()) {
+                results1D.setResult(e.toString(), getProtocol("postproc").getOverTimesResult(e));
             }
+
+        } catch (Exception ex) {
+            throw ex;
+        }
 //            for (NameSpaceProtocolResults1D e : p.get1DResultsNames()) {
 //                results1D.setResult(e.toString(), p.getOverTimesResult(e));
 //            }
-        
+
     }
+    
+//    public List<Integer> getIndexInList(){
+//        
+//    }
 
     @Override
     public Protocol getProtocol(String ident) {

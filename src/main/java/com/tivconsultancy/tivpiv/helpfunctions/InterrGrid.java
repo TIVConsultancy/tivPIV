@@ -84,6 +84,64 @@ public class InterrGrid implements Grid {
         return oGrid;
 
     }
+    
+    public BufferedImage paintVecs(int[][] iaBlackBoard, List<Color> loColors, VelocityGrid oOutputGrid, DataPIV Data) throws IOException {
+        if (loColors == null) {
+            loColors = Colorbar.StartEndLinearColorBar.getCustom(0, 0, 0, 0, 0, 0);
+        }
+        Colorbar oColBar = new Colorbar.StartEndLinearColorBar(0.0, 5.0, loColors, new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
+        List<VelocityVec> oVeloVecs = new ArrayList<>();
+
+        for (InterrArea[] oa : oaContent) {
+            for (InterrArea o : oa) {
+                if (o.bRefined) {
+                    for (int i = 0; i < 2; i++) {
+                        for (int j = 0; j < 2; j++) {
+                            InterrArea oR = o.oRefinedAreas[i][j];
+                            if (oR != null && oR.getVeloX() != null && oR.getVeloY() != null) {
+                                oVeloVecs.add(new VelocityVec(oR.getVeloX(), oR.getVeloY(), oR.getCenter()));
+                            }
+                        }
+                    }
+                } else {
+                    if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
+                        oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
+                    }
+                }
+
+            }
+        }
+
+        List<VelocityVec> oVecChecked;
+        if (oOutputGrid != null) {
+            oOutputGrid.addContent(oVeloVecs);
+            oOutputGrid.GridVeloX.calcAverage();
+            oOutputGrid.GridVeloY.calcAverage();
+            oVecChecked = oOutputGrid.getVectors();
+        } else {
+            oVecChecked = oVeloVecs;
+        }
+
+        double dStretch = Data.dStretch;
+        try {
+            EnumObject o = Sorting.getMaxCharacteristic(oVecChecked, new Sorting.Characteristic() {
+
+                                                    @Override
+                                                    public Double getCharacteristicValue(Object pParameter) {
+                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                                                    }
+                                                });
+            if (Data.AutoStretch) {
+                dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
+            }
+
+            oColBar = new Colorbar.StartEndLinearColorBar(0.0, o.dEnum * 1.1, loColors, new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
+
+        } catch (EmptySetException ex) {
+            System.out.println("Warning Empty Set, skipped");
+        }
+        return PaintVectors.paintOnImage(oVecChecked, oColBar, iaBlackBoard, null, dStretch);
+    }
 
     public BufferedImage paintVecs(int[][] iaBlackBoard, String sFileOut, String sFileOutCSV, List<Color> loColors, VelocityGrid oOutputGrid, DataPIV Data) throws IOException {
         if (loColors == null) {
@@ -123,14 +181,14 @@ public class InterrGrid implements Grid {
         }
 
         double dStretch = Data.dStretch;
-        try {            
+        try {
             EnumObject o = Sorting.getMaxCharacteristic(oVecChecked, new Sorting.Characteristic() {
 
-                @Override
-                public Double getCharacteristicValue(Object pParameter) {
-                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                }
-            });
+                                                    @Override
+                                                    public Double getCharacteristicValue(Object pParameter) {
+                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                                                    }
+                                                });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -144,8 +202,8 @@ public class InterrGrid implements Grid {
         VelocityVec.writeToFile(sFileOutCSV, oVecChecked, null, null);
         return PaintVectors.paintOnImage(oVecChecked, oColBar, iaBlackBoard, sFileOut, dStretch);
     }
-    
-    public List<VelocityVec> getVectors(){
+
+    public List<VelocityVec> getVectors() {
         List<VelocityVec> oVeloVecs = new ArrayList<>();
 
         for (InterrArea[] oa : oaContent) {
@@ -170,6 +228,55 @@ public class InterrGrid implements Grid {
         return oVeloVecs;
     }
     
+    public BufferedImage paintVecs(int[][] iaBlackBoard, List<Color> loColors, DataPIV Data) throws IOException {
+        if (loColors == null) {
+            loColors = Colorbar.StartEndLinearColorBar.getCustom(0, 0, 0, 0, 0, 0);
+        }
+        Colorbar oColBar = new Colorbar.StartEndLinearColorBar(0.0, 5.0, loColors, new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
+        List<VelocityVec> oVeloVecs = new ArrayList<>();
+
+        for (InterrArea[] oa : oaContent) {
+            for (InterrArea o : oa) {
+                if (o.bRefined) {
+                    for (int i = 0; i < 2; i++) {
+                        for (int j = 0; j < 2; j++) {
+                            InterrArea oR = o.oRefinedAreas[i][j];
+                            if (oR != null && oR.getVeloX() != null && oR.getVeloY() != null) {
+                                oVeloVecs.add(new VelocityVec(oR.getVeloX(), oR.getVeloY(), oR.getCenter()));
+                            }
+                        }
+                    }
+                } else {
+                    if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
+                        oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
+                    }
+                }
+
+            }
+        }
+
+        double dStretch = Data.dStretch;
+        try {
+            EnumObject o = Sorting.getMaxCharacteristic(oVeloVecs, new Sorting.Characteristic() {
+
+                                                    @Override
+                                                    public Double getCharacteristicValue(Object pParameter) {
+                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                                                    }
+                                                });
+            if (Data.AutoStretch) {
+                dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
+            }
+
+            oColBar = new Colorbar.StartEndLinearColorBar(0.0, o.dEnum * 1.1, loColors, new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
+
+        } catch (EmptySetException ex) {
+            System.out.println("Warning Empty Set, skipped");
+        }
+
+        return PaintVectors.paintOnImage(oVeloVecs, oColBar, iaBlackBoard, null, dStretch);
+    }
+
     public BufferedImage paintVecs(int[][] iaBlackBoard, String sFileOut, String sFileOutCSV, List<Color> loColors, DataPIV Data) throws IOException {
         if (loColors == null) {
             loColors = Colorbar.StartEndLinearColorBar.getCustom(0, 0, 0, 0, 0, 0);
@@ -201,11 +308,11 @@ public class InterrGrid implements Grid {
         try {
             EnumObject o = Sorting.getMaxCharacteristic(oVeloVecs, new Sorting.Characteristic() {
 
-                @Override
-                public Double getCharacteristicValue(Object pParameter) {
-                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                }
-            });
+                                                    @Override
+                                                    public Double getCharacteristicValue(Object pParameter) {
+                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                                                    }
+                                                });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -216,8 +323,8 @@ public class InterrGrid implements Grid {
             System.out.println("Warning Empty Set, skipped");
         }
 
-        VelocityVec.writeToFile(sFileOutCSV, oVeloVecs, null, null);        
-        return PaintVectors.paintOnImage(oVeloVecs, oColBar, iaBlackBoard, sFileOut, dStretch);        
+        VelocityVec.writeToFile(sFileOutCSV, oVeloVecs, null, null);
+        return PaintVectors.paintOnImage(oVeloVecs, oColBar, iaBlackBoard, sFileOut, dStretch);
     }
 
     public void checkMask(DataPIV Data) {

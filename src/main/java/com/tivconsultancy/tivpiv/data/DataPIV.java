@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package com.tivconsultancy.tivpiv.data;
 
+import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public final class DataPIV {
     public double[][] iaGreyIntensity1;
     public double[][] iaGreyIntensity2;
     public boolean[][] baMask;
+    public InterrGrid oGrid;
     
     //Settings
     public List<String> Pictures = new ArrayList<>();
@@ -26,26 +28,28 @@ public final class DataPIV {
     public final String sDebugFolder = "Debug";
     public final String sOutputFolder = "Data";
     public final String sPicFolder = "Pictures"; 
-    public int cutyTop = -1;
-    public int cutyBottom = -1;
-    public int cutxLeft = 50;
-    public int cutxRight = 1220;
+//    public int cutyTop = -1;
+//    public int cutyBottom = -1;
+//    public int cutxLeft = 50;
+//    public int cutxRight = 1220;
 
     //PreProc
     //Sharpening
-    public boolean bsharpen = true;
-    public int iHistCut = 50;
-    public int iThresholdSharp = 70;
-    public boolean bBinarize = false;
-    public int imax = 255;
-    //Increasing Contrast
-    public boolean bhighcont = false;
+    // outsorced in protocols
+//    public boolean bsharpen = true;
+//    public int iHistCut = 50;
+//    public int iThresholdSharp = 70;
+//    public boolean bBinarize = false;
+//    public int imax = 255;
+//    //Increasing Contrast
+//    public boolean bhighcont = false;
 
     //Masking
-    public boolean bMask = true;
-    public boolean bFixedMask = true;
-    public int iEdgeThreshold = 70;
-    public int iSmallestStructure = 300;
+    // outsorced in protocols
+//    public boolean bMask = true;
+//    public boolean bFixedMask = true;
+//    public int iEdgeThreshold = 70;
+//    public int iSmallestStructure = 300;
 
     //PIV
     public int PIV_columns;
