@@ -16,6 +16,7 @@ import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class Prot_TIVPreProcessor extends Protocol {
     }
 
     @Override
-    public ImageInt getView(String identFromViewer) {
+    public BufferedImage getView(String identFromViewer) {
         return outPutImages.get(identFromViewer);
     }
 
