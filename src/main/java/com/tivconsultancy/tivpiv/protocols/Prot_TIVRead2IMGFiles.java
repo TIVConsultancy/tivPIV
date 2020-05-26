@@ -60,7 +60,7 @@ public class Prot_TIVRead2IMGFiles extends Protocol {
 
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, imgRead));
+        outPutImages.add(new NameObject<>(name, imgRead.getBuffImage()));
     }
 
     @Override

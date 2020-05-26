@@ -46,7 +46,7 @@ public class Prot_TIVPreProcessor extends Protocol {
     
     private void buildLookUp() {
         outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, preproc));
+        outPutImages.add(new NameObject<>(name, preproc.getBuffImage()));
     }
     
     @Override
