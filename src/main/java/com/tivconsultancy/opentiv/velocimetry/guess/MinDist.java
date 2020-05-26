@@ -15,7 +15,6 @@
  */
 package com.tivconsultancy.opentiv.velocimetry.guess;
 
-import com.sun.corba.se.impl.util.PackagePrefixChecker;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.physics.interfaces.Trackable;
 import com.tivconsultancy.opentiv.physics.vectors.VelocityVec;
