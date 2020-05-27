@@ -31,6 +31,9 @@ public class Prot_TIVRead2IMGFiles extends Protocol {
     File imgFile2;
     ImageInt imgRead;
     ImageInt imgRead2;
+    
+    protected LookUp<BufferedImage> outPutImages;
+    
     private String name = "Read In";
 
     public Prot_TIVRead2IMGFiles(String name) {
@@ -156,6 +159,13 @@ public class Prot_TIVRead2IMGFiles extends Protocol {
     @Override
     public Object[] getResults() {
         return new Object[]{imgRead.clone(), imgRead2.clone()};
+    }
+
+    @Override
+    public void setImage(BufferedImage bi) {
+        for(String s : getIdentForViews()){
+            outPutImages.set(s, bi);
+        } 
     }
 
 }

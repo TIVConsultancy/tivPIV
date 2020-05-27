@@ -32,6 +32,9 @@ public class Prot_PIVPreProcessor extends Protocol {
 
     ImageInt preproc;
     ImageInt preproc2;
+    
+    protected LookUp<BufferedImage> outPutImages;
+    
     private String name = "Image Correction";
     
     public Prot_PIVPreProcessor(String name){

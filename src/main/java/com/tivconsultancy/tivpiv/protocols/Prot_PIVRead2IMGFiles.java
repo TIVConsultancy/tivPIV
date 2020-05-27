@@ -37,6 +37,8 @@ public class Prot_PIVRead2IMGFiles extends Protocol {
     ImageInt imgRead2;
     private String name = "Read In";
 
+    protected LookUp<BufferedImage> outPutImages;
+    
     public Prot_PIVRead2IMGFiles(String name) {
         this();
         this.name = name;

@@ -35,6 +35,7 @@ import javafx.embed.swing.SwingFXUtils;
 public class Prot_PIVDisplay extends Protocol {
 
     BufferedImage VectorDisplay;
+    protected LookUp<BufferedImage> outPutImages;
 
     private String name = "Vectors";
 

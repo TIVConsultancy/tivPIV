@@ -5,18 +5,27 @@ package com.tivconsultancy.tivpiv.data;
 
 import com.tivconsultancy.opentiv.datamodels.IndexableResults;
 import com.tivconsultancy.opentiv.datamodels.Result1D;
+import com.tivconsultancy.opentiv.datamodels.ResultsImageShowAble;
+import com.tivconsultancy.opentiv.math.specials.LookUp;
+import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.image.Image;
+import javax.swing.ImageIcon;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class DataPIV implements IndexableResults, Serializable {        
+public class DataPIV implements IndexableResults, Serializable, ResultsImageShowAble {        
 
     private static final long serialVersionUID = 7041378570022471115L;
+    
+    // Output Images
+    protected LookUp<ImageIcon> outPutImages;
     
     // 1D Data
     public Result1D results1D;
@@ -109,6 +118,16 @@ public class DataPIV implements IndexableResults, Serializable {
     @Override
     public void addResult(String name, Double d){
         results1D.addResult(name, d);
+    }
+
+    @Override
+    public BufferedImage getImage(String sIdent) {
+        return (BufferedImage) outPutImages.get(sIdent).getImage();
+    }
+
+    @Override
+    public void setImage(String sIdent, BufferedImage img) {
+        outPutImages.addDuplFree(new NameObject<>(sIdent, new ImageIcon(img)));
     }
     
 }

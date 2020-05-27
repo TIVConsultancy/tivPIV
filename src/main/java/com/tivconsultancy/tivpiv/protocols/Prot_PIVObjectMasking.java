@@ -37,6 +37,8 @@ public class Prot_PIVObjectMasking extends Protocol {
     ImageInt masking2;
     ImageInt totMask;
     
+    protected LookUp<BufferedImage> outPutImages;
+    
     private String name = "Masking";
 
     public Prot_PIVObjectMasking() {

@@ -28,6 +28,8 @@ public class Prot_tivPIV1DPostProc extends Protocol {
 
     private String name = "Post Processor";
     LookUp<Double> results1D = new LookUp<>();
+    
+    protected LookUp<BufferedImage> outPutImages;
 
     public Prot_tivPIV1DPostProc() {
         super();

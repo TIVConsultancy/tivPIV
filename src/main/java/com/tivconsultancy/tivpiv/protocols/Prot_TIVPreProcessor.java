@@ -28,6 +28,9 @@ public class Prot_TIVPreProcessor extends Protocol {
 
     ImageInt preproc;
     ImageInt preproc2;
+    
+    protected LookUp<BufferedImage> outPutImages;
+    
     private String name = "Image Correction";
     
     public Prot_TIVPreProcessor(String name){
@@ -190,6 +193,13 @@ public class Prot_TIVPreProcessor extends Protocol {
         this.loSettings.add(new SettingObject("Curve Correction", "CurveCorrection", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Old Values", "GreyOldValues", "0, 75, 255", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("New Values", "GreyNewValues", "0, 150, 255", SettingObject.SettingsType.String));
+    }
+
+    @Override
+    public void setImage(BufferedImage bi) {
+        for(String s : getIdentForViews()){
+            outPutImages.set(s, bi);
+        } 
     }
 
 

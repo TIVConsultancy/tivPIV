@@ -11,6 +11,7 @@ import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
+import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -23,22 +24,22 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVCalcDisplacement extends Protocol {
+public class Prot_PIVCalcDisplacement extends PIVProtocol {
 
     private String name = "Displacement";
 
+
     public Prot_PIVCalcDisplacement() {
         super();
-        buildLookUp();
         initSettins();
         buildClusters();
+        buildLookUp();
     }
 
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-//        outPutImages.add(new NameObject<>(name, totMask));
+//        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, img);
     }
-
+    
     @Override
     public NameSpaceProtocolResults1D[] get1DResultsNames() {
         return new NameSpaceProtocolResults1D[0];
@@ -47,12 +48,7 @@ public class Prot_PIVCalcDisplacement extends Protocol {
     @Override
     public List<String> getIdentForViews() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
-    }
+    }    
 
     @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {

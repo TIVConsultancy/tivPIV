@@ -34,7 +34,7 @@ public class PIVController extends BasicController {
 
     protected File mainFolder;
     protected List<File> ReadInFile;
-    protected DataPIV database1Step;    
+    protected DataPIV database1Step;
 
     public PIVController() {
         currentMethod = new PIVMethod();
@@ -195,7 +195,7 @@ public class PIVController extends BasicController {
             @Override
             public void run() {
                 try {
-                    startNewTimeStep();
+                    startNewIndexStep();
                     getCurrentMethod().run();
                     data.setRes(currentStep, database1Step);
                     subViews.update();
@@ -213,7 +213,7 @@ public class PIVController extends BasicController {
             public void run() {
                 timeline:
                 for (int i = 0; i < 10; i++) {
-                    startNewTimeStep();
+                    startNewIndexStep();
                     try {
                         getCurrentMethod().run();
                         data.setRes(i, database1Step);
@@ -264,7 +264,7 @@ public class PIVController extends BasicController {
     }
 
     @Override
-    public void startNewTimeStep() {
+    public void startNewIndexStep() {
         database1Step = new DataPIV();
         for (Protocol pro : getCurrentMethod().getProtocols()) {
             for (NameSpaceProtocolResults1D e : pro.get1DResultsNames()) {

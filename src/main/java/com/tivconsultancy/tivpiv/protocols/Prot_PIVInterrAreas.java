@@ -20,7 +20,6 @@ import com.tivconsultancy.opentiv.math.sets.Set1D;
 import com.tivconsultancy.opentiv.math.sets.Set2D;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
-import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -39,6 +38,7 @@ import java.util.List;
 public class Prot_PIVInterrAreas extends Protocol {
 
     ImageInt InterrArea;
+    protected LookUp<BufferedImage> outPutImages;
 
     private String name = "Areas";
 
