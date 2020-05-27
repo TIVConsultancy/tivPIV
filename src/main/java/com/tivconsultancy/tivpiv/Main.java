@@ -8,6 +8,7 @@ package com.tivconsultancy.tivpiv;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.TIVScene;
+import com.tivconsultancy.tivpiv.helpfunctions.RecArea;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +38,18 @@ public class Main extends Application {
 
     public static void showEmptyMainFrame(Stage primaryStage) throws IOException {
 
-        StaticReferences.setStandardIcons(new PIVController(), "com/tivconsultancy/tivPIV/menuicons/");
+        StaticReferences.setStandardIcons(new RecArea(null, null), "com/tivconsultancy/tivPIV/menuicons/");
 
         List<String> icons = new ArrayList<>();
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon128x128.png");
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon64x64.png");
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon32x32.png");
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon16x16.png");
-        MainFrame.setIcons(new PIVController().getClass(), icons);
-        MainFrame.setLoadPicture(new PIVController().getClass(), "/com/tivconsultancy/tivPIV/icons/load.png");
+        MainFrame.setIcons(new RecArea(null, null).getClass(), icons);
+        MainFrame.setLoadPicture(new RecArea(null, null).getClass(), "/com/tivconsultancy/tivPIV/icons/load.png");
 
         StaticReferences.controller = new PIVController();
+        StaticReferences.controller.startNewMethod(new PIVMethod());
         MainFrame tivGUI = new MainFrame();
         TIVScene scene = new TIVScene(tivGUI);
         StaticReferences.controller.setScene(scene);

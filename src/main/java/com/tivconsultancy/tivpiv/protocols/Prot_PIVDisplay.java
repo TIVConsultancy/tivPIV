@@ -32,26 +32,24 @@ import javafx.embed.swing.SwingFXUtils;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVDisplay extends Protocol {
+public class Prot_PIVDisplay extends PIVProtocol {
+
+    private static final long serialVersionUID = 7647922054505532283L;
 
     BufferedImage VectorDisplay;
-    protected LookUp<BufferedImage> outPutImages;
 
     private String name = "Vectors";
 
     public Prot_PIVDisplay() {
         super();
-        VectorDisplay = new ImageInt(50, 50, 0).getBuffImage();
-        
-        
+        VectorDisplay = new ImageInt(50, 50, 0).getBuffImage();                
         buildLookUp();
         initSettins();
         buildClusters();
     }
 
-    private void buildLookUp() {
-        outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, VectorDisplay));
+    private void buildLookUp() {        
+       ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, VectorDisplay);
     }
 
     @Override
@@ -62,12 +60,7 @@ public class Prot_PIVDisplay extends Protocol {
     @Override
     public List<String> getIdentForViews() {
         return Arrays.asList(new String[]{name});
-    }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
-    }
+    }   
 
     @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
@@ -76,9 +69,7 @@ public class Prot_PIVDisplay extends Protocol {
     
     @Override
     public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
+        VectorDisplay = bi;
         buildLookUp();
     }
 

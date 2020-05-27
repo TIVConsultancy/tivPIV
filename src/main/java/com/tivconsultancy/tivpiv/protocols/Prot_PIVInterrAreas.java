@@ -35,10 +35,9 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVInterrAreas extends Protocol {
+public class Prot_PIVInterrAreas extends PIVProtocol {
 
     ImageInt InterrArea;
-    protected LookUp<BufferedImage> outPutImages;
 
     private String name = "Areas";
 
@@ -50,8 +49,7 @@ public class Prot_PIVInterrAreas extends Protocol {
     }
 
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, InterrArea.getBuffImage()));
+        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, InterrArea.getBuffImage());
     }
 
     @Override
@@ -65,20 +63,13 @@ public class Prot_PIVInterrAreas extends Protocol {
     }
 
     @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
-    }
-
-    @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
         return null;
     }
     
     @Override
     public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
+        InterrArea = new ImageInt(bi);
         buildLookUp();
     }
 

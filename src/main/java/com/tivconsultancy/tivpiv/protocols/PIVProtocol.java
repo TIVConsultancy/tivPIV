@@ -17,6 +17,7 @@
 package com.tivconsultancy.tivpiv.protocols;
 
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
+import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import java.awt.image.BufferedImage;
@@ -29,7 +30,11 @@ public abstract class PIVProtocol extends Protocol {
 
     @Override
     public BufferedImage getView(String identFromViewer) {
-        return ((PIVController) StaticReferences.controller).getDataPIV().getImage(identFromViewer);
+        BufferedImage img = ((PIVController) StaticReferences.controller).getDataPIV().getImage(identFromViewer);
+        if(img == null){
+            img = (new ImageInt(50,50,0)).getBuffImage();
+        }
+        return img;
     }
     
 }

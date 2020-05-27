@@ -14,7 +14,7 @@ import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
-import com.tivconsultancy.tivGUI.startup.Database;
+import com.tivconsultancy.opentiv.datamodels.DatabaseRAM;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerLog;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerPlots;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerViews;
@@ -36,12 +36,10 @@ public class PIVController extends BasicController {
     protected List<File> ReadInFile;
     protected DataPIV database1Step;
 
+    
     public PIVController() {
-        currentMethod = new PIVMethod();
-        ReadInFile = new ArrayList<>();
         initDatabase();
-        initSubControllers();
-        createHints(currentMethod);
+        ReadInFile = new ArrayList<>();
     }
 
     private void initSubControllers() {
@@ -73,12 +71,13 @@ public class PIVController extends BasicController {
     }
 
     @Override
-    public void setSelectedFile(File f) {
+    public void setSelectedFile(File f) {                
         this.selectedFile = f;
         File nextFile = f;
         if (getNextPic() != null) {
             nextFile = getNextPic();
         }
+        setCurrentDatabase();
         this.getCurrentMethod().setFiles(new File[]{f, nextFile});
         try {
             getCurrentMethod().readInFileForView(f);
@@ -88,6 +87,14 @@ public class PIVController extends BasicController {
         subViews.update();
     }
 
+    private void setCurrentDatabase(){
+        DataPIV currentData = (DataPIV) data.getRes(getSelecedIndex());
+        if(currentData == null){
+            currentData = new DataPIV();
+        }
+        database1Step = currentData;
+    }
+    
     private File getNextPic() {
         int index = getSelecedIndex();
         if (index >= 0 && (ReadInFile.size() - 1) > index) {
@@ -108,7 +115,9 @@ public class PIVController extends BasicController {
     @Override
     public void startNewMethod(Method newMethod) {
         currentMethod = newMethod;
-        initDatabase();
+        ReadInFile = new ArrayList<>();        
+        initSubControllers();
+        createHints(currentMethod);
     }
 
     @Override
@@ -148,10 +157,10 @@ public class PIVController extends BasicController {
      *
      */
     private void initDatabase() {
-        data = new Database<>();        
+        data = new DatabaseRAM<>();        
         database1Step = new DataPIV();
         try {
-            data.getIndexedResults().addObjectToRefresh(mainFrame.getPlotArea());
+            data.addObjectToRefresh(mainFrame.getPlotArea());
         } catch (Exception e) {
             StaticReferences.getlog().log(Level.SEVERE, "Cannot connect Plot Area to database", e);
         }

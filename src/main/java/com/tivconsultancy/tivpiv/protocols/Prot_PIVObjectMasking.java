@@ -31,13 +31,11 @@ import java.util.logging.Logger;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVObjectMasking extends Protocol {
+public class Prot_PIVObjectMasking extends PIVProtocol {
 
     ImageInt masking1;
     ImageInt masking2;
-    ImageInt totMask;
-    
-    protected LookUp<BufferedImage> outPutImages;
+    ImageInt totMask;   
     
     private String name = "Masking";
 
@@ -52,8 +50,7 @@ public class Prot_PIVObjectMasking extends Protocol {
     }
 
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, totMask.getBuffImage()));
+        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, totMask.getBuffImage());
     }
 
     @Override
@@ -65,17 +62,10 @@ public class Prot_PIVObjectMasking extends Protocol {
     public List<String> getIdentForViews() {
         return Arrays.asList(new String[]{name});
     }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
-    }
     
     @Override
     public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
+        totMask = new ImageInt(bi);
         buildLookUp();
     }
 

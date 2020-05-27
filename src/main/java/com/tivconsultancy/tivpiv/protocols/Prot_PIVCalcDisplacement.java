@@ -82,11 +82,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
     }
     
     @Override
-    public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
-        buildLookUp();
+    public void setImage(BufferedImage bi){        
     }
 
     @Override

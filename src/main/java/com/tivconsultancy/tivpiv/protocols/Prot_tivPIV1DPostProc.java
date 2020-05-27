@@ -24,12 +24,11 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_tivPIV1DPostProc extends Protocol {
+public class Prot_tivPIV1DPostProc extends PIVProtocol {
 
     private String name = "Post Processor";
     LookUp<Double> results1D = new LookUp<>();
     
-    protected LookUp<BufferedImage> outPutImages;
 
     public Prot_tivPIV1DPostProc() {
         super();
@@ -39,8 +38,6 @@ public class Prot_tivPIV1DPostProc extends Protocol {
     }
 
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-//        outPutImages.add(new NameObject<>(name, totMask));
     }
 
     @Override
@@ -51,11 +48,6 @@ public class Prot_tivPIV1DPostProc extends Protocol {
     @Override
     public List<String> getIdentForViews() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
     }
 
     @Override
@@ -96,9 +88,6 @@ public class Prot_tivPIV1DPostProc extends Protocol {
     
     @Override
     public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
         buildLookUp();
     }
 

@@ -29,15 +29,13 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVRead2IMGFiles extends Protocol {
+public class Prot_PIVRead2IMGFiles extends PIVProtocol {
 
     File imgFile;
     File imgFile2;
     ImageInt imgRead;
     ImageInt imgRead2;
     private String name = "Read In";
-
-    protected LookUp<BufferedImage> outPutImages;
     
     public Prot_PIVRead2IMGFiles(String name) {
         this();
@@ -63,18 +61,17 @@ public class Prot_PIVRead2IMGFiles extends Protocol {
         imgRead2.setImage(IMG_Reader.readImageGrayScale(imgFile2));
         return imgRead;
     }
-
-    @Override
-    public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
-        buildLookUp();
-    }
     
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, imgRead.getBuffImage()));
+        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, imgRead.getBuffImage());
+    }
+    
+    
+    @Override
+    public void setImage(BufferedImage bi){
+        imgRead = new ImageInt(bi);
+        imgRead2 = new ImageInt(bi);
+        buildLookUp();
     }
 
     @Override
@@ -85,11 +82,6 @@ public class Prot_PIVRead2IMGFiles extends Protocol {
     @Override
     public List<String> getIdentForViews() {
         return Arrays.asList(new String[]{name});
-    }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
     }
 
     @Override

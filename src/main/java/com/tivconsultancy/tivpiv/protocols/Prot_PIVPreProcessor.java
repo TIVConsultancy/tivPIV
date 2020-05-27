@@ -28,12 +28,11 @@ import java.util.List;
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class Prot_PIVPreProcessor extends Protocol {
+public class Prot_PIVPreProcessor extends PIVProtocol {
 
     ImageInt preproc;
     ImageInt preproc2;
-    
-    protected LookUp<BufferedImage> outPutImages;
+   
     
     private String name = "Image Correction";
     
@@ -52,8 +51,7 @@ public class Prot_PIVPreProcessor extends Protocol {
     }        
     
     private void buildLookUp() {
-        outPutImages = new LookUp<>();
-        outPutImages.add(new NameObject<>(name, preproc.getBuffImage()));
+        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, preproc.getBuffImage());
     }
     
     @Override
@@ -63,20 +61,14 @@ public class Prot_PIVPreProcessor extends Protocol {
     
     @Override
     public void setImage(BufferedImage bi){
-        for(String s : getIdentForViews()){
-            outPutImages.set(s, bi);
-        }
+        preproc = new ImageInt(bi);
+        preproc2 = new ImageInt(bi);
         buildLookUp();
     }
 
     @Override
     public List<String> getIdentForViews() {
         return Arrays.asList(new String[]{name});
-    }
-
-    @Override
-    public BufferedImage getView(String identFromViewer) {
-        return outPutImages.get(identFromViewer);
     }
 
     @Override

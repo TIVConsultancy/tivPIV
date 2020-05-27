@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.image.Image;
 import javax.swing.ImageIcon;
 
 /**
@@ -98,6 +97,7 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
     
     public DataPIV(){     
         results1D = new Result1D();
+        outPutImages = new LookUp<>();
     }
 
     @Override
@@ -122,12 +122,18 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
 
     @Override
     public BufferedImage getImage(String sIdent) {
+        ImageIcon imgI = outPutImages.get(sIdent);
+        if(imgI == null){
+            return null;
+        }
         return (BufferedImage) outPutImages.get(sIdent).getImage();
     }
 
     @Override
     public void setImage(String sIdent, BufferedImage img) {
-        outPutImages.addDuplFree(new NameObject<>(sIdent, new ImageIcon(img)));
+        if(!outPutImages.set(sIdent, new ImageIcon(img))){
+            outPutImages.add(new NameObject<>(sIdent, new ImageIcon(img)));
+        }
     }
     
 }
