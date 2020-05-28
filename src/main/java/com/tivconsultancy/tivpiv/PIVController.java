@@ -13,8 +13,6 @@ import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
-import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseArchive;
-import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseDisk;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
