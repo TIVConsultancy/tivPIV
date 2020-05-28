@@ -20,7 +20,6 @@ import com.tivconsultancy.tivpiv.protocols.Prot_PIVInterrAreas;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVObjectMasking;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVPreProcessor;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVRead2IMGFiles;
-import com.tivconsultancy.tivpiv.protocols.Prot_PIVRead2IMGFiles2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
