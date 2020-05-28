@@ -3,7 +3,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package com.tivconsultancy.tivpiv.data;
 
-import com.tivconsultancy.opentiv.datamodels.overtime.IndexableResults;
 import com.tivconsultancy.opentiv.datamodels.Result1D;
 import com.tivconsultancy.opentiv.datamodels.ResultsImageShowAble;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
@@ -14,21 +13,30 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
+import com.tivconsultancy.opentiv.datamodels.overtime.DataBaseEntry;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
+import com.tivconsultancy.tivGUI.StaticReferences;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Thomas Ziegenhein
  */
-public class DataPIV implements IndexableResults, Serializable, ResultsImageShowAble {        
+public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAble {
 
     private static final long serialVersionUID = 7041378570022471115L;
-    
+
     // Output Images
-    protected LookUp<ImageIcon> outPutImages;
-    
+    protected LookUp<Object> outPutImages;
+
     // 1D Data
     public Result1D results1D;
-    
+
     //Data
     public int[][] iaReadInFirst;
     public int[][] iaReadInSecond;
@@ -36,14 +44,14 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
     public double[][] iaGreyIntensity2;
     public boolean[][] baMask;
     public InterrGrid oGrid;
-    
+
     //Settings
     public List<String> Pictures = new ArrayList<>();
     public String sPWDIn = "";
     public String sPWDOut = "";
     public final String sDebugFolder = "Debug";
     public final String sOutputFolder = "Data";
-    public final String sPicFolder = "Pictures"; 
+    public final String sPicFolder = "Pictures";
 //    public int cutyTop = -1;
 //    public int cutyBottom = -1;
 //    public int cutxLeft = 50;
@@ -59,14 +67,12 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
 //    public int imax = 255;
 //    //Increasing Contrast
 //    public boolean bhighcont = false;
-
     //Masking
     // outsorced in protocols
 //    public boolean bMask = true;
 //    public boolean bFixedMask = true;
 //    public int iEdgeThreshold = 70;
 //    public int iSmallestStructure = 300;
-
     //PIV
     public int PIV_columns;
     public int PIV_rows;
@@ -90,13 +96,12 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
     public double dValidationThreshold = 5;
     public boolean bInterpolation = false;
     //Display
-    public double dStretch  = 7;
+    public double dStretch = 7;
     public boolean AutoStretch = true;
     public double AutoStretchFactor = 2;
-    
-    
-    public DataPIV(){     
-        results1D = new Result1D();
+
+    public DataPIV(int index) {
+        results1D = new Result1D(index);
         outPutImages = new LookUp<>();
     }
 
@@ -119,21 +124,47 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
 //    public void addResult(String name, Double d){
 //        results1D.addResult(name, d);
 //    }
-
     @Override
     public BufferedImage getImage(String sIdent) {
-        ImageIcon imgI = outPutImages.get(sIdent);
-        if(imgI == null){
-            return null;
+        if (StaticReferences.controller.getDataBase() instanceof DatabaseRAM) {
+            return (BufferedImage) outPutImages.get(sIdent);
+        } else {
+            byte[] imgIByte = (byte[]) outPutImages.get(sIdent);
+            if (imgIByte == null) {
+                return null;
+            }
+
+            try {
+                return ImageIO.read(new ByteArrayInputStream((byte[]) outPutImages.get(sIdent)));
+            } catch (IOException ex) {
+                StaticReferences.getlog().log(Level.WARNING, "Cannot get image from storeage: " + sIdent, ex);
+                return null;
+            }
         }
-        return (BufferedImage) outPutImages.get(sIdent).getImage();
     }
 
     @Override
     public void setImage(String sIdent, BufferedImage img) {
-        if(!outPutImages.set(sIdent, new ImageIcon(img))){
-            outPutImages.add(new NameObject<>(sIdent, new ImageIcon(img)));
+
+        if (StaticReferences.controller.getDataBase() instanceof DatabaseRAM) {
+            if (!outPutImages.set(sIdent, img)) {
+                outPutImages.add(new NameObject<>(sIdent, img));
+            }
+        } else {
+
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(img, "png", baos);
+                baos.flush();
+                byte[] imageInByte = baos.toByteArray();
+
+                if (!outPutImages.set(sIdent, imageInByte)) {
+                    outPutImages.add(new NameObject<>(sIdent, imageInByte));
+                }
+            } catch (IOException ex) {
+                StaticReferences.getlog().log(Level.WARNING, "Cannot store image: " + sIdent, ex);
+            }
         }
+
     }
-    
+
 }

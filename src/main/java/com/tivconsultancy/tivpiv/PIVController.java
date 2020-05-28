@@ -14,6 +14,7 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseArchive;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseDisk;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
@@ -96,9 +97,9 @@ public class PIVController extends BasicController {
     }
 
     private void setCurrentDatabase() {
-        DataPIV currentData = (DataPIV) data.getRes(getSelecedIndex());
+        DataPIV currentData = (DataPIV) data.getRes(getSelecedName());
         if (currentData == null) {
-            currentData = new DataPIV();
+            currentData = new DataPIV(getSelecedIndex());
         }
         database1Step = currentData;
     }
@@ -112,12 +113,20 @@ public class PIVController extends BasicController {
     }
 
     private int getSelecedIndex() {
-        for (File f : ReadInFile) {
-            if (f.getName().equals(selectedFile.getName())) {
-                return ReadInFile.indexOf(f);
+        try {
+            for (File f : ReadInFile) {
+                if (f.getName().equals(selectedFile.getName())) {
+                    return ReadInFile.indexOf(f);
+                }
             }
+        } catch (Exception e) {
+            StaticReferences.getlog().log(Level.FINE, "Cannot assing index to file" , e);
         }
         return -1;
+    }
+
+    private String getSelecedName() {
+        return selectedFile.getName();
     }
 
     @Override
@@ -165,8 +174,8 @@ public class PIVController extends BasicController {
      *
      */
     private void initDatabase() {
-        data = new DatabaseArchive<>();
-        database1Step = new DataPIV();
+        data = new DatabaseRAM<>();
+        database1Step = new DataPIV(getSelecedIndex());
         dataForPlot = new DatabaseRAM();
     }
 
@@ -204,14 +213,14 @@ public class PIVController extends BasicController {
     @Override
     public void runCurrentStep() {
         mainFrame.deactivateImageTree();
-        int currentStep = getSelecedIndex();
+//        int currentStep = getSelecedIndex();
         new Thread() {
             @Override
             public void run() {
                 try {
                     startNewIndexStep();
                     getCurrentMethod().run();
-                    data.setRes(currentStep, database1Step);                    
+                    data.setRes(getSelecedName(), database1Step);
                     subViews.update();
                     mainFrame.activateImageTree();
                 } catch (Exception ex) {
@@ -233,7 +242,7 @@ public class PIVController extends BasicController {
                     startNewIndexStep();
                     try {
                         getCurrentMethod().run();
-                        data.setRes(i, database1Step);
+                        data.setRes(getSelecedName(), database1Step);
                         subViews.update();
                         mainFrame.activateImageTree();
                     } catch (Exception ex) {
@@ -243,6 +252,10 @@ public class PIVController extends BasicController {
                 }
             }
         }.start();
+    }
+    
+    public Database getDataBase(){
+        return data;
     }
 
 //    protected void createHints(Method newMethod) {
@@ -278,11 +291,10 @@ public class PIVController extends BasicController {
 //    }
     @Override
     public Results1DPlotAble get1DResults() {
-        int i = getSelecedIndex();
-        Results1DPlotAble r = (Results1DPlotAble) dataForPlot.getRes(i);
-        if(r == null){
-            r = new Result1D();
-            dataForPlot.setRes(i, r);
+        Results1DPlotAble r = (Results1DPlotAble) dataForPlot.getRes(getSelecedName());
+        if (r == null) {
+            r = new Result1D(getSelecedIndex());
+            dataForPlot.setRes(getSelecedName(), r);
         }
         return r;
 //        return (Results1DPlotAble) dataForPlot.getRes(getSelecedIndex());
@@ -291,7 +303,7 @@ public class PIVController extends BasicController {
 
     @Override
     public void startNewIndexStep() {
-        database1Step = new DataPIV();
+        database1Step = new DataPIV(getSelecedIndex());
         for (Protocol pro : getCurrentMethod().getProtocols()) {
             for (NameSpaceProtocolResults1D e : pro.get1DResultsNames()) {
                 get1DResults().addResult(e.toString(), Double.NaN);
