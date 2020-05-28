@@ -103,6 +103,7 @@ public class PIVMethod implements Method {
             for (NameSpaceProtocolResults1D e : getProtocol("postproc").get1DResultsNames()) {
                 StaticReferences.controller.get1DResults().setResult(e.toString(), getProtocol("postproc").getOverTimesResult(e));
             }
+            StaticReferences.controller.getPlotAbleOverTimeResults().refreshObjects();
 
         } catch (Exception ex) {
             throw ex;

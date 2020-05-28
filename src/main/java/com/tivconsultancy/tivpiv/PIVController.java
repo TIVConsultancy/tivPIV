@@ -5,16 +5,19 @@
  */
 package com.tivconsultancy.tivpiv;
 
+import com.tivconsultancy.opentiv.datamodels.Result1D;
 import com.tivconsultancy.opentiv.helpfunctions.io.Reader;
 import com.tivconsultancy.opentiv.helpfunctions.io.Writer;
 import com.tivconsultancy.opentiv.highlevel.methods.Method;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
+import com.tivconsultancy.opentiv.datamodels.overtime.Database;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseArchive;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
-import com.tivconsultancy.opentiv.datamodels.DatabaseRAM;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerLog;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerPlots;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerViews;
@@ -35,8 +38,8 @@ public class PIVController extends BasicController {
     protected File mainFolder;
     protected List<File> ReadInFile;
     protected DataPIV database1Step;
+    protected DatabaseRAM dataForPlot;
 
-    
     public PIVController() {
         initDatabase();
         ReadInFile = new ArrayList<>();
@@ -66,12 +69,17 @@ public class PIVController extends BasicController {
     }
 
     @Override
+    public Database getPlotAbleOverTimeResults() {
+        return dataForPlot;
+    }
+
+    @Override
     public List<File> getInputFiles(String name) {
         return ReadInFile;
     }
 
     @Override
-    public void setSelectedFile(File f) {                
+    public void setSelectedFile(File f) {
         this.selectedFile = f;
         File nextFile = f;
         if (getNextPic() != null) {
@@ -87,14 +95,14 @@ public class PIVController extends BasicController {
         subViews.update();
     }
 
-    private void setCurrentDatabase(){
+    private void setCurrentDatabase() {
         DataPIV currentData = (DataPIV) data.getRes(getSelecedIndex());
-        if(currentData == null){
+        if (currentData == null) {
             currentData = new DataPIV();
         }
         database1Step = currentData;
     }
-    
+
     private File getNextPic() {
         int index = getSelecedIndex();
         if (index >= 0 && (ReadInFile.size() - 1) > index) {
@@ -115,7 +123,7 @@ public class PIVController extends BasicController {
     @Override
     public void startNewMethod(Method newMethod) {
         currentMethod = newMethod;
-        ReadInFile = new ArrayList<>();        
+        ReadInFile = new ArrayList<>();
         initSubControllers();
         createHints(currentMethod);
     }
@@ -157,13 +165,9 @@ public class PIVController extends BasicController {
      *
      */
     private void initDatabase() {
-        data = new DatabaseRAM<>();        
+        data = new DatabaseArchive<>();
         database1Step = new DataPIV();
-        try {
-            data.addObjectToRefresh(mainFrame.getPlotArea());
-        } catch (Exception e) {
-            StaticReferences.getlog().log(Level.SEVERE, "Cannot connect Plot Area to database", e);
-        }
+        dataForPlot = new DatabaseRAM();
     }
 
     /**
@@ -185,7 +189,7 @@ public class PIVController extends BasicController {
                 break;
             }
         }
-        if(settingsFile == null){
+        if (settingsFile == null) {
             StaticReferences.getlog().log(Level.SEVERE, "Cannot load Settings file: Not existing .tiv file", new Throwable());
             return;
         }
@@ -199,6 +203,7 @@ public class PIVController extends BasicController {
 
     @Override
     public void runCurrentStep() {
+        mainFrame.deactivateImageTree();
         int currentStep = getSelecedIndex();
         new Thread() {
             @Override
@@ -206,10 +211,12 @@ public class PIVController extends BasicController {
                 try {
                     startNewIndexStep();
                     getCurrentMethod().run();
-                    data.setRes(currentStep, database1Step);
+                    data.setRes(currentStep, database1Step);                    
                     subViews.update();
+                    mainFrame.activateImageTree();
                 } catch (Exception ex) {
                     StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
+                    mainFrame.activateImageTree();
                 }
             }
         }.start();
@@ -217,6 +224,7 @@ public class PIVController extends BasicController {
 
     @Override
     public void run() {
+        mainFrame.deactivateImageTree();
         new Thread() {
             @Override
             public void run() {
@@ -227,8 +235,10 @@ public class PIVController extends BasicController {
                         getCurrentMethod().run();
                         data.setRes(i, database1Step);
                         subViews.update();
+                        mainFrame.activateImageTree();
                     } catch (Exception ex) {
                         StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
+                        mainFrame.activateImageTree();
                     }
                 }
             }
@@ -266,10 +276,17 @@ public class PIVController extends BasicController {
 //            }
 //        }
 //    }
-
     @Override
     public Results1DPlotAble get1DResults() {
-        return database1Step.results1D;
+        int i = getSelecedIndex();
+        Results1DPlotAble r = (Results1DPlotAble) dataForPlot.getRes(i);
+        if(r == null){
+            r = new Result1D();
+            dataForPlot.setRes(i, r);
+        }
+        return r;
+//        return (Results1DPlotAble) dataForPlot.getRes(getSelecedIndex());
+//        return database1Step.results1D;
     }
 
     @Override

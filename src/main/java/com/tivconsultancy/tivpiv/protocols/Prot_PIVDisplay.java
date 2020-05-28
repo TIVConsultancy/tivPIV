@@ -5,19 +5,14 @@
  */
 package com.tivconsultancy.tivpiv.protocols;
 
-import com.tivconsultancy.opentiv.helpfunctions.colorspaces.ColorSpaceCIEELab;
 import com.tivconsultancy.opentiv.helpfunctions.colorspaces.Colorbar;
 import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixGenerator;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
-import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
-import com.tivconsultancy.opentiv.math.specials.LookUp;
-import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.velocimetry.helpfunctions.VelocityGrid;
-import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -26,7 +21,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-import javafx.embed.swing.SwingFXUtils;
 
 /**
  *

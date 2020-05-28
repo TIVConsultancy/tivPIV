@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package com.tivconsultancy.tivpiv.data;
 
-import com.tivconsultancy.opentiv.datamodels.IndexableResults;
+import com.tivconsultancy.opentiv.datamodels.overtime.IndexableResults;
 import com.tivconsultancy.opentiv.datamodels.Result1D;
 import com.tivconsultancy.opentiv.datamodels.ResultsImageShowAble;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
@@ -100,25 +100,25 @@ public class DataPIV implements IndexableResults, Serializable, ResultsImageShow
         outPutImages = new LookUp<>();
     }
 
-    @Override
-    public Double getRes(String name) {
-        return results1D.getRes(name);
-    }
-
-    @Override
-    public String getName(Double value) {
-        return results1D.getName(value);
-    }
-
-    @Override
-    public boolean setResult(String name, Double d) {
-        return results1D.setResult(name, d);
-    }
-    
-    @Override
-    public void addResult(String name, Double d){
-        results1D.addResult(name, d);
-    }
+//    @Override
+//    public Double getRes(String name) {
+//        return results1D.getRes(name);
+//    }
+//
+//    @Override
+//    public String getName(Double value) {
+//        return results1D.getName(value);
+//    }
+//
+//    @Override
+//    public boolean setResult(String name, Double d) {
+//        return results1D.setResult(name, d);
+//    }
+//    
+//    @Override
+//    public void addResult(String name, Double d){
+//        results1D.addResult(name, d);
+//    }
 
     @Override
     public BufferedImage getImage(String sIdent) {
