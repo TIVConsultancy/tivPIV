@@ -12,6 +12,7 @@ import com.tivconsultancy.opentiv.highlevel.methods.Method;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
+import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
 import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
@@ -175,6 +176,8 @@ public class PIVController extends BasicController {
         data = new DatabaseRAM<>();
         database1Step = new DataPIV(getSelecedIndex());
         dataForPlot = new DatabaseRAM();
+        PostgreSQL sql = new PostgreSQL();
+        sql.connect();
     }
 
     /**
