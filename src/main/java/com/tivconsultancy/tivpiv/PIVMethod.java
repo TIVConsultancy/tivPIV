@@ -15,6 +15,7 @@ import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.protocols.Prot_tivPIV1DPostProc;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVCalcDisplacement;
+import com.tivconsultancy.tivpiv.protocols.Prot_PIVDataHandling;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVDisplay;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVInterrAreas;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVObjectMasking;
@@ -49,6 +50,7 @@ public class PIVMethod implements Method {
         methods.add(new NameObject<>("calculate", new Prot_PIVCalcDisplacement()));
         methods.add(new NameObject<>("display", new Prot_PIVDisplay()));
         methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
+        methods.add(new NameObject<>("data", new Prot_PIVDataHandling()));
     }
 
     @Override

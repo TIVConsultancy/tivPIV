@@ -8,14 +8,10 @@ package com.tivconsultancy.tivpiv.protocols;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
-import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Reader;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
-import com.tivconsultancy.opentiv.math.specials.LookUp;
-import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
-import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -30,6 +26,8 @@ import java.util.List;
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
 public class Prot_PIVRead2IMGFiles extends PIVProtocol {
+
+    private static final long serialVersionUID = -5062728987649688264L;
 
     File imgFile;
     File imgFile2;

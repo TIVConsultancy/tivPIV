@@ -20,6 +20,7 @@ import com.tivconsultancy.tivGUI.controller.BasicController;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerLog;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerPlots;
+import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerViews;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.io.File;
@@ -50,6 +51,7 @@ public class PIVController extends BasicController {
         subPlots = new StartUpSubControllerPlots();
         subMenu = new tivPIVSubControllerMenu();
         subLog = new StartUpSubControllerLog();
+        subSQL = new tivPIVSubControllerSQL();
     }
 
     @Override
@@ -150,6 +152,8 @@ public class PIVController extends BasicController {
         }
         mainFrame.startNewSettings();
     }
+    
+    
 
     @Override
     public void exportSettings(File saveFile) {

@@ -7,11 +7,16 @@ package com.tivconsultancy.tivpiv;
 
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
+import com.tivconsultancy.tivGUI.DialogSQL;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.subControllerMenu;
+import com.tivconsultancy.tivGUI.controller.subControllerSQL;
+import com.tivconsultancy.tivGUI.startup.StartUpSubControllerMenu;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
@@ -41,6 +46,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         mainMenu = new ArrayList<>();
         mainMenu.add(dictionary(MainItems.Session));
         mainMenu.add(dictionary(MainItems.Run));
+        mainMenu.add(dictionary(MainItems.Data));
     }
 
     private void initMainEntries() {
@@ -56,6 +62,10 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         RunEntries.add(dictionary(MenuEntries.OneStep));
         RunEntries.add(dictionary(MenuEntries.RunAll));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Run), RunEntries));
+        
+        List<String> dataEntries = new ArrayList<>();
+        dataEntries.add(dictionary(MenuEntries.SQL));
+        subMenuEntries.add(new NameObject<>(dictionary(MainItems.Data), dataEntries));
 
     }
 
@@ -68,6 +78,9 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
 
         icons.add(new NameObject<>(dictionary(MenuEntries.OneStep), StaticReferences.standardIcons.get("walking.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.RunAll), StaticReferences.standardIcons.get("runningMult.png")));
+        
+        icons.add(new NameObject<>(dictionary(MenuEntries.SQL), StaticReferences.standardIcons.get("sql.png")));
+        
     }
 
     private void initActionEvents() {
@@ -124,7 +137,20 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             public void handle(ActionEvent t) {
                 StaticReferences.controller.run();
             }
-        };  
+        };
+        
+        EventHandler<ActionEvent> sql = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+
+                Optional<Map<Enum, String>> retrunSQLDialog = (new DialogSQL()).showAndWait();
+                retrunSQLDialog.ifPresent(Map -> {
+                    subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
+                    controllerSQL.connect(Map.get(DialogSQL.fieldNames.user), Map.get(DialogSQL.fieldNames.password), Map.get(DialogSQL.fieldNames.database), Map.get(DialogSQL.fieldNames.hostname));
+                });
+
+            }
+        };
         
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.New), newSession));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.Load), loadSession));
@@ -132,6 +158,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.ExportSettings), exportSettings));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.OneStep), runOneStep));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.RunAll), runAll));
+        actionEvents.add(new NameObject<>(dictionary(MenuEntries.SQL), sql));
     }
 
     /**
@@ -167,11 +194,11 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
     }
 
     private enum MainItems {
-        Session, Run
+        Session, Run, Data
     }
 
     private enum MenuEntries {
-        New, Load, OneStep, RunAll, ImportSettings, ExportSettings
+        New, Load, OneStep, RunAll, ImportSettings, ExportSettings, SQL
     }
 
     private String dictionary(Enum e) {

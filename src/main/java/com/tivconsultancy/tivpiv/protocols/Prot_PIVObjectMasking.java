@@ -8,24 +8,15 @@ package com.tivconsultancy.tivpiv.protocols;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
-import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
-import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Writer;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.masking.main.OpenTIV_Masking;
-import com.tivconsultancy.opentiv.math.specials.LookUp;
-import com.tivconsultancy.opentiv.math.specials.NameObject;
-import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
