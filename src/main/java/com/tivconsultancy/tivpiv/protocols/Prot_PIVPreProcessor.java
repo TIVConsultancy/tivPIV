@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.tivconsultancy.tivpiv.protocols;
 
 import com.tivconsultancy.opentiv.helpfunctions.settings.FactorySettingsCluster;
@@ -28,35 +27,34 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     ImageInt preproc;
     ImageInt preproc2;
-   
-    
+
     private String name = "Image Correction";
-    
-    public Prot_PIVPreProcessor(String name){
+
+    public Prot_PIVPreProcessor(String name) {
         this();
         this.name = name;
     }
-    
-    public Prot_PIVPreProcessor(){
+
+    public Prot_PIVPreProcessor() {
         super();
         preproc = new ImageInt(50, 50, 150);
         preproc2 = new ImageInt(50, 50, 150);
         buildLookUp();
         initSettings();
         buildClusters();
-    }        
-    
+    }
+
     private void buildLookUp() {
         ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, preproc.getBuffImage());
     }
-    
+
     @Override
     public NameSpaceProtocolResults1D[] get1DResultsNames() {
         return new NameSpaceProtocolResults1D[0];
     }
-    
+
     @Override
-    public void setImage(BufferedImage bi){
+    public void setImage(BufferedImage bi) {
         preproc = new ImageInt(bi);
         preproc2 = new ImageInt(bi);
         buildLookUp();
@@ -75,29 +73,44 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
     @Override
     public void run(Object... input) throws UnableToRunException {
         if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
-            preproc.setImage((OpenTIV_PreProc.performPreProc(this, (ImageInt) input[0])).getBuffImage());
-            preproc2.setImage((OpenTIV_PreProc.performPreProc(this, (ImageInt) input[1])).getBuffImage());
-        }else{
+
+            try {
+                preproc.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[0]).getBuffImage());
+                preproc2.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[1]).getBuffImage());
+
+                preproc.setImage((OpenTIV_PreProc.performPreProc(this, preproc.clone())).getBuffImage());
+                preproc2.setImage((OpenTIV_PreProc.performPreProc(this, preproc2.clone())).getBuffImage());
+            } catch (Exception ex) {
+                throw new UnableToRunException("Cannot transform image:", ex);
+            }
+
+        } else {
             throw new UnableToRunException("Wrong input", new Exception());
         }
         buildLookUp();
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         data.iaReadInFirst = preproc.iaPixels;
         data.iaReadInSecond = preproc2.iaPixels;
-    }        
+    }
 
     @Override
     public String getType() {
         return name;
     }
-    
-    
+
     @Override
     public Object[] getResults() {
         return new Object[]{preproc.clone(), preproc2.clone()};
     }
 
     public void buildClusters() {
+
+        SettingsCluster CutImage = new SettingsCluster("Cut Image",
+                                                       new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
+                                                           "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
+                                                           "cutxRight"}, this);
+        CutImage.setDescription("Cut image");
+        lsClusters.add(CutImage);
 
         lsClusters.add(FactorySettingsCluster.getStandardCluster("Curve Correction",
                                                                  new String[]{
@@ -150,9 +163,9 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 //        HGWhiteStretch.setDescription("Stretches the histogram towards "
 //                + "black values by the given factor");
 //        lsClusters.add(HGWhiteStretch);
-    }    
-    
-    private void initSettings(){
+    }
+
+    private void initSettings() {
         /*
          ____ Abbrevations
          NR : Noise Reduction
@@ -160,7 +173,7 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
          HG : Histogram
          */
 
-        /*
+ /*
          The logic behind this settings are
          ...
          Feature(n) activate false/true
@@ -169,10 +182,19 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
          Feature(n+1) values
          ....
          */
+        this.loSettings.add(new SettingObject("Cut Top", "BcutyTop", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Value", "cutyTop", 0, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Value", "cutyBottom", 600, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Cut Left", "BcutxLeft", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Value", "cutxLeft", 0, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Cut Right", "BcutxRight", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Value", "cutxRight", 10, SettingObject.SettingsType.Integer));
+
         this.loSettings.add(new SettingObject("Use Noise Reduction", "NRSimple1", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Threshold", "NRSimple1Threshold", 50, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Algorithm", "NRType", "Simple1", SettingObject.SettingsType.String));
-        this.loSettings.add(new SettingObject("Standard Gauss" ,"SFGauss", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Standard Gauss", "SFGauss", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Large Gauss", "SF5x5Gauss", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Box Filter", "SF3x3Box", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("SFType", "Gauss", SettingObject.SettingsType.String));
@@ -185,7 +207,7 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         this.loSettings.add(new SettingObject("HGType", "Contrast", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Contrast Correction", "HGContrast", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Min Black Value", "BlackMin", 0, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Max White Value","WhiteMax", 255, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Max White Value", "WhiteMax", 255, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("HGType", "BlackStretch", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("HGBlackStretch", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("BlackStretchFactor", 1.0, SettingObject.SettingsType.Double));
@@ -197,6 +219,5 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         this.loSettings.add(new SettingObject("Old Values", "GreyOldValues", "0, 75, 255", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("New Values", "GreyNewValues", "0, 150, 255", SettingObject.SettingsType.String));
     }
-
 
 }

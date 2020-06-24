@@ -42,7 +42,7 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
 
     @Override
     public NameSpaceProtocolResults1D[] get1DResultsNames() {
-        return NameSpaceProtocol.class.getEnumConstants();
+        return NameSpaceProtocol1DResults.class.getEnumConstants();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
             }
         });
         
-        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol.avgx.toString(), avgx));
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgx.toString(), avgx));
         
         double avgy = Averaging.getMeanAverage(loVec, new Value<Object>() {
             @Override
@@ -80,7 +80,7 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
             }
         });
         
-        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol.avgy.toString(), avgy));
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgy.toString(), avgy));
         
         
         buildLookUp();
@@ -195,7 +195,7 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
 //
 //    }
     
-    private enum NameSpaceProtocol implements NameSpaceProtocolResults1D{
+    private enum NameSpaceProtocol1DResults implements NameSpaceProtocolResults1D{
        avgx, avgy, tkeX, tkey
     }
 

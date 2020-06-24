@@ -8,10 +8,7 @@ package com.tivconsultancy.tivpiv.protocols;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
-import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
-import com.tivconsultancy.opentiv.math.specials.LookUp;
-import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -67,6 +64,12 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         data.bMultipass_BiLin = Boolean.valueOf(getSettingsValue("tivPIVMultipass_BiLin").toString());
         data.iMultipassCount = Integer.valueOf(getSettingsValue("tivPIVMultipassCount").toString());
         data.bRefine = Boolean.valueOf(getSettingsValue("tivPIVInterrAreaRefine").toString());
+        data.iLeap = Integer.valueOf(getSettingsValue("tivPIVInternalLeap").toString());
+        data.iBurstLength = Integer.valueOf(getSettingsValue("tivPIVBurstLength").toString());
+        data.bValidate = Boolean.valueOf(getSettingsValue("tivPIVValidateVectors").toString());
+        data.sValidationType = getSettingsValue("tivPIVValidationType").toString();
+        data.dValidationThreshold = Double.valueOf(getSettingsValue("tivPIVValThreshold").toString());
+        data.bInterpolation = Boolean.valueOf(getSettingsValue("tivPIVValidateInterpol").toString());
 
         /*
          Calculate displacement
@@ -103,8 +106,12 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         this.loSettings.add(new SettingObject("Multipass BiLinear", "tivPIVMultipass_BiLin", true, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Multipass Count", "tivPIVMultipassCount", 3, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Leap", "tivPIVInternalBurstLeap", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Burst Leap", "tivPIVBurstLeap", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Leap", "tivPIVInternalLeap", 1, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Burst Length", "tivPIVBurstLength", -1, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Validate", "tivPIVValidateVectors", true, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Threshold", "tivPIVValThreshold", 5.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("Interpolate New Values", "tivPIVValidateInterpol", true, SettingObject.SettingsType.Boolean));
     }
 
     @Override
@@ -119,15 +126,21 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         SubPixel.setDescription("Improving the accuracy with sub pixel interpolation");
         lsClusters.add(SubPixel);
 
-        SettingsCluster Improvements = new SettingsCluster("Improvements",
+        SettingsCluster improvements = new SettingsCluster("Improvements",
                                                            new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine"}, this);
-        Improvements.setDescription("Other strategies to improve the results");
-        lsClusters.add(Improvements);
+        improvements.setDescription("Other strategies to improve the results");
+        lsClusters.add(improvements);
         
-        SettingsCluster Leap = new SettingsCluster("Leap",
-                                                           new String[]{"tivPIVInternalBurstLeap", "tivPIVBurstLeap"}, this);
-        Improvements.setDescription("Control the Leaps of the Displacement calculations");
-        lsClusters.add(Leap);
+        SettingsCluster leap = new SettingsCluster("Leap&Burst",
+                                                           new String[]{"tivPIVInternalLeap", "tivPIVBurstLength"}, this);
+        leap.setDescription("Control the Leaps of the Displacement calculations");
+        lsClusters.add(leap);
+        
+        SettingsCluster validation = new SettingsCluster("Validation",
+                                                           new String[]{"tivPIVValidateVectors", "tivPIVValidationType" , "tivPIVValThreshold", "tivPIVValidateInterpol"}, this);
+        validation.setDescription("Validation of output vectors");
+        lsClusters.add(validation);
+        
 
     }
     
@@ -136,6 +149,12 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "None", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Parabolic", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Centroid", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Type", "tivPIVValidationType", "NormMedian", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianLength", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Type", "tivPIVValidationType", "VecDiff", SettingObject.SettingsType.String));
+        
+        
         return ls;
     }
 

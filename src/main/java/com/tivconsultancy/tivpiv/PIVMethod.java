@@ -49,7 +49,7 @@ public class PIVMethod implements Method {
         methods.add(new NameObject<>("inter areas", new Prot_PIVInterrAreas()));
         methods.add(new NameObject<>("calculate", new Prot_PIVCalcDisplacement()));
         methods.add(new NameObject<>("display", new Prot_PIVDisplay()));
-        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
+//        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
         methods.add(new NameObject<>("data", new Prot_PIVDataHandling()));
     }
 
@@ -90,7 +90,7 @@ public class PIVMethod implements Method {
 
     @Override
     public void run() throws Exception {
-        StaticReferences.controller.getViewController(null).update();
+//        StaticReferences.controller.getViewController(null).update();
 
         try {
             getProtocol("read").run(new Object[]{imageFile1, imageFile2});
@@ -100,10 +100,11 @@ public class PIVMethod implements Method {
             getProtocol("inter areas").run();
             getProtocol("calculate").run();
             getProtocol("display").run();
-            getProtocol("postproc").run();
+//            getProtocol("postproc").run();
+            getProtocol("data").run();
 
-            for (NameSpaceProtocolResults1D e : getProtocol("postproc").get1DResultsNames()) {
-                StaticReferences.controller.get1DResults().setResult(e.toString(), getProtocol("postproc").getOverTimesResult(e));
+            for (NameSpaceProtocolResults1D e : getProtocol("data").get1DResultsNames()) {
+                StaticReferences.controller.get1DResults().setResult(e.toString(), getProtocol("data").getOverTimesResult(e));
             }
             StaticReferences.controller.getPlotAbleOverTimeResults().refreshObjects();
 
@@ -119,5 +120,29 @@ public class PIVMethod implements Method {
     @Override
     public Protocol getProtocol(String ident) {
         return methods.get(ident);
+    }
+
+    @Override
+    public void runParts(String ident) throws Exception {
+        if (ident.equals("preproc")) {
+            getProtocol("read").run(new Object[]{imageFile1, imageFile2});
+            getProtocol("preproc").run(getProtocol("read").getResults());
+        }
+    }
+    
+    public boolean checkBurst(int i){
+        int burstLength = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVBurstLength").toString());
+        if(i < burstLength || burstLength <= 1) return false;        
+        return i%burstLength == 0;
+    }
+    
+    public int getLeapLength(){
+        int leapLength = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVInternalLeap").toString());
+        return Math.max(leapLength, 1);
+    }
+    
+    public int getBurstLength(){
+        int burst = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVBurstLength").toString());
+        return burst;
     }
 }

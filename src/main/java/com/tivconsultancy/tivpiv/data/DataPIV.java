@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
  */
 public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAble {
 
-    private static final long serialVersionUID = 7041378570022471115L;
+    private static final long serialVersionUID = 7041378570022471116L;
 
     // Output Images
     protected LookUp<Object> outPutImages;
@@ -99,6 +99,9 @@ public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAbl
     public double dStretch = 7;
     public boolean AutoStretch = true;
     public double AutoStretchFactor = 2;
+    // Leap and Burst
+    public int iLeap = 1;
+    public int iBurstLength = -1;
 
     public DataPIV(int index) {
         results1D = new Result1D(index);

@@ -57,7 +57,6 @@ public class InterrGrid implements Grid, Serializable {
         for (InterrArea[] oa : oaContent) {
             for (InterrArea o : oa) {
                 if (!o.bMasked) {
-
                     if (o.bRefined) {
                         CellRec oCellX = oGrid.GridVeloX.getCell(new OrderedPair(o.oIntervalX.getCenter(), o.oIntervalY.getCenter()));
                         CellRec oCellY = oGrid.GridVeloY.getCell(new OrderedPair(o.oIntervalX.getCenter(), o.oIntervalY.getCenter()));
@@ -87,7 +86,38 @@ public class InterrGrid implements Grid, Serializable {
         return oGrid;
 
     }
-    
+
+    public VelocityGrid getVeloGrid(VelocityGrid oOutputGrid, DataPIV Data) {
+
+        List<VelocityVec> oVeloVecs = new ArrayList<>();
+
+        for (InterrArea[] oa : oaContent) {
+            for (InterrArea o : oa) {
+                if (o.bRefined) {
+                    for (int i = 0; i < 2; i++) {
+                        for (int j = 0; j < 2; j++) {
+                            InterrArea oR = o.oRefinedAreas[i][j];
+                            if (oR != null && oR.getVeloX() != null && oR.getVeloY() != null) {
+                                oVeloVecs.add(new VelocityVec(oR.getVeloX(), oR.getVeloY(), oR.getCenter()));
+                            }
+                        }
+                    }
+                } else {
+                    if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
+                        oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
+                    }
+                }
+
+            }
+        }
+
+        oOutputGrid.addContent(oVeloVecs);
+        oOutputGrid.GridVeloX.calcAverage();
+        oOutputGrid.GridVeloY.calcAverage();
+
+        return oOutputGrid;
+    }
+
     public BufferedImage paintVecs(int[][] iaBlackBoard, List<Color> loColors, VelocityGrid oOutputGrid, DataPIV Data) throws IOException {
         if (loColors == null) {
             loColors = Colorbar.StartEndLinearColorBar.getCustom(0, 0, 0, 0, 0, 0);
@@ -230,7 +260,7 @@ public class InterrGrid implements Grid, Serializable {
         }
         return oVeloVecs;
     }
-    
+
     public BufferedImage paintVecs(int[][] iaBlackBoard, List<Color> loColors, DataPIV Data) throws IOException {
         if (loColors == null) {
             loColors = Colorbar.StartEndLinearColorBar.getCustom(0, 0, 0, 0, 0, 0);

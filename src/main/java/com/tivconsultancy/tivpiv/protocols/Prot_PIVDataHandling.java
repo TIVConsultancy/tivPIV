@@ -9,21 +9,35 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
+import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
+import com.tivconsultancy.opentiv.math.algorithms.Averaging;
+import com.tivconsultancy.opentiv.math.interfaces.Value;
+import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import com.tivconsultancy.opentiv.math.primitives.Vector;
+import com.tivconsultancy.opentiv.math.specials.LookUp;
+import com.tivconsultancy.opentiv.math.specials.NameObject;
+import com.tivconsultancy.opentiv.physics.vectors.VelocityVec;
+import com.tivconsultancy.opentiv.velocimetry.helpfunctions.VelocityGrid;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.subControllerSQL;
+import com.tivconsultancy.tivpiv.PIVController;
+import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL;
+import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL.sqlEntry;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
 public class Prot_PIVDataHandling extends PIVProtocol {
-  
-    
+
     private String name = "DataExport";
+    LookUp<Double> results1D = new LookUp<>();
 
     public Prot_PIVDataHandling() {
         super();
@@ -37,29 +51,167 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
     @Override
     public NameSpaceProtocolResults1D[] get1DResultsNames() {
-        return new NameSpaceProtocolResults1D[0];
+        return NameSpaceProtocol1DResults.class.getEnumConstants();
     }
 
     @Override
     public List<String> getIdentForViews() {
         return Arrays.asList(new String[]{});
     }
-    
+
     @Override
-    public void setImage(BufferedImage bi){
+    public void setImage(BufferedImage bi) {
         buildLookUp();
     }
 
     @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
-        return null;
+        return results1D.get(ident.toString());
     }
 
     @Override
     public void run(Object... input) throws UnableToRunException {
-        if(Boolean.valueOf(this.getSettingsValue("sql_activation").toString())){
-            tivPIVSubControllerSQL sql_Control = (tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null);
-//            sql_Control.
+
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+
+        String expName = getSettingsValue("sql_experimentident").toString();
+        String settingsPIVName = getSettingsValue("sql_evalsettingspiv").toString();
+
+        int refPX_X = Integer.valueOf(getSettingsValue("data_refposPXX").toString());
+        double refM_X = Double.valueOf(getSettingsValue("data_refposMX").toString());
+        int refPX_Y = Integer.valueOf(getSettingsValue("data_refposPXY").toString());
+        double refM_Y = Double.valueOf(getSettingsValue("data_refposMY").toString());
+        double refM_Z = Double.valueOf(getSettingsValue("data_refposMZ").toString());
+        double fps = Integer.valueOf(getSettingsValue("data_FPS").toString());
+        boolean bUPSERT = Boolean.valueOf(getSettingsValue("sql_upsert").toString());
+        tivPIVSubControllerSQL sql_Control = (tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null);
+        sql_Control.setTimeStamp(getTimeStamp());
+        double dResolution = 10.0/ 100000.0;
+
+        try {            
+            if (Boolean.valueOf(this.getSettingsValue("sql_activation").toString())) {
+                dResolution = sql_Control.getResolution(expName) / 100000.0;
+//                double dResolution = sql_Control.getResolution(expName) / 100000.0;
+                List<sqlEntry> entries = new ArrayList<>();
+                for (Vector v : data.oGrid.getVectors()) {
+                    double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
+                    double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
+                    double dPosZ = refM_Z;
+                    double dVX = v.getX() * dResolution * fps;
+                    double dVY = v.getY() * dResolution * fps;
+                    entries.add(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+
+                }
+                if (bUPSERT) {
+                    sql_Control.upsertEntry(entries);
+                } else {
+                    sql_Control.insertEntry(entries);
+                }
+
+//            for(Vector v : data.oGrid.getVectors()){
+//                double dPosX = (v.getPosX() - refPX_X)*dResolution + refM_X;
+//                double dPosY = (v.getPosY() - refPX_Y)*dResolution + refM_Y;
+//                double dPosZ = refM_Z;
+//                double dVX = v.getX() * dResolution;
+//                double dVY = v.getY() * dResolution;
+//                if(bUPSERT){
+//                    sql_Control.upsertEntry(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+//                }else{
+//                    sql_Control.insertEntry(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+//                }
+//            }
+            }
+        } catch (Exception e) {
+            StaticReferences.getlog().log(Level.SEVERE, "Error writing to SQL database", e);
+        }
+        run1DResults(dResolution, fps);
+    }
+
+    public void run1DResults(double resolution, double fps) {
+        results1D = new LookUp<>();
+
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+
+        List<VelocityVec> loVec = data.oGrid.getVectors();
+
+        double avgx = Averaging.getMeanAverage(loVec, new Value<Object>() {
+                                           @Override
+                                           public Double getValue(Object pParameter) {
+                                               return ((VelocityVec) pParameter).getVelocityX();
+                                           }
+                                       });
+
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgx.toString(), avgx * resolution * fps));
+
+        double avgy = Averaging.getMeanAverage(loVec, new Value<Object>() {
+                                           @Override
+                                           public Double getValue(Object pParameter) {
+                                               return ((VelocityVec) pParameter).getVelocityY();
+                                           }
+                                       });
+
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgy.toString(), avgy * resolution * fps));
+
+        List<Double> lvarX = new ArrayList<>();
+        List<Double> lvarY = new ArrayList<>();
+        for (VelocityVec v: loVec) {
+            lvarX.add(Math.pow((v.getVelocityX() - avgx),2));
+            lvarX.add(Math.pow((v.getVelocityY() - avgy),2));
+        }
+        
+//        VelocityGrid ovelo = getVeloGrid();
+//        List<Double> lvarX = new ArrayList<>();
+//        for (OrderedPair[] lop : ovelo.GridVeloX.calcVariance()) {
+//            for (OrderedPair op : lop) {
+//                lvarX.add(op.dValue);
+//            }
+//        }
+//        List<Double> lvarY = new ArrayList<>();
+//        for (OrderedPair[] lop : ovelo.GridVeloY.calcVariance()) {
+//            for (OrderedPair op : lop) {
+//                lvarY.add(op.dValue);
+//            }
+//        }
+
+        double varX = Averaging.getMeanAverage(lvarX, null);
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.tkeX.toString(), varX * resolution * resolution * fps * fps));
+
+        double varY = Averaging.getMeanAverage(lvarY, null);
+        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.tkey.toString(), varY * resolution * resolution * fps * fps));
+
+    }
+
+    public VelocityGrid getVeloGrid() {
+//        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+//        return data.oGrid.getVeloGrid();
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+        ImageInt oSourceImage = new ImageInt(data.iaReadInFirst);
+        double dSize = data.oGrid.getCellSize();
+        int iOffSet = 0;
+        if ("50Overlap".equals(data.sGridType)) {
+            dSize = dSize / 2.0;
+            iOffSet = (int) (dSize / 2.0);
+        }
+        VelocityGrid oOutputGrid = new VelocityGrid(iOffSet, oSourceImage.iaPixels[0].length, oSourceImage.iaPixels.length, iOffSet, (int) (oSourceImage.iaPixels[0].length / dSize), (int) (oSourceImage.iaPixels.length / dSize));
+
+        oOutputGrid = data.oGrid.getVeloGrid(oOutputGrid, data);
+        return oOutputGrid;
+
+    }
+
+    private double getTimeStamp() {
+        int index = ((PIVController) StaticReferences.controller).getSelecedIndex();
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+        int fps = Integer.valueOf(getSettingsValue("data_FPS").toString());
+        if (data.iBurstLength > 1) {
+            int burstFreq = Integer.valueOf(getSettingsValue("data_BurstFreq").toString());
+            double dBurstTime = ((int) (index / data.iBurstLength)) * (1.0 / burstFreq);
+            double dRestTime = (index - (((int) (index / data.iBurstLength)) * data.iBurstLength)) * (1.0 / fps);
+            System.out.println("Burst Time" + dBurstTime);
+            System.out.println("Rest Time" + dRestTime);
+            return dBurstTime + dRestTime;
+        } else {
+            return index * (1.0 / fps);
         }
     }
 
@@ -76,14 +228,40 @@ public class Prot_PIVDataHandling extends PIVProtocol {
     private void initSettins() {
         this.loSettings.add(new SettingObject("Export->SQL", "sql_activation", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Experiment", "sql_experimentident", "NabilColumnTergitol1p0", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("UPSERT", "sql_upsert", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Settings PIV", "sql_evalsettingspiv", "bestpractice", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Reference Pos X [Px]", "data_refposPXX", 0, SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Reference Pos X [m]", "data_refposMX", 0.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("Reference Pos Y [Px]", "data_refposPXY", 0, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Reference Pos Y [m]", "data_refposMY", 0.0, SettingObject.SettingsType.Double));
+//        this.loSettings.add(new SettingObject("Reference Pos Z [Px]", "data_refposPXZ", 0, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Reference Pos Z [m]", "data_refposMZ", 0.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("FPS", "data_FPS", 500, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("Burst Frequency [Hz]", "data_BurstFreq", 5, SettingObject.SettingsType.Integer));
     }
 
     @Override
     public void buildClusters() {
-        SettingsCluster IMGFilter = new SettingsCluster("SQL",
-                                                        new String[]{"sql_activation", "sql_experimentident"}, this);
-        IMGFilter.setDescription("Handles the export to the SQL database");
-        lsClusters.add(IMGFilter);
+        SettingsCluster sqlCluster = new SettingsCluster("SQL",
+                                                         new String[]{"sql_activation", "sql_experimentident", "sql_upsert", "sql_evalsettingspiv"}, this);
+        sqlCluster.setDescription("Handles the export to the SQL database");
+        lsClusters.add(sqlCluster);
+
+        SettingsCluster refPos = new SettingsCluster("Referennce Position",
+                                                     new String[]{"data_refposPXX", "data_refposMX",
+                                                         "data_refposPXY", "data_refposMY", "data_refposMZ"}, this);
+        refPos.setDescription("Specifies the reference position in the image");
+        lsClusters.add(refPos);
+
+        SettingsCluster timeSettings = new SettingsCluster("Time",
+                                                           new String[]{"data_FPS", "data_BurstFreq"}, this);
+        timeSettings.setDescription("Time settings for FPS and Burst Frequency");
+        lsClusters.add(timeSettings);
+
+    }
+
+    private enum NameSpaceProtocol1DResults implements NameSpaceProtocolResults1D {
+        avgx, avgy, tkeX, tkey
     }
 
 }

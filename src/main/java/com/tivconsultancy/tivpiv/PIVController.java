@@ -14,32 +14,42 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
-import com.tivconsultancy.tivGUI.MainFrame;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
+import com.tivconsultancy.tivGUI.Dialogs.Data.processes.DialogProcessing;
+import com.tivconsultancy.tivGUI.controller.ControllerUI;
+import com.tivconsultancy.tivGUI.controller.ControllerWithImageInteraction;
+import com.tivconsultancy.tivGUI.startup.StartUpSubControllerImageTools;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerLog;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerPlots;
-import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerViews;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
-import javafx.embed.swing.SwingFXUtils;
+import javafx.application.Platform;
+import javafx.scene.control.Dialog;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import org.ujmp.core.collections.list.ArrayIndexList;
 
 /**
  *
  * @author TZ ThomasZiegenhein@TIVConsultancy.com +1 480 494 7254
  */
-public class PIVController extends BasicController {
+public class PIVController extends BasicController implements ControllerWithImageInteraction {
 
     protected File mainFolder;
     protected List<File> ReadInFile;
     protected DataPIV database1Step;
     protected DatabaseRAM dataForPlot;
+    Map<String, Dialog> openDialogBoxes = new HashMap<>();
+    Thread runningThread = null;
 
     public PIVController() {
         initDatabase();
@@ -52,6 +62,7 @@ public class PIVController extends BasicController {
         subMenu = new tivPIVSubControllerMenu();
         subLog = new StartUpSubControllerLog();
         subSQL = new tivPIVSubControllerSQL();
+        subImageTools = new StartUpSubControllerImageTools();
     }
 
     @Override
@@ -84,7 +95,8 @@ public class PIVController extends BasicController {
     public void setSelectedFile(File f) {
         this.selectedFile = f;
         File nextFile = f;
-        if (getNextPic() != null) {
+        int iLeap = ((PIVMethod) getCurrentMethod()).getLeapLength();
+        if (getNextPic(iLeap) != null) {
             nextFile = getNextPic();
         }
         setCurrentDatabase();
@@ -112,8 +124,16 @@ public class PIVController extends BasicController {
         }
         return null;
     }
+    
+    private File getNextPic(int iLeap) {
+        int index = getSelecedIndex();
+        if (index >= 0 && (ReadInFile.size() - iLeap) > index) {
+            return ReadInFile.get(index + iLeap);
+        }
+        return null;
+    }
 
-    private int getSelecedIndex() {
+    public int getSelecedIndex() {
         try {
             for (File f : ReadInFile) {
                 if (f.getName().equals(selectedFile.getName())) {
@@ -121,7 +141,7 @@ public class PIVController extends BasicController {
                 }
             }
         } catch (Exception e) {
-            StaticReferences.getlog().log(Level.FINE, "Cannot assing index to file" , e);
+            StaticReferences.getlog().log(Level.FINE, "Cannot assing index to file", e);
         }
         return -1;
     }
@@ -152,8 +172,6 @@ public class PIVController extends BasicController {
         }
         mainFrame.startNewSettings();
     }
-    
-    
 
     @Override
     public void exportSettings(File saveFile) {
@@ -217,9 +235,12 @@ public class PIVController extends BasicController {
 
     @Override
     public void runCurrentStep() {
-        mainFrame.deactivateImageTree();
+        blockUIForProceess();
+        Dialog dialogProgress = new DialogProcessing();
+        StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.PROCESS, dialogProgress);
+        dialogProgress.show();
 //        int currentStep = getSelecedIndex();
-        new Thread() {
+        Thread running = new Thread() {
             @Override
             public void run() {
                 try {
@@ -227,39 +248,98 @@ public class PIVController extends BasicController {
                     getCurrentMethod().run();
                     data.setRes(getSelecedName(), database1Step);
                     subViews.update();
-                    mainFrame.activateImageTree();
                 } catch (Exception ex) {
                     StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
-                    mainFrame.activateImageTree();
                 }
+                releaseUIAfterProceess();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
+                    }
+                });
             }
-        }.start();
+        };
+        setRunningThread(running);
+        try {
+            running.start();
+        } catch (Exception e) {
+            StaticReferences.getlog().log(Level.SEVERE, "Thread stopped : " + e.getMessage(), e);
+            releaseUIAfterProceess();
+        }
+
     }
 
     @Override
     public void run() {
-        mainFrame.deactivateImageTree();
-        new Thread() {
+        blockUIForProceess();
+        Dialog dialogProgress = new DialogProcessing();
+        StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.PROCESS, dialogProgress);
+        dialogProgress.show();
+        Thread running = new Thread() {
             @Override
             public void run() {
                 timeline:
-                for (int i = 0; i < 10; i++) {
-                    startNewIndexStep();
-                    try {
-                        getCurrentMethod().run();
-                        data.setRes(getSelecedName(), database1Step);
-                        subViews.update();
-                        mainFrame.activateImageTree();
-                    } catch (Exception ex) {
-                        StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
-                        mainFrame.activateImageTree();
+                for (int i : getBurstStarts()) {
+                    try {                        
+                        setSelectedFile(ReadInFile.get(i));
+
+//                        if (((PIVMethod) getCurrentMethod()).checkBurst(i + 1)) {
+//                            System.out.println(i);
+//                            continue timeline;
+//                        }
+                        startNewIndexStep();
+                        try {
+                            getCurrentMethod().run();
+                            data.setRes(getSelecedName(), database1Step);
+                            subViews.update();
+                        } catch (Exception ex) {
+                            StaticReferences.getlog().log(Level.SEVERE, "Unable to finish step" + i + " : " + ex.getMessage(), ex);
+//                            releaseUIAfterProceess();
+//                            StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
+                        }
+                    } catch (Exception e) {
+                        StaticReferences.getlog().log(Level.SEVERE, "Unable to select file and start new timestep : " + e.getMessage(), e);
+//                        releaseUIAfterProceess();
+//                        StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
                     }
                 }
+                releaseUIAfterProceess();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
+                    }
+                });
+
             }
-        }.start();
+        };
+        setRunningThread(running);
+        try {
+            running.start();
+        } catch (Exception e) {
+            StaticReferences.getlog().log(Level.SEVERE, "Thread stopped : " + e.getMessage(), e);
+            releaseUIAfterProceess();
+        }
     }
-    
-    public Database getDataBase(){
+
+    public List<Integer> getBurstStarts() {
+        int iLeap = ((PIVMethod) getCurrentMethod()).getLeapLength();
+        int iBurst = ((PIVMethod) getCurrentMethod()).getBurstLength();
+        List<Integer> startingPoints = new ArrayIndexList<>();
+        if (iBurst < 2) {
+            for (int i = 0; i < ReadInFile.size() - iLeap; i++) {
+                startingPoints.add(i);
+            }
+        } else {
+            for (int i = 0; i < ReadInFile.size() - iBurst; i = i + iBurst) {
+                startingPoints.add(i);
+            }
+        }
+        return startingPoints;
+    }
+
+    public Database getDataBase() {
         return data;
     }
 
@@ -313,10 +393,47 @@ public class PIVController extends BasicController {
             for (NameSpaceProtocolResults1D e : pro.get1DResultsNames()) {
                 get1DResults().addResult(e.toString(), Double.NaN);
             }
-            if (MainFrame.loadGif != null) {
-                pro.setImage(SwingFXUtils.fromFXImage(MainFrame.loadGif, null));
-            }
+//            if (MainFrame.loadGif != null) {
+//                pro.setImage(SwingFXUtils.fromFXImage(MainFrame.loadGif, null));
+//            }
 
         }
     }
+
+    @Override
+    public void clickOnImage(int i, int j, MouseEvent evt, String ident) {
+        getsubControllerImageTools(null).clickOnImage(i, j, ident);
+    }
+
+    @Override
+    public void buttonPressed(KeyEvent evt, String ident) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Dialog getDialog(Enum ident) {
+        return openDialogBoxes.get(ident.toString());
+    }
+
+    @Override
+    public void setDialog(Enum ident, Dialog dialogBox) {
+        openDialogBoxes.put(ident.toString(), dialogBox);
+    }
+
+    public Thread getRunningThread() {
+        return runningThread;
+    }
+
+    public void setRunningThread(Thread running) {
+        runningThread = running;
+    }
+
+    public void blockUIForProceess() {
+        mainFrame.deactivateImageTree();
+    }
+
+    public void releaseUIAfterProceess() {
+        mainFrame.activateImageTree();
+    }
+
 }

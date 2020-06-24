@@ -5,13 +5,10 @@
  */
 package com.tivconsultancy.tivpiv.protocols;
 
-import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
-import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Reader;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
-import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
@@ -96,11 +93,11 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
             } catch (IOException ex) {
                 throw new UnableToRunException("Cannot read imgage: " + imgFile, ex);
             }
-            try {
-                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
-            } catch (Exception ex) {
-                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
-            }
+//            try {
+//                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
+//            } catch (Exception ex) {
+//                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
+//            }
         }else if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof File && input[1] instanceof File ) {
             imgFile = (File) input[0];
             imgFile2 = (File) input[1];
@@ -110,12 +107,12 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
             } catch (IOException ex) {
                 throw new UnableToRunException("Cannot read imgage: " + imgFile, ex);
             }
-            try {
-                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
-                imgRead2.setImage(OpenTIV_PreProc.performTransformation(this, imgRead2).getBuffImage());
-            } catch (Exception ex) {
-                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
-            }
+//            try {
+//                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
+//                imgRead2.setImage(OpenTIV_PreProc.performTransformation(this, imgRead2).getBuffImage());
+//            } catch (Exception ex) {
+//                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
+//            }
         }else{
             throw new UnableToRunException("Input is not a file", new IOException());
         }
@@ -132,12 +129,12 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
 
     @Override
     public void buildClusters() {
-        SettingsCluster CutImage = new SettingsCluster("Cut Image",
-                                                       new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
-                                                           "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
-                                                           "cutxRight"}, this);
-        CutImage.setDescription("Cut image");
-        lsClusters.add(CutImage);
+//        SettingsCluster CutImage = new SettingsCluster("Cut Image",
+//                                                       new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
+//                                                           "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
+//                                                           "cutxRight"}, this);
+//        CutImage.setDescription("Cut image");
+//        lsClusters.add(CutImage);
     }
     
     /**
@@ -150,14 +147,14 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
     
         
     private void initSettings(){
-        this.loSettings.add(new SettingObject("Cut Top", "BcutyTop", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Value", "cutyTop", 0, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Value","cutyBottom", 600, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Cut Left", "BcutxLeft", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Value","cutxLeft", 0, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Cut Right", "BcutxRight", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Value","cutxRight", 10, SettingObject.SettingsType.Integer));
+//        this.loSettings.add(new SettingObject("Cut Top", "BcutyTop", false, SettingObject.SettingsType.Boolean));
+//        this.loSettings.add(new SettingObject("Value", "cutyTop", 0, SettingObject.SettingsType.Integer));
+//        this.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", false, SettingObject.SettingsType.Boolean));
+//        this.loSettings.add(new SettingObject("Value","cutyBottom", 600, SettingObject.SettingsType.Integer));
+//        this.loSettings.add(new SettingObject("Cut Left", "BcutxLeft", false, SettingObject.SettingsType.Boolean));
+//        this.loSettings.add(new SettingObject("Value","cutxLeft", 0, SettingObject.SettingsType.Integer));
+//        this.loSettings.add(new SettingObject("Cut Right", "BcutxRight", false, SettingObject.SettingsType.Boolean));
+//        this.loSettings.add(new SettingObject("Value","cutxRight", 10, SettingObject.SettingsType.Integer));
     }
 
     @Override
