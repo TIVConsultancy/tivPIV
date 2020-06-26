@@ -32,9 +32,9 @@ public class Main extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        imgTobase64();
-        System.exit(0);
-//        launch(args);
+//        imgTobase64();
+//        System.exit(0);
+        launch(args);
     }
     
     public static void imgTobase64() throws IOException{

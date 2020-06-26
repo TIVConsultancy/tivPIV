@@ -22,9 +22,11 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.subControllerSQL;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,13 +46,14 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
             StaticReferences.getlog().log(Level.INFO, "SQL Status: " + sqlData.getStatus());
         }
         Settings hints = ((PIVController) StaticReferences.controller).getHintsSettings();
-        hints.removeSettings("sql_experimentident");
-        hints.removeSettings("sql_evalsettingspiv");
-        List<String> availExperiments = getColumnEntries("piv", "experiment", "ident");
-        for (String s : availExperiments) {
-            hints.addSettingsObject(new SettingObject("Experiment", "sql_experimentident", s, SettingObject.SettingsType.String));
-        }
+//        hints.removeSettings("sql_experimentident");
+//        hints.removeSettings("sql_evalsettingspiv");
+//        List<String> availExperiments = getColumnEntries("piv", "experiment", "ident");
+//        for (String s : availExperiments) {
+//            hints.addSettingsObject(new SettingObject("Experiment", "sql_experimentident", s, SettingObject.SettingsType.String));
+//        }
         List<String> availSettingsPIV = getColumnEntries("piv", "evalsettingspiv", "ident");
+        System.out.println(availSettingsPIV.toString());
         for (String s : availSettingsPIV) {
             hints.addSettingsObject(new SettingObject("Settings PIV", "sql_evalsettingspiv", s, SettingObject.SettingsType.String));
         }
@@ -123,6 +126,12 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
                 + "velox = EXCLUDED.velox, "
                 + "veloy = EXCLUDED.veloy";
         return sqlStatement;
+    }
+
+    public void importCSVfile(String sDir) {
+        getDatabase(null).performStatement("COPY piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) FROM '" + sDir + "' CSV HEADER;");
+        String s1 = getColumnEntries("piv", "liqvelo", "experiment").toString();
+        System.out.println(s1);
     }
 
     public static class sqlEntry {
