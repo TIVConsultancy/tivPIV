@@ -67,7 +67,9 @@ public class PIVController extends BasicController implements ControllerWithImag
 
     @Override
     public void startNewSession(File inputFolder) {
-        startNewMethod(new PIVMethod());
+        if(getCurrentMethod() == null){
+            startNewMethod(new PIVMethod());
+        }        
         if (inputFolder != null && inputFolder.exists()) {
             mainFolder = inputFolder;
             ReadInFile = new ArrayList<>();

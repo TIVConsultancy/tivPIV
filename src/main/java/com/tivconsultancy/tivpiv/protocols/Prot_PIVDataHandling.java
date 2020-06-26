@@ -124,6 +124,14 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         } catch (Exception e) {
             StaticReferences.getlog().log(Level.SEVERE, "Error writing to SQL database", e);
         }
+        
+        try {
+            if(Boolean.valueOf(this.getSettingsValue("data_csvExport").toString())){
+//                mache export csv
+            }
+        } catch (Exception e) {
+        }
+        
         run1DResults(dResolution, fps);
     }
 
@@ -156,7 +164,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         List<Double> lvarY = new ArrayList<>();
         for (VelocityVec v: loVec) {
             lvarX.add(Math.pow((v.getVelocityX() - avgx),2));
-            lvarX.add(Math.pow((v.getVelocityY() - avgy),2));
+            lvarY.add(Math.pow((v.getVelocityY() - avgy),2));
         }
         
 //        VelocityGrid ovelo = getVeloGrid();
@@ -238,6 +246,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         this.loSettings.add(new SettingObject("Reference Pos Z [m]", "data_refposMZ", 0.0, SettingObject.SettingsType.Double));
         this.loSettings.add(new SettingObject("FPS", "data_FPS", 500, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Burst Frequency [Hz]", "data_BurstFreq", 5, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("CSV", "data_csvExport", false, SettingObject.SettingsType.Boolean));
     }
 
     @Override
@@ -246,6 +255,11 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                                                          new String[]{"sql_activation", "sql_experimentident", "sql_upsert", "sql_evalsettingspiv"}, this);
         sqlCluster.setDescription("Handles the export to the SQL database");
         lsClusters.add(sqlCluster);
+        
+        SettingsCluster csvExport = new SettingsCluster("CSV",
+                                                           new String[]{"data_csvExport"}, this);
+        csvExport.setDescription("CSV export");
+        lsClusters.add(csvExport);
 
         SettingsCluster refPos = new SettingsCluster("Referennce Position",
                                                      new String[]{"data_refposPXX", "data_refposMX",
@@ -257,6 +271,8 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                                                            new String[]{"data_FPS", "data_BurstFreq"}, this);
         timeSettings.setDescription("Time settings for FPS and Burst Frequency");
         lsClusters.add(timeSettings);
+        
+        
 
     }
 

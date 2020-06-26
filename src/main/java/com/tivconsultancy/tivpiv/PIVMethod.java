@@ -32,10 +32,10 @@ import java.util.List;
 public class PIVMethod implements Method {
 
     
-    private File imageFile1 = null;
-    private File imageFile2 = null;
+    protected File imageFile1 = null;
+    protected File imageFile2 = null;
 
-    LookUp<Protocol> methods;
+    protected LookUp<Protocol> methods;
 
     public PIVMethod() {
         initProtocols();
