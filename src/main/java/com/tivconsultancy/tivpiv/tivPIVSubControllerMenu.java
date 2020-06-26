@@ -168,16 +168,16 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             @Override
             public void handle(ActionEvent t) {
                 subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
-                if (controllerSQL.getDatabase(null) != null) {
-                    controllerSQL.importCSVfile("C:\\NoAdmin\\SQL\\Complete00000.csv");
-                } else {
+                if (controllerSQL.getDatabase(null) == null) {
                     sql.handle(t);
-                    controllerSQL.importCSVfile("C:\\NoAdmin\\SQL\\Complete00001.csv");
                 }
+                DirectoryChooser fileChooser = new DirectoryChooser();
+                fileChooser.setTitle("Import CSV Files");
+                File selectedFile = fileChooser.showDialog(StaticReferences.controller.getMainWindows());
+                controllerSQL.importCSVfile(selectedFile.getAbsolutePath());
             }
         };
 
-//                List<String> ls = StaticReferences.controller.getSQLControler(null).getColumnEntries("piv", "liqvelo", "experiment");
         EventHandler<ActionEvent> imageTools_Cut = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {

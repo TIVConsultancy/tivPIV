@@ -22,6 +22,7 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.subControllerSQL;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,9 +130,13 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public void importCSVfile(String sDir) {
-        getDatabase(null).performStatement("COPY piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) FROM '" + sDir + "' CSV HEADER;");
-        String s1 = getColumnEntries("piv", "liqvelo", "experiment").toString();
-        System.out.println(s1);
+        File f = new File(sDir);
+        for (File af : f.listFiles()) {
+            if (af.getName().contains("Complete") && af.getName().contains(".csv")) {
+                int iAffectedRows = getDatabase(null).performStatement("COPY piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) FROM '" + af.toPath() + "' CSV HEADER;");
+                System.out.println(iAffectedRows);
+            }
+        }
     }
 
     public static class sqlEntry {
