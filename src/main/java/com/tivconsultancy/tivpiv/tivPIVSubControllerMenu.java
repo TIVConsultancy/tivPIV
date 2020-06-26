@@ -66,11 +66,12 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         RunEntries.add(dictionary(MenuEntries.OneStep));
         RunEntries.add(dictionary(MenuEntries.RunAll));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Run), RunEntries));
-        
+
         List<String> dataEntries = new ArrayList<>();
         dataEntries.add(dictionary(MenuEntries.SQL));
+        dataEntries.add(dictionary(MenuEntries.ImportCSVtoSQL));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Data), dataEntries));
-        
+
         List<String> toolsEntries = new ArrayList<>();
         toolsEntries.add(dictionary(MenuEntries.CutImage));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Tools), toolsEntries));
@@ -86,11 +87,11 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
 
         icons.add(new NameObject<>(dictionary(MenuEntries.OneStep), StaticReferences.standardIcons.get("walking.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.RunAll), StaticReferences.standardIcons.get("runningMult.png")));
-        
+
         icons.add(new NameObject<>(dictionary(MenuEntries.SQL), StaticReferences.standardIcons.get("sql.png")));
-        
+
         icons.add(new NameObject<>(dictionary(MenuEntries.CutImage), StaticReferences.standardIcons.get("scissors.png")));
-        
+
     }
 
     private void initActionEvents() {
@@ -98,65 +99,64 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         EventHandler<ActionEvent> newSession = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                DirectoryChooser direcChooser = new DirectoryChooser();                
+                DirectoryChooser direcChooser = new DirectoryChooser();
                 direcChooser.setTitle("Start New Session");
                 File selectedFile = direcChooser.showDialog(StaticReferences.controller.getMainWindows());
                 StaticReferences.controller.startNewSession(selectedFile);
             }
         };
-        
+
         EventHandler<ActionEvent> loadSession = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                DirectoryChooser fileChooser = new DirectoryChooser();                
+                DirectoryChooser fileChooser = new DirectoryChooser();
                 fileChooser.setTitle("Load Session");
                 File selectedFile = fileChooser.showDialog(StaticReferences.controller.getMainWindows());
                 StaticReferences.controller.loadSession(selectedFile);
             }
         };
-        
+
         EventHandler<ActionEvent> importSettings = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                FileChooser fileChooser = new FileChooser();                
+                FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Import Settings");
                 File selectedFile = fileChooser.showOpenDialog(StaticReferences.controller.getMainWindows());
                 StaticReferences.controller.importSettings(selectedFile);
             }
         };
-        
+
         EventHandler<ActionEvent> exportSettings = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                FileChooser fileChooser = new FileChooser();                
+                FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Export Settings");
                 File selectedFile = fileChooser.showSaveDialog(StaticReferences.controller.getMainWindows());
                 StaticReferences.controller.exportSettings(selectedFile);
             }
         };
-        
+
         EventHandler<ActionEvent> runOneStep = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 StaticReferences.controller.runCurrentStep();
             }
         };
-        
+
         EventHandler<ActionEvent> runAll = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 StaticReferences.controller.run();
             }
         };
-        
+
         EventHandler<ActionEvent> sql = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
 
-                
                 Dialog dialSQL = new DialogSQL();
                 StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.SQL, dialSQL);
-                Optional<Map<Enum, String>> retrunSQLDialog = dialSQL.showAndWait(); 
+                Optional<Map<Enum, String>> retrunSQLDialog = dialSQL.showAndWait();
                 retrunSQLDialog.ifPresent(Map -> {
                     subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
                     controllerSQL.connect(Map.get(DialogSQL.fieldNames.user), Map.get(DialogSQL.fieldNames.password), Map.get(DialogSQL.fieldNames.database), Map.get(DialogSQL.fieldNames.hostname));
@@ -164,18 +164,31 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
 
             }
         };
-        
+        EventHandler<ActionEvent> importcsvtosql = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
+                if (controllerSQL.getDatabase(null) != null) {
+                    controllerSQL.importCSVfile("C:\\NoAdmin\\SQL\\Complete00000.csv");
+                } else {
+                    sql.handle(t);
+                    controllerSQL.importCSVfile("C:\\NoAdmin\\SQL\\Complete00001.csv");
+                }
+            }
+        };
+
+//                List<String> ls = StaticReferences.controller.getSQLControler(null).getColumnEntries("piv", "liqvelo", "experiment");
         EventHandler<ActionEvent> imageTools_Cut = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
 
-               Dialog dialogCutImage = new DialogCutImage();
-               StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.CUT, dialogCutImage);
-               dialogCutImage.show();
+                Dialog dialogCutImage = new DialogCutImage();
+                StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.CUT, dialogCutImage);
+                dialogCutImage.show();
 
             }
         };
-        
+
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.New), newSession));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.Load), loadSession));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.ImportSettings), importSettings));
@@ -184,6 +197,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.RunAll), runAll));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.SQL), sql));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.CutImage), imageTools_Cut));
+        actionEvents.add(new NameObject<>(dictionary(MenuEntries.ImportCSVtoSQL), importcsvtosql));
     }
 
     /**
@@ -223,7 +237,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
     }
 
     private enum MenuEntries {
-        New, Load, OneStep, RunAll, ImportSettings, ExportSettings, SQL, CutImage
+        New, Load, OneStep, RunAll, ImportSettings, ExportSettings, SQL, ImportCSVtoSQL, CutImage
     }
 
     private String dictionary(Enum e) {
