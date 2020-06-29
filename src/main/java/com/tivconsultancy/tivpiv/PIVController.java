@@ -14,9 +14,13 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseArchive;
+import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseDisk;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
+import static com.tivconsultancy.opentiv.highlevel.protocols.Prot_SystemSettings.systemSettings.HEAP;
+import static com.tivconsultancy.opentiv.highlevel.protocols.Prot_SystemSettings.systemSettings.RAM;
 import com.tivconsultancy.tivGUI.Dialogs.Data.processes.DialogProcessing;
 import com.tivconsultancy.tivGUI.controller.ControllerUI;
 import com.tivconsultancy.tivGUI.controller.ControllerWithImageInteraction;
@@ -56,7 +60,7 @@ public class PIVController extends BasicController implements ControllerWithImag
         ReadInFile = new ArrayList<>();
     }
 
-    private void initSubControllers() {
+    protected void initSubControllers() {
         subViews = new StartUpSubControllerViews(this);
         subPlots = new StartUpSubControllerPlots();
         subMenu = new tivPIVSubControllerMenu();
@@ -67,9 +71,9 @@ public class PIVController extends BasicController implements ControllerWithImag
 
     @Override
     public void startNewSession(File inputFolder) {
-        if(getCurrentMethod() == null){
+        if (getCurrentMethod() == null) {
             startNewMethod(new PIVMethod());
-        }        
+        }
         if (inputFolder != null && inputFolder.exists()) {
             mainFolder = inputFolder;
             ReadInFile = new ArrayList<>();
@@ -111,7 +115,7 @@ public class PIVController extends BasicController implements ControllerWithImag
         subViews.update();
     }
 
-    private void setCurrentDatabase() {
+    protected void setCurrentDatabase() {
         DataPIV currentData = (DataPIV) data.getRes(getSelecedName());
         if (currentData == null) {
             currentData = new DataPIV(getSelecedIndex());
@@ -126,7 +130,7 @@ public class PIVController extends BasicController implements ControllerWithImag
         }
         return null;
     }
-    
+
     private File getNextPic(int iLeap) {
         int index = getSelecedIndex();
         if (index >= 0 && (ReadInFile.size() - iLeap) > index) {
@@ -197,7 +201,14 @@ public class PIVController extends BasicController implements ControllerWithImag
      *
      */
     private void initDatabase() {
-        data = new DatabaseRAM<>();
+//        if(String.valueOf(getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")).equals(HEAP.toString())){
+            data = new DatabaseRAM<>();
+//        } else if(String.valueOf(getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")).equals(RAM.toString())){
+//            data = new DatabaseArchive();
+//        } else{
+//            data = new DatabaseDisk();
+//        }
+        
         database1Step = new DataPIV(getSelecedIndex());
         dataForPlot = new DatabaseRAM();
         PostgreSQL sql = new PostgreSQL();
@@ -283,7 +294,8 @@ public class PIVController extends BasicController implements ControllerWithImag
             public void run() {
                 timeline:
                 for (int i : getBurstStarts()) {
-                    try {                        
+                    try {
+                        StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(i));
                         setSelectedFile(ReadInFile.get(i));
 
 //                        if (((PIVMethod) getCurrentMethod()).checkBurst(i + 1)) {
@@ -293,7 +305,7 @@ public class PIVController extends BasicController implements ControllerWithImag
                         startNewIndexStep();
                         try {
                             getCurrentMethod().run();
-                            data.setRes(getSelecedName(), database1Step);
+                            storeTempData();
                             subViews.update();
                         } catch (Exception ex) {
                             StaticReferences.getlog().log(Level.SEVERE, "Unable to finish step" + i + " : " + ex.getMessage(), ex);
@@ -323,6 +335,10 @@ public class PIVController extends BasicController implements ControllerWithImag
             StaticReferences.getlog().log(Level.SEVERE, "Thread stopped : " + e.getMessage(), e);
             releaseUIAfterProceess();
         }
+    }
+
+    public boolean safeTemporaryData() {
+        return Boolean.valueOf(String.valueOf(getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")));
     }
 
     public List<Integer> getBurstStarts() {
@@ -436,6 +452,13 @@ public class PIVController extends BasicController implements ControllerWithImag
 
     public void releaseUIAfterProceess() {
         mainFrame.activateImageTree();
+    }
+
+    @Override
+    public void storeTempData() {
+        if (safeTemporaryData()) {
+            data.setRes(getSelecedName(), database1Step);
+        }
     }
 
 }

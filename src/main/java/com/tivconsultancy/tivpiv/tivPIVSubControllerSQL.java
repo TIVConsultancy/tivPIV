@@ -16,11 +16,9 @@
 package com.tivconsultancy.tivpiv;
 
 import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
-import com.tivconsultancy.opentiv.datamodels.SQL.SQLDatabase;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.tivGUI.StaticReferences;
-import com.tivconsultancy.tivGUI.controller.subControllerSQL;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +30,7 @@ import java.util.logging.Level;
  */
 public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 
-    private float t = 0.0f;
+    protected float t = 0.0f;
 
     @Override
     public String connect(String user, String password, String database, String host) {
@@ -80,37 +78,37 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 
     }
 
-    public int insertEntry(sqlEntry ent) {
+    public int insertEntry(sqlEntryPIV ent) {
         return getDatabase(null).performStatement(getinsertEntry(ent));
     }
 
-    public void insertEntry(List<sqlEntry> ent) {
+    public void insertEntry(List<sqlEntryPIV> ent) {
         List<String> entriesSQL = new ArrayList<>();
-        for (sqlEntry e : ent) {
+        for (sqlEntryPIV e : ent) {
             entriesSQL.add(getinsertEntry(e));
         }
         getDatabase(null).performStatements(entriesSQL);
     }
 
-    public int upsertEntry(sqlEntry ent) {
+    public int upsertEntry(sqlEntryPIV ent) {
         return getDatabase(null).performStatement(getupserEntry(ent));
     }
 
-    public void upsertEntry(List<sqlEntry> ent) {
+    public void upsertEntry(List<sqlEntryPIV> ent) {
         List<String> entriesSQL = new ArrayList<>();
-        for (sqlEntry e : ent) {
+        for (sqlEntryPIV e : ent) {
             entriesSQL.add(getupserEntry(e));
         }
         getDatabase(null).performStatements(entriesSQL);
     }
 
-    public String getinsertEntry(sqlEntry e) {
+    public String getinsertEntry(sqlEntryPIV e) {
         String sqlStatement = "INSERT INTO piv.liqvelo (experiment, timestampexp, posx, posy, posz, velox, veloy) "
-                + "VALUES('" + e.experiment + "', " + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")";
+                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")";
         return sqlStatement;
     }
 
-    public String getupserEntry(sqlEntry e) {
+    public String getupserEntry(sqlEntryPIV e) {
         String sqlStatement = "INSERT INTO piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) "
                 + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")"
                 + "ON CONFLICT (experiment, settings, timestampexp, posx, posy, posz) DO UPDATE SET "
@@ -125,7 +123,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         return sqlStatement;
     }
 
-    public static class sqlEntry {
+    public static class sqlEntryPIV {
 
         String experiment;
         String settingsName;
@@ -135,7 +133,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         double vX;
         double vY;
 
-        public sqlEntry(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY) {
+        public sqlEntryPIV(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY) {
             this.experiment = experiment;
             this.settingsName = settingsName;
             this.posX = posX;
