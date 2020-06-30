@@ -23,7 +23,7 @@ import com.tivconsultancy.tivGUI.controller.subControllerSQL;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL;
-import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL.sqlEntry;
+import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL.sqlEntryPIV;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,14 +92,14 @@ public class Prot_PIVDataHandling extends PIVProtocol {
             if (Boolean.valueOf(this.getSettingsValue("sql_activation").toString())) {
                 dResolution = sql_Control.getResolution(expName) / 100000.0;
 //                double dResolution = sql_Control.getResolution(expName) / 100000.0;
-                List<sqlEntry> entries = new ArrayList<>();
+                List<sqlEntryPIV> entries = new ArrayList<>();
                 for (Vector v : data.oGrid.getVectors()) {
                     double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
                     double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
                     double dPosZ = refM_Z;
                     double dVX = v.getX() * dResolution * fps;
                     double dVY = v.getY() * dResolution * fps;
-                    entries.add(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+                    entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
 
                 }
                 if (bUPSERT) {
@@ -115,9 +115,9 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 //                double dVX = v.getX() * dResolution;
 //                double dVY = v.getY() * dResolution;
 //                if(bUPSERT){
-//                    sql_Control.upsertEntry(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+//                    sql_Control.upsertEntry(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
 //                }else{
-//                    sql_Control.insertEntry(new sqlEntry(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+//                    sql_Control.insertEntry(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
 //                }
 //            }
             }

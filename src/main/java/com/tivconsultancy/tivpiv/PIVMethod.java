@@ -9,6 +9,7 @@ import delete.com.tivconsultancy.opentiv.devgui.main.ImagePath;
 import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
 import com.tivconsultancy.opentiv.highlevel.methods.Method;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
+import com.tivconsultancy.opentiv.highlevel.protocols.Prot_SystemSettings;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
@@ -51,6 +52,7 @@ public class PIVMethod implements Method {
         methods.add(new NameObject<>("display", new Prot_PIVDisplay()));
 //        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
         methods.add(new NameObject<>("data", new Prot_PIVDataHandling()));
+        methods.add(new NameObject<>("system", new Prot_SystemSettings()));
     }
 
     @Override
@@ -145,4 +147,10 @@ public class PIVMethod implements Method {
         int burst = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVBurstLength").toString());
         return burst;
     }
+    
+    @Override
+    public Prot_SystemSettings getSystemSetting(String ident) {
+        return (Prot_SystemSettings) methods.get("system");
+    }
+    
 }
