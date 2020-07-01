@@ -89,7 +89,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         icons.add(new NameObject<>(dictionary(MenuEntries.RunAll), StaticReferences.standardIcons.get("runningMult.png")));
 
         icons.add(new NameObject<>(dictionary(MenuEntries.SQL), StaticReferences.standardIcons.get("sql.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ImportCSVtoSQL), StaticReferences.standardIcons.get("importCSV.png")));
+        icons.add(new NameObject<>(dictionary(MenuEntries.ImportCSVtoSQL), StaticReferences.standardIcons.get("export.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.CutImage), StaticReferences.standardIcons.get("scissors.png")));
 
     }
@@ -255,6 +255,9 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         }
         if (e == MenuEntries.CutImage) {
             return "Cut Image";
+        }
+        if (e == MenuEntries.ImportCSVtoSQL) {
+            return "CSV to SQL";
         }
         return e.toString();
     }
