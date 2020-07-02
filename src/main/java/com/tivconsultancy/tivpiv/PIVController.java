@@ -14,13 +14,9 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.datamodels.Results1DPlotAble;
 import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
 import com.tivconsultancy.opentiv.datamodels.overtime.Database;
-import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseArchive;
-import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseDisk;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.BasicController;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
-import static com.tivconsultancy.opentiv.highlevel.protocols.Prot_SystemSettings.systemSettings.HEAP;
-import static com.tivconsultancy.opentiv.highlevel.protocols.Prot_SystemSettings.systemSettings.RAM;
 import com.tivconsultancy.tivGUI.Dialogs.Data.processes.DialogProcessing;
 import com.tivconsultancy.tivGUI.controller.ControllerUI;
 import com.tivconsultancy.tivGUI.controller.ControllerWithImageInteraction;
@@ -74,7 +70,16 @@ public class PIVController extends BasicController implements ControllerWithImag
         if (getCurrentMethod() == null) {
             startNewMethod(new PIVMethod());
         }
-        if (inputFolder != null && inputFolder.exists()) {
+        if (((PIVMethod) getCurrentMethod()).bReadFromSQL) {
+            mainFolder = null;
+            String schemaName = "pivexp";
+            String tableName = "pictures";
+            String columnName = "ident";
+            ReadInFile = new ArrayList<>();
+            for (String s : ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).getColumnEntries(schemaName, tableName, columnName)) {
+                ReadInFile.add(new File(s));
+            }
+        } else if (inputFolder != null && inputFolder.exists()) {
             mainFolder = inputFolder;
             ReadInFile = new ArrayList<>();
             for (File f : mainFolder.listFiles()) {
@@ -170,12 +175,18 @@ public class PIVController extends BasicController implements ControllerWithImag
             Reader oRead = new Reader(loadFile);
             oRead.setSeperator(";");
             List<String[]> ls = oRead.readFileStringa2();
-            for (Protocol p : currentMethod.getProtocols()) {
-                p.setFromFile(ls);
-            }
+            importSettings(ls);
         } catch (IOException ioe) {
             StaticReferences.getlog().log(Level.SEVERE, "Cannot load settings file", ioe);
         }
+//        mainFrame.startNewSettings();
+    }
+
+    public void importSettings(List<String[]> ls) {
+        for (Protocol p : currentMethod.getProtocols()) {
+            p.setFromFile(ls);
+        }
+        
         mainFrame.startNewSettings();
     }
 
@@ -202,13 +213,13 @@ public class PIVController extends BasicController implements ControllerWithImag
      */
     private void initDatabase() {
 //        if(String.valueOf(getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")).equals(HEAP.toString())){
-            data = new DatabaseRAM<>();
+        data = new DatabaseRAM<>();
 //        } else if(String.valueOf(getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")).equals(RAM.toString())){
 //            data = new DatabaseArchive();
 //        } else{
 //            data = new DatabaseDisk();
 //        }
-        
+
         database1Step = new DataPIV(getSelecedIndex());
         dataForPlot = new DatabaseRAM();
         PostgreSQL sql = new PostgreSQL();
@@ -227,8 +238,11 @@ public class PIVController extends BasicController implements ControllerWithImag
     @Override
     public void loadSession(File f) {
         startNewSession(f);
+        if (f == null) {
+            return;
+        }
         File settingsFile = null;
-        for (File af : f.listFiles()) {
+        for (File af : f.listFiles() == null ? new File[]{} : f.listFiles()) {
             if (af.getName().contains(".tiv")) {
                 settingsFile = af;
                 break;
@@ -247,7 +261,7 @@ public class PIVController extends BasicController implements ControllerWithImag
     }
 
     @Override
-    public void runCurrentStep() {
+    public void runCurrentStep(String... options) {
         blockUIForProceess();
         Dialog dialogProgress = new DialogProcessing();
         StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.PROCESS, dialogProgress);
@@ -284,7 +298,7 @@ public class PIVController extends BasicController implements ControllerWithImag
     }
 
     @Override
-    public void run() {
+    public void run(String... options) {
         blockUIForProceess();
         Dialog dialogProgress = new DialogProcessing();
         StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.PROCESS, dialogProgress);
@@ -297,11 +311,6 @@ public class PIVController extends BasicController implements ControllerWithImag
                     try {
                         StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(i));
                         setSelectedFile(ReadInFile.get(i));
-
-//                        if (((PIVMethod) getCurrentMethod()).checkBurst(i + 1)) {
-//                            System.out.println(i);
-//                            continue timeline;
-//                        }
                         startNewIndexStep();
                         try {
                             getCurrentMethod().run();
@@ -459,6 +468,10 @@ public class PIVController extends BasicController implements ControllerWithImag
         if (safeTemporaryData()) {
             data.setRes(getSelecedName(), database1Step);
         }
+    }
+
+    public enum DialogNames {
+        SQLTOPIC, SETSQL, SQLTOSET
     }
 
 }

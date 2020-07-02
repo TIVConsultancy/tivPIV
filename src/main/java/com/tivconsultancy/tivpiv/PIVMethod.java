@@ -14,7 +14,6 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivGUI.StaticReferences;
-import com.tivconsultancy.tivpiv.protocols.Prot_tivPIV1DPostProc;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVCalcDisplacement;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVDataHandling;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVDisplay;
@@ -35,6 +34,9 @@ public class PIVMethod implements Method {
     
     protected File imageFile1 = null;
     protected File imageFile2 = null;
+    
+    public boolean bReadFromSQL = false;
+    public  String experimentSQL;    
 
     protected LookUp<Protocol> methods;
 

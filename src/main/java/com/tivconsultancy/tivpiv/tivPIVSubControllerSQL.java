@@ -18,14 +18,18 @@ package com.tivconsultancy.tivpiv;
 import com.tivconsultancy.opentiv.datamodels.SQL.PostgreSQL;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
+import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
+import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -52,7 +56,6 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 //            hints.addSettingsObject(new SettingObject("Experiment", "sql_experimentident", s, SettingObject.SettingsType.String));
 //        }
         List<String> availSettingsPIV = getColumnEntries("piv", "evalsettingspiv", "ident");
-        System.out.println(availSettingsPIV.toString());
         for (String s : availSettingsPIV) {
             hints.addSettingsObject(new SettingObject("Settings PIV", "sql_evalsettingspiv", s, SettingObject.SettingsType.String));
         }
@@ -127,14 +130,89 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         return sqlStatement;
     }
 
-    public void importCSVfile(String sDir) {
-        File f = new File(sDir);
-        for (File af : f.listFiles()) {
-            if (af.getName().contains("Complete") && af.getName().contains(".csv")) {
-                int iAffectedRows = getDatabase(null).performStatement("COPY piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) FROM '" + af.toPath() + "' CSV HEADER;");
-                System.out.println(iAffectedRows);
-            }
+//    public void importCSVfile(String sDir) {
+//        File f = new File(sDir);
+//        for (File af : f.listFiles()) {
+//            if (af.getName().contains("Complete") && af.getName().contains(".csv")) {
+//                int iAffectedRows = getDatabase(null).performStatement("COPY piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) FROM '" + af.toPath() + "' CSV HEADER;");
+//                System.out.println(iAffectedRows);
+//            }
+//        }
+//    }
+    public BufferedImage readIMGFromSQL(String experiment, String ident) throws SQLException, IOException {
+        InputStream is = sqlData.getBinaryStream(getreadEntryPic(ident, experiment));
+        BufferedImage img = ImageIO.read(is);
+        return img;
+    }
+
+    public List<String> getFileNamesFromSQL() {
+        return sqlData.getColumnEntries("pivexp", "pictures", "ident", "WHERE experiment = " + ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL);
+    }
+
+    public List<String> getAvailExperiments() {
+        return getColumnEntries("piv", "experiment", "ident");
+    }
+    
+    public List<String> getAvailSettings(String experiment) {
+        return sqlData.getColumnEntries("pivexp", "settings", "ident", "WHERE experiment = '" + experiment+"'");
+    }
+    
+    public List<String[]> getSettings(String experiment, String ident) {
+        String settingString = sqlData.getColumnEntries("pivexp", "settings", "settingstring", "WHERE experiment = '" + experiment + "' AND ident ='" +ident+"'").get(0);
+        List<String[]> settingsSplit = new ArrayList<>();
+        for(String line: settingString.split("\\r?\\n")){
+            settingsSplit.add(StringWorker.cutElements(";", line).toArray(new String[4]));
         }
+        return settingsSplit;
+    }
+
+    public String getreadEntryPic(String ident, String experiment) {
+        String sqlStatement = "SELECT picture FROM pivexp.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
+        return sqlStatement;
+    }
+
+    public void settingsToSQL(String experiment, String ident) {
+        List<String> allSettings = new ArrayList<>();
+        for (Protocol p : StaticReferences.controller.getCurrentMethod().getProtocols()) {
+            allSettings.addAll(p.getForFile());
+        }
+
+        String sout = "";
+        for (Object s : allSettings) {
+
+            sout = sout + (s.toString());
+            sout = sout + ("\n");
+        }
+
+        writeSettingsToSQL(experiment, ident, sout);
+    }
+
+    public boolean writeSettingsToSQL(String experiment, String ident, String settingsString) {
+        try {
+            if ("adminpiv".equalsIgnoreCase(StaticReferences.controller.getSQLControler(null).getUser())) {
+                getDatabase(null).performStatement(getupserEntrySettings(experiment, ident, settingsString));
+            } else {
+                getDatabase(null).performStatement(getinsertEntrySettings(experiment, ident, settingsString));
+            }
+        } catch (Exception e) {
+            StaticReferences.getlog().log(Level.SEVERE, "Cannot insert Settings", e);
+        }
+
+        return true;
+    }
+
+    public String getinsertEntrySettings(String experiment, String ident, String settingsString) {
+        String sqlStatement = "INSERT INTO pivexp.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')";
+        return sqlStatement;
+    }
+
+    public String getupserEntrySettings(String experiment, String ident, String settingsString) {
+        String sqlStatement = "INSERT INTO pivexp.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')"
+                + "ON CONFLICT (experiment, ident) DO UPDATE SET "
+                + "experiment = EXCLUDED.experiment, "
+                + "ident = EXCLUDED.ident,"
+                + "settingstring = EXCLUDED.settingstring";
+        return sqlStatement;
     }
 
     public static class sqlEntryPIV {

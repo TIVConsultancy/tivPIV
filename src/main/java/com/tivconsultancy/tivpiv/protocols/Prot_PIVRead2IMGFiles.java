@@ -11,12 +11,17 @@ import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Reader;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
+import com.tivconsultancy.tivpiv.PIVMethod;
 import com.tivconsultancy.tivpiv.data.DataPIV;
+import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,12 +36,12 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
     ImageInt imgRead;
     ImageInt imgRead2;
     private String name = "Read In";
-    
+
     public Prot_PIVRead2IMGFiles(String name) {
         this();
         this.name = name;
     }
-    
+
     public Prot_PIVRead2IMGFiles() {
         super();
         imgRead = new ImageInt(50, 50, 150);
@@ -46,24 +51,22 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
         buildClusters();
     }
 
-
     private ImageInt readImage() throws IOException {
         imgRead.setImage(IMG_Reader.readImageGrayScale(imgFile));
         return imgRead;
     }
-    
+
     private ImageInt readImage2() throws IOException {
         imgRead2.setImage(IMG_Reader.readImageGrayScale(imgFile2));
         return imgRead;
     }
-    
+
     private void buildLookUp() {
         ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, imgRead.getBuffImage());
     }
-    
-    
+
     @Override
-    public void setImage(BufferedImage bi){
+    public void setImage(BufferedImage bi) {
         imgRead = new ImageInt(bi);
         imgRead2 = new ImageInt(bi);
         buildLookUp();
@@ -86,35 +89,55 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
 
     @Override
     public void run(Object... input) throws UnableToRunException {
-        if (input != null && input.length == 1 && input[0] != null && input[0] instanceof File){
+        if (((PIVMethod) StaticReferences.controller.getCurrentMethod()).bReadFromSQL) {
+            runSQL(input);
+            return;
+        }
+
+        if (input != null && input.length == 1 && input[0] != null && input[0] instanceof File) {
             imgFile = (File) input[0];
             try {
                 readImage();
             } catch (IOException ex) {
                 throw new UnableToRunException("Cannot read imgage: " + imgFile, ex);
             }
-//            try {
-//                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
-//            } catch (Exception ex) {
-//                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
-//            }
-        }else if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof File && input[1] instanceof File ) {
+        } else if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof File && input[1] instanceof File) {
             imgFile = (File) input[0];
             imgFile2 = (File) input[1];
             try {
                 readImage();
                 readImage2();
             } catch (IOException ex) {
-                throw new UnableToRunException("Cannot read imgage: " + imgFile, ex);
+                throw new UnableToRunException("Cannot read image: " + imgFile, ex);
             }
-//            try {
-//                imgRead.setImage(OpenTIV_PreProc.performTransformation(this, imgRead).getBuffImage());
-//                imgRead2.setImage(OpenTIV_PreProc.performTransformation(this, imgRead2).getBuffImage());
-//            } catch (Exception ex) {
-//                throw new UnableToRunException("Cannot transform image: " + imgFile, ex);
-//            }
-        }else{
+        } else {
             throw new UnableToRunException("Input is not a file", new IOException());
+        }
+        buildLookUp();
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+        data.iaReadInFirst = imgRead.iaPixels;
+        data.iaReadInSecond = imgRead2.iaPixels;
+    }
+
+    private void runSQL(Object... input) throws UnableToRunException {
+        if (input != null && input.length == 1 && input[0] != null) {
+            PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
+            try {
+                imgFile = (File) input[0];
+                imgRead = new ImageInt(((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readIMGFromSQL(method.experimentSQL, imgFile.getName()));
+            } catch (SQLException | IOException ex) {
+                throw new UnableToRunException("Cannot read image from SQL: " + imgFile, ex);
+            }
+        }else if (input != null && input.length == 2 && input[0] != null && input[1] != null) {
+            PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
+            try {
+                imgFile = (File) input[0];
+                imgFile2 = (File) input[1];
+                imgRead = new ImageInt(((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readIMGFromSQL(method.experimentSQL, imgFile.getName()));
+                imgRead2 = new ImageInt(((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readIMGFromSQL(method.experimentSQL, imgFile2.getName()));
+            } catch (SQLException | IOException ex) {
+                throw new UnableToRunException("Cannot read image from SQL: " + imgFile, ex);
+            }
         }
         buildLookUp();
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
@@ -136,17 +159,15 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
 //        CutImage.setDescription("Cut image");
 //        lsClusters.add(CutImage);
     }
-    
+
     /**
      * Cuts the image
      *
      * @param oInput Input image in the openTIV ImageInt format
      * @param oSettings Settings object containing the settings information
      * @return
-     */  
-    
-        
-    private void initSettings(){
+     */
+    private void initSettings() {
 //        this.loSettings.add(new SettingObject("Cut Top", "BcutyTop", false, SettingObject.SettingsType.Boolean));
 //        this.loSettings.add(new SettingObject("Value", "cutyTop", 0, SettingObject.SettingsType.Integer));
 //        this.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", false, SettingObject.SettingsType.Boolean));
