@@ -14,6 +14,7 @@ import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.controller.ControllerUI;
 import com.tivconsultancy.tivGUI.controller.subControllerMenu;
 import com.tivconsultancy.tivGUI.controller.subControllerSQL;
+import com.tivconsultancy.tivGUI.menue.tivMenuBar;
 import com.tivconsultancy.tivpiv.dialogs.DialogSQLToSettings;
 import com.tivconsultancy.tivpiv.dialogs.DialogSQLtoPic;
 import com.tivconsultancy.tivpiv.dialogs.DialogSettingsToSQL;
@@ -26,6 +27,7 @@ import java.util.logging.Level;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -80,11 +82,12 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         subMenuEntries = new LookUp<>();
         List<String> SessionEntries = new ArrayList<>();
         SessionEntries.add(dictionary(MenuEntries.New));
-        SessionEntries.add(dictionary(MenuEntries.Load));
-        SessionEntries.add(dictionary(MenuEntries.LoadSQL));
-        SessionEntries.add(dictionary(MenuEntries.ImportSettings));
-        SessionEntries.add(dictionary(MenuEntries.ImportSettingsSQL));
+        SessionEntries.add(dictionary(MenuEntries.Load));        
+        SessionEntries.add(dictionary(MenuEntries.ImportSettings));        
         SessionEntries.add(dictionary(MenuEntries.ExportSettings));
+        SessionEntries.add(tivMenuBar.tivSpecialMenue.SEP.toString());
+        SessionEntries.add(dictionary(MenuEntries.LoadSQL));
+        SessionEntries.add(dictionary(MenuEntries.ImportSettingsSQL));
         SessionEntries.add(dictionary(MenuEntries.ExportSettingsSQL));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Session), SessionEntries));
 
@@ -110,7 +113,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         icons.add(new NameObject<>(dictionary(MenuEntries.Load), StaticReferences.standardIcons.get("folderOpen2.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.LoadSQL), StaticReferences.standardIcons.get("cloud-Border.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettings), StaticReferences.standardIcons.get("export2.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettingsSQL), StaticReferences.standardIcons.get("mixcloud-brands.png")));
+        icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettingsSQL), StaticReferences.standardIcons.get("support.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettings), StaticReferences.standardIcons.get("import2.png")));
         icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettingsSQL), StaticReferences.standardIcons.get("settingsCloud.png")));        
 
@@ -342,9 +345,6 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         if (e == MenuEntries.Load) {
             return "Load Session";
         }
-        if (e == MenuEntries.LoadSQL) {
-            return "Load From SQL";
-        }
         if (e == MenuEntries.OneStep) {
             return "One Step";
         }
@@ -354,6 +354,25 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         if (e == MenuEntries.CutImage) {
             return "Cut Image";
         }
+        if (e == MenuEntries.ImportSettings) {
+            return "Import Settings";
+        }
+        if (e == MenuEntries.ExportSettings) {
+            return "Export Settings";
+        }
+        if (e == MenuEntries.ImportSettingsSQL) {
+            return "Settings from SQL";
+        }
+        if (e == MenuEntries.ExportSettingsSQL) {
+            return "Settings to SQL";
+        }
+        if (e == MenuEntries.LoadSQL) {
+            return "Images from SQL";
+        }
+        if (e == MenuEntries.SQL) {
+            return "Connect to SQL";
+        }
+        
 //        if (e == MenuEntries.ImportCSVtoSQL) {
 //            return "CSV to SQL";
 //        }
