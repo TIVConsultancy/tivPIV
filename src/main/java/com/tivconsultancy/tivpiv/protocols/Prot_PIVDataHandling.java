@@ -95,8 +95,8 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                     double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
                     double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
                     double dPosZ = refM_Z;
-                    double dVX = v.getX() * dResolution * fps * -1.0;
-                    double dVY = v.getY() * dResolution * fps;
+                    double dVX = v.getX() * dResolution * fps;
+                    double dVY = v.getY() * dResolution * fps * -1.0;
                     entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
 
                 }

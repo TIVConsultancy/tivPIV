@@ -61,6 +61,7 @@ public class Main extends Application {
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon32x32.png");
         icons.add("/com/tivconsultancy/tivPIV/icons/Icon16x16.png");
         MainFrame.setIcons(new RecArea(null, null).getClass(), icons);
+        MainFrame.setLogo(new RecArea(null, null).getClass(), "/com/tivconsultancy/tivPIV/logo/Logo-BlackBlueText_noBckGr_s.png");
         MainFrame.setLoadPicture(new RecArea(null, null).getClass(), "/com/tivconsultancy/tivPIV/icons/load.png");
 
         StaticReferences.controller = new PIVController();
