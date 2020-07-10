@@ -103,7 +103,7 @@ public class PIVController extends BasicController implements ControllerWithImag
     }
 
     @Override
-    public void setSelectedFile(File f) {
+    public void setSelectedFile(File fOld, File f) {
         this.selectedFile = f;
         File nextFile = f;
         int iLeap = ((PIVMethod) getCurrentMethod()).getLeapLength();
@@ -310,7 +310,7 @@ public class PIVController extends BasicController implements ControllerWithImag
                 for (int i : getBurstStarts()) {
                     try {
                         StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(i));
-                        setSelectedFile(ReadInFile.get(i));
+                        setSelectedFile(null, ReadInFile.get(i));
                         startNewIndexStep();
                         try {
                             getCurrentMethod().run();

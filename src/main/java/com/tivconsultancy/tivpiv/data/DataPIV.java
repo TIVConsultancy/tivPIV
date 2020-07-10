@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ImageIcon;
 import com.tivconsultancy.opentiv.datamodels.overtime.DataBaseEntry;
 import com.tivconsultancy.opentiv.datamodels.overtime.DatabaseRAM;
 import com.tivconsultancy.tivGUI.StaticReferences;
@@ -20,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
