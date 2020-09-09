@@ -19,11 +19,13 @@ import com.tivconsultancy.tivpiv.dialogs.DialogSQLToSettings;
 import com.tivconsultancy.tivpiv.dialogs.DialogSQLtoPic;
 import com.tivconsultancy.tivpiv.dialogs.DialogSettingsToSQL;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Dialog;
@@ -53,7 +55,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         initGlobalEventHandlers();
     }
 
-    private void initGlobalEventHandlers(){
+    private void initGlobalEventHandlers() {
         sql = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
@@ -69,7 +71,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             }
         };
     }
-    
+
     private void initMainItems() {
         mainMenu = new ArrayList<>();
         mainMenu.add(dictionary(MainItems.Session));
@@ -82,8 +84,8 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         subMenuEntries = new LookUp<>();
         List<String> SessionEntries = new ArrayList<>();
         SessionEntries.add(dictionary(MenuEntries.New));
-        SessionEntries.add(dictionary(MenuEntries.Load));        
-        SessionEntries.add(dictionary(MenuEntries.ImportSettings));        
+        SessionEntries.add(dictionary(MenuEntries.Load));
+        SessionEntries.add(dictionary(MenuEntries.ImportSettings));
         SessionEntries.add(dictionary(MenuEntries.ExportSettings));
         SessionEntries.add(tivMenuBar.tivSpecialMenue.SEP.toString());
         SessionEntries.add(dictionary(MenuEntries.LoadSQL));
@@ -109,20 +111,24 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
 
     private void initIcons() {
         icons = new LookUp<>();
-        icons.add(new NameObject<>(dictionary(MenuEntries.New), StaticReferences.standardIcons.get("plus2.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.Load), StaticReferences.standardIcons.get("folderOpen2.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.LoadSQL), StaticReferences.standardIcons.get("cloud-Border.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettings), StaticReferences.standardIcons.get("export2.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettingsSQL), StaticReferences.standardIcons.get("support.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettings), StaticReferences.standardIcons.get("import2.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettingsSQL), StaticReferences.standardIcons.get("settingsCloud.png")));        
+        try {
+            icons.add(new NameObject<>(dictionary(MenuEntries.New), StaticReferences.standardIcons.get("plus2.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.Load), StaticReferences.standardIcons.get("folderOpen2.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.LoadSQL), StaticReferences.standardIcons.get("cloud-Border.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettings), StaticReferences.standardIcons.get("export2.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.ImportSettingsSQL), StaticReferences.standardIcons.get("support.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettings), StaticReferences.standardIcons.get("import2.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.ExportSettingsSQL), StaticReferences.standardIcons.get("settingsCloud.png")));
 
-        icons.add(new NameObject<>(dictionary(MenuEntries.OneStep), StaticReferences.standardIcons.get("walking.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.RunAll), StaticReferences.standardIcons.get("runningMult.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.OneStep), StaticReferences.standardIcons.get("walking.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.RunAll), StaticReferences.standardIcons.get("runningMult.png")));
 
-        icons.add(new NameObject<>(dictionary(MenuEntries.SQL), StaticReferences.standardIcons.get("sql.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.SQL), StaticReferences.standardIcons.get("sql.png")));
 //        icons.add(new NameObject<>(dictionary(MenuEntries.ImportCSVtoSQL), StaticReferences.standardIcons.get("export.png")));
-        icons.add(new NameObject<>(dictionary(MenuEntries.CutImage), StaticReferences.standardIcons.get("scissors.png")));
+            icons.add(new NameObject<>(dictionary(MenuEntries.CutImage), StaticReferences.standardIcons.get("scissors.png")));
+        } catch (IOException ex) {
+            Logger.getLogger(tivPIVSubControllerMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -147,8 +153,6 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
                 StaticReferences.controller.loadSession(selectedFile);
             }
         };
-
-        
 
         EventHandler<ActionEvent> importSettings = new EventHandler<ActionEvent>() {
             @Override
@@ -182,8 +186,8 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             public void handle(ActionEvent t) {
                 StaticReferences.controller.run();
             }
-        };        
-        
+        };
+
         EventHandler<ActionEvent> loadSQL = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
@@ -199,10 +203,10 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
                     ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL = Map.get(DialogSQLtoPic.fieldNames.EXP);
                     StaticReferences.controller.loadSession(null);
                 });
-                
+
             }
         };
-        
+
         EventHandler<ActionEvent> exportSettingsSQL = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
@@ -220,17 +224,17 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
                         ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).settingsToSQL(experiment, ident);
                         StaticReferences.getlog().log(Level.INFO, "Settings Exported");
                         Dialog dialOK = new DialogNote("Settings Exported");
-                        dialOK.showAndWait(); 
+                        dialOK.showAndWait();
                     } catch (Exception e) {
                         StaticReferences.getlog().log(Level.SEVERE, "Cannot export settings", e);
                         Dialog dialFail = new DialogNote("Export Failed");
                         dialFail.showAndWait();
-                    }                                                                               
+                    }
                 });
-                
+
             }
         };
-        
+
         EventHandler<ActionEvent> importSettingsSQL = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
@@ -254,9 +258,9 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
                         StaticReferences.getlog().log(Level.SEVERE, "Cannot import settings", e);
                         Dialog dialFail = new DialogNote("Import Failed");
                         dialFail.showAndWait();
-                    }                                                                               
+                    }
                 });
-                
+
             }
         };
 
@@ -372,7 +376,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         if (e == MenuEntries.SQL) {
             return "Connect to SQL";
         }
-        
+
 //        if (e == MenuEntries.ImportCSVtoSQL) {
 //            return "CSV to SQL";
 //        }
