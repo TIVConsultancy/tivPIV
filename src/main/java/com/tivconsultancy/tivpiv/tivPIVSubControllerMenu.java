@@ -264,7 +264,21 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             }
         };
 
-//        EventHandler<ActionEvent> importcsvtosql = new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> sql = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+
+                Dialog dialSQL = new DialogSQL();
+                StaticReferences.controller.setDialog(ControllerUI.DialogNames_Default.SQL, dialSQL);
+                Optional<Map<Enum, String>> retrunSQLDialog = dialSQL.showAndWait();
+                retrunSQLDialog.ifPresent(Map -> {
+                    subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
+                    controllerSQL.connect(Map.get(DialogSQL.fieldNames.user), Map.get(DialogSQL.fieldNames.password), Map.get(DialogSQL.fieldNames.database), Map.get(DialogSQL.fieldNames.hostname));
+                });
+
+            }
+        };
+        //        EventHandler<ActionEvent> importcsvtosql = new EventHandler<ActionEvent>() {
 //            @Override
 //            public void handle(ActionEvent t) {
 //                subControllerSQL controllerSQL = StaticReferences.controller.getSQLControler(null);
