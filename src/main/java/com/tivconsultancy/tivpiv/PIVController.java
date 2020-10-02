@@ -73,13 +73,14 @@ public class PIVController extends BasicController implements ControllerWithImag
         }
         if (((PIVMethod) getCurrentMethod()).bReadFromSQL) {
             mainFolder = null;
-            String schemaName = "pivexp";
+            String schemaName = "expdata";
             String tableName = "pictures";
             String columnName = "ident";
             ReadInFile = new ArrayList<>();
             for (String s : ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).getColumnEntries(schemaName, tableName, columnName)) {
                 ReadInFile.add(new File(s));
             }
+            Collections.sort(ReadInFile);
         } else if (inputFolder != null && inputFolder.exists()) {
             mainFolder = inputFolder;
             ReadInFile = new ArrayList<>();

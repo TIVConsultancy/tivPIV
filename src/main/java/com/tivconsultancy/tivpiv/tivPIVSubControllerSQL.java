@@ -55,7 +55,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 //        for (String s : availExperiments) {
 //            hints.addSettingsObject(new SettingObject("Experiment", "sql_experimentident", s, SettingObject.SettingsType.String));
 //        }
-        List<String> availSettingsPIV = getColumnEntries("piv", "evalsettingspiv", "ident");
+        List<String> availSettingsPIV = getColumnEntries("flowdata", "evalsettingspiv", "ident");
         for (String s : availSettingsPIV) {
             hints.addSettingsObject(new SettingObject("Settings PIV", "sql_evalsettingspiv", s, SettingObject.SettingsType.String));
         }
@@ -69,7 +69,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 
     public Double getResolution(String experiment) {
         try {
-            String schemaName = "piv";
+            String schemaName = "flowdata";
             String tableName = "experiment";
             String columnName = "resolution";
             String stmtSQL = "SELECT * FROM " + schemaName + "." + tableName + " WHERE ident = '" + experiment + "'";
@@ -110,13 +110,13 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public String getinsertEntry(sqlEntryPIV e) {
-        String sqlStatement = "INSERT INTO piv.liqvelo (experiment, timestampexp, posx, posy, posz, velox, veloy) "
+        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, timestampexp, posx, posy, posz, velox, veloy) "
                 + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")";
         return sqlStatement;
     }
 
     public String getupserEntry(sqlEntryPIV e) {
-        String sqlStatement = "INSERT INTO piv.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) "
+        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) "
                 + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")"
                 + "ON CONFLICT (experiment, settings, timestampexp, posx, posy, posz) DO UPDATE SET "
                 + "experiment = EXCLUDED.experiment, "
@@ -146,19 +146,19 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public List<String> getFileNamesFromSQL() {
-        return sqlData.getColumnEntries("pivexp", "pictures", "ident", "WHERE experiment = " + ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL);
+        return sqlData.getColumnEntries("expdata", "pictures", "ident", "WHERE experiment = " + ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL);
     }
 
     public List<String> getAvailExperiments() {
-        return getColumnEntries("piv", "experiment", "ident");
+        return getColumnEntries("flowdata", "experiment", "ident");
     }
     
     public List<String> getAvailSettings(String experiment) {
-        return sqlData.getColumnEntries("pivexp", "settings", "ident", "WHERE experiment = '" + experiment+"'");
+        return sqlData.getColumnEntries("expdata", "settings", "ident", "WHERE experiment = '" + experiment+"'");
     }
     
     public List<String[]> getSettings(String experiment, String ident) {
-        String settingString = sqlData.getColumnEntries("pivexp", "settings", "settingstring", "WHERE experiment = '" + experiment + "' AND ident ='" +ident+"'").get(0);
+        String settingString = sqlData.getColumnEntries("expdata", "settings", "settingstring", "WHERE experiment = '" + experiment + "' AND ident ='" +ident+"'").get(0);
         List<String[]> settingsSplit = new ArrayList<>();
         for(String line: settingString.split("\\r?\\n")){
             settingsSplit.add(StringWorker.cutElements(";", line).toArray(new String[4]));
@@ -167,7 +167,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public String getreadEntryPic(String ident, String experiment) {
-        String sqlStatement = "SELECT picture FROM pivexp.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
+        String sqlStatement = "SELECT picture FROM expdata.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
         return sqlStatement;
     }
 
@@ -202,12 +202,12 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public String getinsertEntrySettings(String experiment, String ident, String settingsString) {
-        String sqlStatement = "INSERT INTO pivexp.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')";
+        String sqlStatement = "INSERT INTO expdata.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')";
         return sqlStatement;
     }
 
     public String getupserEntrySettings(String experiment, String ident, String settingsString) {
-        String sqlStatement = "INSERT INTO pivexp.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')"
+        String sqlStatement = "INSERT INTO expdata.settings (experiment, ident, settingstring)" + " VALUES('" + experiment + "','" + ident + "','" + settingsString + "')"
                 + "ON CONFLICT (experiment, ident) DO UPDATE SET "
                 + "experiment = EXCLUDED.experiment, "
                 + "ident = EXCLUDED.ident,"
