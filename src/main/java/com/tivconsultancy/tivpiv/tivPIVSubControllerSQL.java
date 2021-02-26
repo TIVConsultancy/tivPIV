@@ -20,9 +20,12 @@ import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
+import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivGUI.startup.StartUpSubControllerSQL;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -110,14 +113,14 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
     }
 
     public String getinsertEntry(sqlEntryPIV e) {
-        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, timestampexp, posx, posy, posz, velox, veloy) "
-                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")";
+        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings,timestampexp, posx, posy, posz, velox, veloy, burstnumber) "
+                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+ ", " + e.burstnumber + ")";
         return sqlStatement;
     }
 
     public String getupserEntry(sqlEntryPIV e) {
-        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy) "
-                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY + ")"
+        String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy, burstnumber) "
+                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+ ", " + e.burstnumber + ")"
                 + "ON CONFLICT (experiment, settings, timestampexp, posx, posy, posz) DO UPDATE SET "
                 + "experiment = EXCLUDED.experiment, "
                 + "settings = EXCLUDED.settings,"
@@ -126,7 +129,8 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
                 + "posy = EXCLUDED.posy, "
                 + "posz = EXCLUDED.posz, "
                 + "velox = EXCLUDED.velox, "
-                + "veloy = EXCLUDED.veloy";
+                + "veloy = EXCLUDED.veloy, "
+                + "burstnumber = EXCLUDED.burstnumber";
         return sqlStatement;
     }
 
@@ -145,22 +149,50 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         return img;
     }
 
+    public ImageInt[] readPredictionFromSQL(String experiment, String ident,int iHeight, int iWidth) throws SQLException, IOException {
+        InputStream is = sqlData.getBinaryStream(getreadEntryMask(ident, experiment));
+        ImageInt I1 = new ImageInt(iHeight, iWidth, getBytes(is, (iWidth*iHeight)));
+        is = sqlData.getBinaryStream(getreadEntryIntersection(ident, experiment));
+        ImageInt I2 = new ImageInt(iHeight, iWidth, getBytes(is, (iWidth*iHeight)));
+        return new ImageInt[]{I1,I2};
+    }
+    
+    public static byte[] getBytes(InputStream is,int size) throws IOException {
+
+    int len;
+//    int size = 1024;
+    byte[] buf;
+
+    if (is instanceof ByteArrayInputStream) {
+      size = is.available();
+      buf = new byte[size];
+      len = is.read(buf, 0, size);
+    } else {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      buf = new byte[size];
+      while ((len = is.read(buf, 0, size)) != -1)
+        bos.write(buf, 0, len);
+      buf = bos.toByteArray();
+    }
+    return buf;
+  }
+
     public List<String> getFileNamesFromSQL() {
-        return sqlData.getColumnEntries("expdata", "pictures", "ident", "WHERE experiment = " + ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL);
+        return sqlData.getColumnEntries("expdata", "pictures", "ident", "WHERE experiment = '" + ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL+"'");
     }
 
     public List<String> getAvailExperiments() {
         return getColumnEntries("flowdata", "experiment", "ident");
     }
-    
+
     public List<String> getAvailSettings(String experiment) {
-        return sqlData.getColumnEntries("expdata", "settings", "ident", "WHERE experiment = '" + experiment+"'");
+        return sqlData.getColumnEntries("expdata", "settings", "ident", "WHERE experiment = '" + experiment + "'");
     }
-    
+
     public List<String[]> getSettings(String experiment, String ident) {
-        String settingString = sqlData.getColumnEntries("expdata", "settings", "settingstring", "WHERE experiment = '" + experiment + "' AND ident ='" +ident+"'").get(0);
+        String settingString = sqlData.getColumnEntries("expdata", "settings", "settingstring", "WHERE experiment = '" + experiment + "' AND ident ='" + ident + "'").get(0);
         List<String[]> settingsSplit = new ArrayList<>();
-        for(String line: settingString.split("\\r?\\n")){
+        for (String line : settingString.split("\\r?\\n")) {
             settingsSplit.add(StringWorker.cutElements(";", line).toArray(new String[4]));
         }
         return settingsSplit;
@@ -168,6 +200,16 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 
     public String getreadEntryPic(String ident, String experiment) {
         String sqlStatement = "SELECT picture FROM expdata.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
+        return sqlStatement;
+    }
+
+    public String getreadEntryMask(String ident, String experiment) {
+        String sqlStatement = "SELECT mask FROM expdata.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
+        return sqlStatement;
+    }
+
+    public String getreadEntryIntersection(String ident, String experiment) {
+        String sqlStatement = "SELECT intersec FROM expdata.pictures WHERE ident = '" + ident + "' AND experiment = '" + experiment + "'";
         return sqlStatement;
     }
 
@@ -224,8 +266,9 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         double posZ;
         double vX;
         double vY;
+        int burstnumber;
 
-        public sqlEntryPIV(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY) {
+        public sqlEntryPIV(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY,int burstnumber) {
             this.experiment = experiment;
             this.settingsName = settingsName;
             this.posX = posX;
@@ -233,6 +276,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
             this.posZ = posZ;
             this.vX = vX;
             this.vY = vY;
+            this.burstnumber = burstnumber;
         }
 
     }

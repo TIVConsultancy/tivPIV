@@ -74,7 +74,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
         String expName = getSettingsValue("sql_experimentident").toString();
         String settingsPIVName = getSettingsValue("sql_evalsettingspiv").toString();
-
+        int iBurstNumber = getBurstNumber();
         int refPX_X = Integer.valueOf(getSettingsValue("data_refposPXX").toString());
         double refM_X = Double.valueOf(getSettingsValue("data_refposMX").toString());
         int refPX_Y = Integer.valueOf(getSettingsValue("data_refposPXY").toString());
@@ -82,9 +82,9 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         double refM_Z = Double.valueOf(getSettingsValue("data_refposMZ").toString());
         double fps = Integer.valueOf(getSettingsValue("data_FPS").toString());
         boolean bUPSERT = Boolean.valueOf(getSettingsValue("sql_upsert").toString());
-        double dResolution = Double.valueOf(getSettingsValue("data_Resolution").toString())/100000.0;
+        double dResolution = Double.valueOf(getSettingsValue("data_Resolution").toString()) / 100000.0;
         boolean activateSQL = Boolean.valueOf(this.getSettingsValue("sql_activation").toString());
-        
+
         try {
             if (activateSQL) {
                 tivPIVSubControllerSQL sql_Control = (tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null);
@@ -97,7 +97,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                     double dPosZ = refM_Z;
                     double dVX = v.getX() * dResolution * fps;
                     double dVY = v.getY() * dResolution * fps * -1.0;
-                    entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
+                    entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY, iBurstNumber));
 
                 }
                 if (bUPSERT) {
@@ -141,20 +141,20 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         List<VelocityVec> loVec = data.oGrid.getVectors();
 
         double avgx = Averaging.getMeanAverage(loVec, new Value<Object>() {
-                                           @Override
-                                           public Double getValue(Object pParameter) {
-                                               return ((VelocityVec) pParameter).getVelocityX();
-                                           }
-                                       });
+            @Override
+            public Double getValue(Object pParameter) {
+                return ((VelocityVec) pParameter).getVelocityX();
+            }
+        });
 
         results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgx.toString(), avgx * resolution * fps));
 
         double avgy = Averaging.getMeanAverage(loVec, new Value<Object>() {
-                                           @Override
-                                           public Double getValue(Object pParameter) {
-                                               return ((VelocityVec) pParameter).getVelocityY();
-                                           }
-                                       });
+            @Override
+            public Double getValue(Object pParameter) {
+                return ((VelocityVec) pParameter).getVelocityY();
+            }
+        });
 
         results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgy.toString(), avgy * resolution * fps));
 
@@ -204,6 +204,16 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
     }
 
+    private int getBurstNumber() {
+        int index = ((PIVController) StaticReferences.controller).getSelecedIndex();
+        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+        if (data.iBurstLength > 1) {
+            return (index / data.iBurstLength);
+        } else {
+            return 0;
+        }
+    }
+
     private double getTimeStamp() {
         int index = ((PIVController) StaticReferences.controller).getSelecedIndex();
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
@@ -214,6 +224,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
             double dRestTime = (index - (((int) (index / data.iBurstLength)) * data.iBurstLength)) * (1.0 / fps);
             System.out.println("Burst Time" + dBurstTime);
             System.out.println("Rest Time" + dRestTime);
+            System.out.println("Burst Number " + getBurstNumber());
             return dBurstTime + dRestTime;
         } else {
             return index * (1.0 / fps);
@@ -232,7 +243,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
     private void initSettins() {
         this.loSettings.add(new SettingObject("Export->SQL", "sql_activation", false, SettingObject.SettingsType.Boolean));
-        this.loSettings.add(new SettingObject("Experiment", "sql_experimentident", "NabilColumnTergitol1p0", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Experiment", "sql_experimentident", "TestHome2", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("UPSERT", "sql_upsert", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Settings PIV", "sql_evalsettingspiv", "bestpractice", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Reference Pos X [Px]", "data_refposPXX", 0, SettingObject.SettingsType.String));
@@ -250,23 +261,23 @@ public class Prot_PIVDataHandling extends PIVProtocol {
     @Override
     public void buildClusters() {
         SettingsCluster sqlCluster = new SettingsCluster("SQL",
-                                                         new String[]{"sql_activation", "sql_experimentident", "sql_upsert", "sql_evalsettingspiv"}, this);
+                new String[]{"sql_activation", "sql_experimentident", "sql_upsert", "sql_evalsettingspiv"}, this);
         sqlCluster.setDescription("Handles the export to the SQL database");
         lsClusters.add(sqlCluster);
 
         SettingsCluster csvExport = new SettingsCluster("CSV",
-                                                        new String[]{"data_csvExport"}, this);
+                new String[]{"data_csvExport"}, this);
         csvExport.setDescription("CSV export");
         lsClusters.add(csvExport);
 
         SettingsCluster refPos = new SettingsCluster("Referennce Position",
-                                                     new String[]{"data_refposPXX", "data_refposMX",
-                                                         "data_refposPXY", "data_refposMY", "data_refposMZ", "data_Resolution"}, this);
+                new String[]{"data_refposPXX", "data_refposMX",
+                    "data_refposPXY", "data_refposMY", "data_refposMZ", "data_Resolution"}, this);
         refPos.setDescription("Specifies the reference position in the image");
         lsClusters.add(refPos);
 
         SettingsCluster timeSettings = new SettingsCluster("Time",
-                                                           new String[]{"data_FPS", "data_BurstFreq"}, this);
+                new String[]{"data_FPS", "data_BurstFreq"}, this);
         timeSettings.setDescription("Time settings for FPS and Burst Frequency");
         lsClusters.add(timeSettings);
 

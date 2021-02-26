@@ -7,6 +7,7 @@ package com.tivconsultancy.tivpiv.protocols;
 
 import com.tivconsultancy.opentiv.helpfunctions.settings.FactorySettingsCluster;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
+import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
@@ -27,7 +28,7 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     ImageInt preproc;
     ImageInt preproc2;
-
+    Settings oSet;
     private String name = "Image Correction";
 
     public Prot_PIVPreProcessor(String name) {
@@ -39,6 +40,17 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         super();
         preproc = new ImageInt(50, 50, 150);
         preproc2 = new ImageInt(50, 50, 150);
+        oSet=new Settings() {
+            @Override
+            public String getType() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void buildClusters() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
         buildLookUp();
         initSettings();
         buildClusters();
@@ -91,6 +103,20 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         data.iaReadInFirst = preproc.iaPixels;
         data.iaReadInSecond = preproc2.iaPixels;
+        SettingsCluster CutImage = new SettingsCluster("Cut Image",
+                new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
+                    "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
+                    "cutxRight"}, this);
+        CutImage.setDescription("Cut image");
+        oSet.lsClusters.add(CutImage);
+        oSet.loSettings.add(new SettingObject("Cut Top", "BcutyTop", this.getSettingsValue("BcutyTop"), SettingObject.SettingsType.Boolean));
+        oSet.loSettings.add(new SettingObject("Value", "cutyTop", this.getSettingsValue("cutyTop"), SettingObject.SettingsType.Integer));
+        oSet.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", this.getSettingsValue("BcutyBottom"), SettingObject.SettingsType.Boolean));
+        oSet.loSettings.add(new SettingObject("Value", "cutyBottom", this.getSettingsValue("cutyBottom"), SettingObject.SettingsType.Integer));
+        oSet.loSettings.add(new SettingObject("Cut Left", "BcutxLeft", this.getSettingsValue("BcutxLeft"), SettingObject.SettingsType.Boolean));
+        oSet.loSettings.add(new SettingObject("Value", "cutxLeft", this.getSettingsValue("cutxLeft"), SettingObject.SettingsType.Integer));
+        oSet.loSettings.add(new SettingObject("Cut Right", "BcutxRight", this.getSettingsValue("BcutxRight"), SettingObject.SettingsType.Boolean));
+        oSet.loSettings.add(new SettingObject("Value", "cutxRight", this.getSettingsValue("cutxRight"), SettingObject.SettingsType.Integer));
     }
 
     @Override
@@ -100,30 +126,30 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     @Override
     public Object[] getResults() {
-        return new Object[]{preproc.clone(), preproc2.clone()};
-    }
+            return new Object[]{preproc.clone(), preproc2.clone(),this.oSet};
+        }
 
     public void buildClusters() {
 
         SettingsCluster CutImage = new SettingsCluster("Cut Image",
-                                                       new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
-                                                           "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
-                                                           "cutxRight"}, this);
+                new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
+                    "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
+                    "cutxRight"}, this);
         CutImage.setDescription("Cut image");
         lsClusters.add(CutImage);
 
         lsClusters.add(FactorySettingsCluster.getStandardCluster("Curve Correction",
-                                                                 new String[]{
-                                                                     "CurveCorrection",
-                                                                     "GreyOldValues",
-                                                                     "GreyNewValues"},
-                                                                 "Curve correction "
-                                                                 + "with spline "
-                                                                 + "interpolation",
-                                                                 this));
+                new String[]{
+                    "CurveCorrection",
+                    "GreyOldValues",
+                    "GreyNewValues"},
+                "Curve correction "
+                + "with spline "
+                + "interpolation",
+                this));
 
         SettingsCluster NR1 = new SettingsCluster("Noise Reduction",
-                                                  new String[]{"NRSimple1", "NRSimple1Threshold", "NRType"}, this);
+                new String[]{"NRSimple1", "NRSimple1Threshold", "NRType"}, this);
         NR1.setDescription("Simple noise reduction that are based on a "
                 + "threshold. \n NRSimple1: Turn on/off \n NRSimple1Threshold:"
                 + " Threshold \n NRType: Type of noise reduction"
@@ -131,23 +157,23 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         lsClusters.add(NR1);
 
         SettingsCluster IMGFilter = new SettingsCluster("Image Filter",
-                                                        new String[]{"SFGauss", "SF5x5Gauss", "SF3x3Box"}, this);
+                new String[]{"SFGauss", "SF5x5Gauss", "SF3x3Box"}, this);
         IMGFilter.setDescription("Standard image filters of different sizes");
         lsClusters.add(IMGFilter);
 
         SettingsCluster Brightness = new SettingsCluster("Brightness",
-                                                         new String[]{"HGBrightness", "Brightness"}, this);
+                new String[]{"HGBrightness", "Brightness"}, this);
         Brightness.setDescription("Shifts the brighntess +- to the value");
         lsClusters.add(Brightness);
 
         SettingsCluster Equalize = new SettingsCluster("Equalize",
-                                                       new String[]{"HGEqualize", "Equalize"}, this);
+                new String[]{"HGEqualize", "Equalize"}, this);
         Equalize.setDescription("Equalizes the histogram to the "
                 + "given maximum value");
         lsClusters.add(Equalize);
 
         SettingsCluster Contrast = new SettingsCluster("Contrast",
-                                                       new String[]{"HGContrast", "BlackMin", "WhiteMax"}, this);
+                new String[]{"HGContrast", "BlackMin", "WhiteMax"}, this);
         Contrast.setDescription("Increase the contrast by normalizing to the "
                 + "possible black and white values");
         lsClusters.add(Contrast);

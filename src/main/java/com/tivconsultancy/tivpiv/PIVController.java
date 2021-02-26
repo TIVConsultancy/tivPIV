@@ -76,8 +76,10 @@ public class PIVController extends BasicController implements ControllerWithImag
             String schemaName = "expdata";
             String tableName = "pictures";
             String columnName = "ident";
+            String expName = ((PIVMethod) StaticReferences.controller.getCurrentMethod()).experimentSQL;
             ReadInFile = new ArrayList<>();
-            for (String s : ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).getColumnEntries(schemaName, tableName, columnName)) {
+//            for (String s : ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).getColumnEntries(schemaName, tableName, columnName)) {
+            for (String s : ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).getFileNamesFromSQL()) {
                 ReadInFile.add(new File(s));
             }
             Collections.sort(ReadInFile);
@@ -189,7 +191,7 @@ public class PIVController extends BasicController implements ControllerWithImag
         for (Protocol p : currentMethod.getProtocols()) {
             p.setFromFile(ls);
         }
-        
+
         mainFrame.startNewSettings();
     }
 
@@ -309,7 +311,7 @@ public class PIVController extends BasicController implements ControllerWithImag
         Thread running = new Thread() {
             @Override
             public void run() {
-                timeline:
+                timeline:                
                 for (int i : getBurstStarts()) {
                     try {
                         StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(i));
@@ -362,7 +364,7 @@ public class PIVController extends BasicController implements ControllerWithImag
                 startingPoints.add(i);
             }
         } else {
-            for (int i = 0; i < ReadInFile.size() - iBurst; i = i + iBurst) {
+            for (int i = 0; i <= ReadInFile.size() - iBurst; i = i + iBurst) {
                 startingPoints.add(i);
             }
         }

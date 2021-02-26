@@ -99,7 +99,8 @@ public class PIVMethod implements Method {
         try {
             getProtocol("read").run(new Object[]{imageFile1, imageFile2});
             getProtocol("preproc").run(getProtocol("read").getResults());
-            getProtocol("mask").run(getProtocol("preproc").getResults());
+            Object[] prepr = getProtocol("preproc").getResults();
+            getProtocol("mask").run(new Object[]{prepr[0],prepr[1],imageFile1, imageFile2});
             PIVStaticReferences.calcIntensityValues(((PIVController) StaticReferences.controller).getDataPIV());
             getProtocol("inter areas").run();
             getProtocol("calculate").run();
