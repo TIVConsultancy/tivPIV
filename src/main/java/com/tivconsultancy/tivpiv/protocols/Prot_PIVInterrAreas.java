@@ -96,12 +96,13 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     private void initSettins() {
         this.loSettings.add(new SettingObject("Window Size", "PIV_WindowSize", 32, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Grid Type", "PIV_GridType", "Standard", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("PIV Interrogation", "PIV_Interrogation", true, SettingObject.SettingsType.Boolean));
     }
 
     @Override
     public void buildClusters() {
         SettingsCluster IMGFilter = new SettingsCluster("Interrogation Area",
-                                                        new String[]{"PIV_WindowSize", "PIV_GridType"}, this);
+                                                        new String[]{"PIV_WindowSize", "PIV_GridType","PIV_Interrogation"}, this);
         IMGFilter.setDescription("Masks objects in pictures based on edge detecting");
         lsClusters.add(IMGFilter);
     }
@@ -291,6 +292,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 16, SettingObject.SettingsType.Integer));
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 64, SettingObject.SettingsType.Integer));
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 128, SettingObject.SettingsType.Integer));
+//        ls.add(new SettingObject("PIV Interrogation", "PIV_Interrogation", true, SettingObject.SettingsType.Boolean));
         return ls;
     }
 
