@@ -5,6 +5,7 @@
  */
 package com.tivconsultancy.tivpiv.protocols;
 
+import com.tivconsultancy.opentiv.helpfunctions.io.Writer;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
@@ -23,6 +24,7 @@ import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL;
 import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL.sqlEntryPIV;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +76,6 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
         String expName = getSettingsValue("sql_experimentident").toString();
         String settingsPIVName = getSettingsValue("sql_evalsettingspiv").toString();
-        int iBurstNumber = getBurstNumber();
         int refPX_X = Integer.valueOf(getSettingsValue("data_refposPXX").toString());
         double refM_X = Double.valueOf(getSettingsValue("data_refposMX").toString());
         int refPX_Y = Integer.valueOf(getSettingsValue("data_refposPXY").toString());
@@ -97,7 +98,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                     double dPosZ = refM_Z;
                     double dVX = v.getX() * dResolution * fps;
                     double dVY = v.getY() * dResolution * fps * -1.0;
-                    entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY, iBurstNumber));
+                    entries.add(new sqlEntryPIV(expName, settingsPIVName, dPosX, dPosY, dPosZ, dVX, dVY));
 
                 }
                 if (bUPSERT) {
@@ -126,6 +127,40 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         try {
             if (Boolean.valueOf(this.getSettingsValue("data_csvExport").toString())) {
 //                mache export csv
+                List<String[]> lsOut = new ArrayList<>();
+                int time = (int) getTimeStamp();
+                String sExportPath = this.getSettingsValue("data_csvExportPath").toString();
+                if (sExportPath == "Directory") {
+                    String sDir = ((PIVController) StaticReferences.controller).getCurrentFileSelected().getParent();
+                    sExportPath = sDir + System.getProperty("file.separator") + data.sOutputFolder;
+                    File oF = new File(sExportPath);
+                    if (!oF.exists()) {
+                        oF.mkdir();
+                    }
+                }
+
+                for (Vector v : data.oGrid.getVectors()) {
+                    double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
+                    double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
+//                    double dPosYPx = v.getPosY();
+//                    double dPosXPx = v.getPosX();
+                    double dPosZ = refM_Z;
+                    double dVX = v.getX() * dResolution * fps;
+                    double dVY = -1.0 * v.getY() * dResolution * fps;
+                    String[] sOut = new String[5];
+                    sOut[0] = String.valueOf(dPosX);
+                    sOut[1] = String.valueOf(dPosY);
+                    sOut[2] = String.valueOf(dPosZ);
+                    sOut[3] = String.valueOf(dVX);
+                    sOut[4] = String.valueOf(dVY);
+//                    sOut[5] = String.valueOf(dPosXPx);
+//                    sOut[6] = String.valueOf(dPosYPx);
+                    lsOut.add(sOut);
+                }
+                lsOut.add(0, new String[]{"Position X [m]", "Position Y [m]", "Position Z [m]", "Velocity X [m/s]", "Velocity Y [m/s]" });
+                Writer oWrite = new Writer(sExportPath + System.getProperty("file.separator") + "LiqVelo" + time + ".csv");
+                oWrite.writels(lsOut, ",");
+                lsOut.clear();
             }
         } catch (Exception e) {
         }
@@ -256,6 +291,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         this.loSettings.add(new SettingObject("FPS", "data_FPS", 500, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Burst Frequency [Hz]", "data_BurstFreq", 5, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("CSV", "data_csvExport", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Export Path", "data_csvExportPath", "Directory", SettingObject.SettingsType.String));
     }
 
     @Override
@@ -266,7 +302,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         lsClusters.add(sqlCluster);
 
         SettingsCluster csvExport = new SettingsCluster("CSV",
-                new String[]{"data_csvExport"}, this);
+                new String[]{"data_csvExport", "data_csvExportPath"}, this);
         csvExport.setDescription("CSV export");
         lsClusters.add(csvExport);
 

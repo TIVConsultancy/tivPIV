@@ -27,6 +27,7 @@ import com.tivconsultancy.tivGUI.startup.StartUpSubControllerViews;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.io.File;
 import java.io.IOException;
+import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.ujmp.core.collections.list.ArrayIndexList;
 
 /**
@@ -311,26 +313,34 @@ public class PIVController extends BasicController implements ControllerWithImag
         Thread running = new Thread() {
             @Override
             public void run() {
-                timeline:                
+                timeline:
                 for (int i : getBurstStarts()) {
-                    try {
-                        StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(i));
-                        setSelectedFile(null, ReadInFile.get(i));
-                        startNewIndexStep();
+                    int iLength = ((PIVMethod) getCurrentMethod()).getBurstLength() > 1 ? ((PIVMethod) getCurrentMethod()).getBurstLength() : 2;
+                    iLength=((PIVMethod) getCurrentMethod()).getLeapLength() > 1 ? ((PIVMethod) getCurrentMethod()).getBurstLength() : 2;
+                    for (int j = i; j < i + iLength - 1; j++) {
                         try {
-                            getCurrentMethod().run();
-                            storeTempData();
-                            subViews.update();
-                        } catch (Exception ex) {
-                            StaticReferences.getlog().log(Level.SEVERE, "Unable to finish step" + i + " : " + ex.getMessage(), ex);
+                            StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(j));
+                            setSelectedFile(null, ReadInFile.get(j));
+                            startNewIndexStep();
+                            try {
+                                getCurrentMethod().run();
+                                storeTempData();
+                                subViews.update();
+                            } catch (Exception ex) {
+                                StaticReferences.getlog().log(Level.SEVERE, "Unable to finish step" + j + " : " + ex.getMessage(), ex);
 //                            releaseUIAfterProceess();
 //                            StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
-                        }
-                    } catch (Exception e) {
-                        StaticReferences.getlog().log(Level.SEVERE, "Unable to select file and start new timestep : " + e.getMessage(), e);
+                            }
+                        } catch (Exception e) {
+                            StaticReferences.getlog().log(Level.SEVERE, "Unable to select file and start new timestep : " + e.getMessage(), e);
 //                        releaseUIAfterProceess();
 //                        StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
+                        }
                     }
+//                    System.out.println("Object Size data");
+//                    System.out.println(ObjectSizeCalculator.getObjectSize(data));
+//                    System.out.println("Object Size subviews");
+//                    System.out.println(ObjectSizeCalculator.getObjectSize(subViews));
                 }
                 releaseUIAfterProceess();
                 Platform.runLater(new Runnable() {

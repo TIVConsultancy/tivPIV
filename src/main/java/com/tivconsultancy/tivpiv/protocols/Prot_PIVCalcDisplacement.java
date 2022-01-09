@@ -110,7 +110,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         this.loSettings.add(new SettingObject("Burst Length", "tivPIVBurstLength", -1, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Validate", "tivPIVValidateVectors", true, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
-        this.loSettings.add(new SettingObject("Threshold", "tivPIVValThreshold", 5.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("Threshold", "tivPIVValThreshold", 2.0, SettingObject.SettingsType.Double));
         this.loSettings.add(new SettingObject("Interpolate New Values", "tivPIVValidateInterpol", true, SettingObject.SettingsType.Boolean));
     }
 

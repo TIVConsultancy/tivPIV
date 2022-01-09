@@ -95,7 +95,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
 
     private void initSettins() {
         this.loSettings.add(new SettingObject("Window Size", "PIV_WindowSize", 32, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Grid Type", "PIV_GridType", "Standard", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Grid Type", "PIV_GridType", "50Overlap", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("PIV Interrogation", "PIV_Interrogation", true, SettingObject.SettingsType.Boolean));
     }
 
@@ -288,7 +288,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     public List<SettingObject> getHints() {
         List<SettingObject> ls = super.getHints();
         ls.add(new SettingObject("Grid Type", "PIV_GridType", "PIV_Ziegenhein2018", SettingObject.SettingsType.String));
-        ls.add(new SettingObject("Grid Type", "PIV_GridType", "50Overlap", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Grid Type", "PIV_GridType", "Standard", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 16, SettingObject.SettingsType.Integer));
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 64, SettingObject.SettingsType.Integer));
         ls.add(new SettingObject("Window Size", "PIV_WindowSize", 128, SettingObject.SettingsType.Integer));

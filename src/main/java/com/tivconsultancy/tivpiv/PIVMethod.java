@@ -31,12 +31,11 @@ import java.util.List;
  */
 public class PIVMethod implements Method {
 
-    
     protected File imageFile1 = null;
     protected File imageFile2 = null;
-    
+
     public boolean bReadFromSQL = false;
-    public  String experimentSQL;    
+    public String experimentSQL;
 
     protected LookUp<Protocol> methods;
 
@@ -59,6 +58,12 @@ public class PIVMethod implements Method {
 
     @Override
     public List<ImagePath> getInputImages() {
+        if (imageFile1 != null && imageFile2 != null) {
+            List<ImagePath> lIP = new ArrayList<>();
+            lIP.add(new ImagePath(imageFile1.getAbsolutePath()));
+            lIP.add(new ImagePath(imageFile2.getAbsolutePath()));
+            return lIP;
+        }
         return new ArrayList<>();
     }
 
@@ -100,7 +105,7 @@ public class PIVMethod implements Method {
             getProtocol("read").run(new Object[]{imageFile1, imageFile2});
             getProtocol("preproc").run(getProtocol("read").getResults());
             Object[] prepr = getProtocol("preproc").getResults();
-            getProtocol("mask").run(new Object[]{prepr[0],prepr[1],imageFile1, imageFile2});
+            getProtocol("mask").run(new Object[]{prepr[0], prepr[1], imageFile1, imageFile2, prepr[2]});
             PIVStaticReferences.calcIntensityValues(((PIVController) StaticReferences.controller).getDataPIV());
             getProtocol("inter areas").run();
             getProtocol("calculate").run();
@@ -120,7 +125,7 @@ public class PIVMethod implements Method {
 //                results1D.setResult(e.toString(), p.getOverTimesResult(e));
 //            }
 
-    }   
+    }
 
     @Override
     public Protocol getProtocol(String ident) {
@@ -134,26 +139,28 @@ public class PIVMethod implements Method {
             getProtocol("preproc").run(getProtocol("read").getResults());
         }
     }
-    
-    public boolean checkBurst(int i){
+
+    public boolean checkBurst(int i) {
         int burstLength = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVBurstLength").toString());
-        if(i < burstLength || burstLength <= 1) return false;        
-        return i%burstLength == 0;
+        if (i < burstLength || burstLength <= 1) {
+            return false;
+        }
+        return i % burstLength == 0;
     }
-    
-    public int getLeapLength(){
+
+    public int getLeapLength() {
         int leapLength = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVInternalLeap").toString());
         return Math.max(leapLength, 1);
     }
-    
-    public int getBurstLength(){
+
+    public int getBurstLength() {
         int burst = Integer.valueOf(methods.get("calculate").getSettingsValue("tivPIVBurstLength").toString());
         return burst;
     }
-    
+
     @Override
     public Prot_SystemSettings getSystemSetting(String ident) {
         return (Prot_SystemSettings) methods.get("system");
     }
-    
+
 }

@@ -114,13 +114,13 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
 
     public String getinsertEntry(sqlEntryPIV e) {
         String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings,timestampexp, posx, posy, posz, velox, veloy, burstnumber) "
-                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+ ", " + e.burstnumber + ")";
+                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+  ")";
         return sqlStatement;
     }
 
     public String getupserEntry(sqlEntryPIV e) {
         String sqlStatement = "INSERT INTO flowdata.liqvelo (experiment, settings, timestampexp, posx, posy, posz, velox, veloy, burstnumber) "
-                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+ ", " + e.burstnumber + ")"
+                + "VALUES('" + e.experiment + "', '" + e.settingsName + "', " + t + ", " + e.posX + ", " + e.posY + ", " + e.posZ + ", " + e.vX + ", " + e.vY+  ")"
                 + "ON CONFLICT (experiment, settings, timestampexp, posx, posy, posz) DO UPDATE SET "
                 + "experiment = EXCLUDED.experiment, "
                 + "settings = EXCLUDED.settings,"
@@ -129,8 +129,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
                 + "posy = EXCLUDED.posy, "
                 + "posz = EXCLUDED.posz, "
                 + "velox = EXCLUDED.velox, "
-                + "veloy = EXCLUDED.veloy, "
-                + "burstnumber = EXCLUDED.burstnumber";
+                + "veloy = EXCLUDED.veloy";
         return sqlStatement;
     }
 
@@ -266,9 +265,9 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
         double posZ;
         double vX;
         double vY;
-        int burstnumber;
+//        int burstnumber;
 
-        public sqlEntryPIV(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY,int burstnumber) {
+        public sqlEntryPIV(String experiment, String settingsName, double posX, double posY, double posZ, double vX, double vY) {
             this.experiment = experiment;
             this.settingsName = settingsName;
             this.posX = posX;
@@ -276,7 +275,7 @@ public class tivPIVSubControllerSQL extends StartUpSubControllerSQL {
             this.posZ = posZ;
             this.vX = vX;
             this.vY = vY;
-            this.burstnumber = burstnumber;
+//            this.burstnumber = burstnumber;
         }
 
     }
