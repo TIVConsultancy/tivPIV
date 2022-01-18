@@ -93,7 +93,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
             File oF1 = (File) input[2];
             File oF2 = (File) input[3];
             PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
-            System.out.println(this.getSettingsValue("Mask"));
+            System.out.println("Mask generation using "+this.getSettingsValue("Mask"));
             //Get ML generated mask from SQL database
             if (this.getSettingsValue("Mask") == "ReadfromDirectory" && method.bReadFromSQL) {
                 try {
@@ -241,7 +241,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
     @Override
     public List<SettingObject> getHints() {
         List<SettingObject> ls = super.getHints();
-        ls.add(new SettingObject("Bubble Mask", "Mask", "Hessenkemper2018", SettingObject.SettingsType.String));
+//        ls.add(new SettingObject("Bubble Mask", "Mask", "Hessenkemper2018", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Bubble Mask", "Mask", "ReadfromDirectory", SettingObject.SettingsType.String));
 
         return ls;

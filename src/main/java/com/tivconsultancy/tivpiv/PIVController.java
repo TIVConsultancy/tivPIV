@@ -53,6 +53,7 @@ public class PIVController extends BasicController implements ControllerWithImag
     protected DatabaseRAM dataForPlot;
     Map<String, Dialog> openDialogBoxes = new HashMap<>();
     Thread runningThread = null;
+    public boolean neglect_prevStep = false;
 
     public PIVController() {
         initDatabase();
@@ -282,6 +283,7 @@ public class PIVController extends BasicController implements ControllerWithImag
                     getCurrentMethod().run();
                     data.setRes(getSelecedName(), database1Step);
                     subViews.update();
+                    neglect_prevStep=true;
                 } catch (Exception ex) {
                     StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
                 }
@@ -301,7 +303,7 @@ public class PIVController extends BasicController implements ControllerWithImag
             StaticReferences.getlog().log(Level.SEVERE, "Thread stopped : " + e.getMessage(), e);
             releaseUIAfterProceess();
         }
-
+        
     }
 
     @Override
@@ -313,12 +315,16 @@ public class PIVController extends BasicController implements ControllerWithImag
         Thread running = new Thread() {
             @Override
             public void run() {
-                timeline:
+                int prevstep=0;
+                timeline:               
                 for (int i : getBurstStarts()) {
                     int iLength = ((PIVMethod) getCurrentMethod()).getBurstLength() > 1 ? ((PIVMethod) getCurrentMethod()).getBurstLength() : 2;
                     iLength=((PIVMethod) getCurrentMethod()).getLeapLength() > 1 ? ((PIVMethod) getCurrentMethod()).getBurstLength() : 2;
                     for (int j = i; j < i + iLength - 1; j++) {
                         try {
+                            if (j-1!=prevstep){
+                                neglect_prevStep=true;
+                            }
                             StaticReferences.getlog().log(Level.SEVERE, "Starting for: " + ReadInFile.get(j));
                             setSelectedFile(null, ReadInFile.get(j));
                             startNewIndexStep();
@@ -328,13 +334,10 @@ public class PIVController extends BasicController implements ControllerWithImag
                                 subViews.update();
                             } catch (Exception ex) {
                                 StaticReferences.getlog().log(Level.SEVERE, "Unable to finish step" + j + " : " + ex.getMessage(), ex);
-//                            releaseUIAfterProceess();
-//                            StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
                             }
+                            prevstep=j;
                         } catch (Exception e) {
                             StaticReferences.getlog().log(Level.SEVERE, "Unable to select file and start new timestep : " + e.getMessage(), e);
-//                        releaseUIAfterProceess();
-//                        StaticReferences.controller.getDialog(ControllerUI.DialogNames_Default.PROCESS).close();
                         }
                     }
 //                    System.out.println("Object Size data");
@@ -342,6 +345,7 @@ public class PIVController extends BasicController implements ControllerWithImag
 //                    System.out.println("Object Size subviews");
 //                    System.out.println(ObjectSizeCalculator.getObjectSize(subViews));
                 }
+                neglect_prevStep=true;
                 releaseUIAfterProceess();
                 Platform.runLater(new Runnable() {
                     @Override
