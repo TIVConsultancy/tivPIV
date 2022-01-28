@@ -201,61 +201,61 @@ public class Prot_PIVDisplay extends PIVProtocol {
     }
 
 
-    public static InterrGrid posProc(InterrGrid oGrid, DataPIV Data) {
-        /*
-         put everything that is used to improve the result after the standard FFT        
-         */
-
-        if (Data.bValidate) {
-            oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-            if (Data.bInterpolation) {
-                oGrid.reconstructInvalidVectors(5);
-            }
-        }
-
-        if (Data.bMultipass || Data.bMultipass_BiLin) {
-            for (int i = 0; i < Data.iMultipassCount; i++) {
-//                oGrid.shiftAndRecalc();
-                if (Data.bMultipass_BiLin) {
-                    oGrid.shiftAndRecalcSubPix(Data);
-                } else {
-                    oGrid.shiftAndRecalc(Data);
-                }
-                if (Data.bValidate) {
-                    oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-                    if (Data.bInterpolation) {
-                        oGrid.reconstructInvalidVectors(5);
-                    }
-                }
-            }
-        }
-        if (Data.bRefine) {
-            for (int i = 0; i < oGrid.oaContent.length; i++) {
-                for (int j = 0; j < oGrid.oaContent[0].length; j++) {
-                    oGrid.oaContent[i][j].refine();
-                }
-            }
-            InterrGrid oRefine = oGrid.getRefinesGrid();
-            oRefine.checkMask(Data);
-
-            if (Data.bMultipass || Data.bMultipass_BiLin) {
-                for (int i = 0; i < Data.iMultipassCount; i++) {
-                    if (Data.bMultipass_BiLin) {
-                        oGrid.shiftAndRecalcSubPix(Data);
-                    } else {
-                        oGrid.shiftAndRecalc(Data);
-                    }
-                    oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-                    oRefine.reconstructInvalidVectors(5);
-                }
-            }
-
-            return oRefine;
-
-        }
-
-        return oGrid;
-
-    }
+//    public static InterrGrid posProc(InterrGrid oGrid, DataPIV Data) {
+//        /*
+//         put everything that is used to improve the result after the standard FFT        
+//         */
+//
+//        if (Data.bValidate) {
+//            oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
+//            if (Data.bInterpolation) {
+//                oGrid.reconstructInvalidVectors(5);
+//            }
+//        }
+//
+//        if (Data.bMultipass || Data.bMultipass_BiLin) {
+//            for (int i = 0; i < Data.iMultipassCount; i++) {
+////                oGrid.shiftAndRecalc();
+//                if (Data.bMultipass_BiLin) {
+//                    oGrid.shiftAndRecalcSubPix(Data);
+//                } else {
+//                    oGrid.shiftAndRecalc(Data);
+//                }
+//                if (Data.bValidate) {
+//                    oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
+//                    if (Data.bInterpolation) {
+//                        oGrid.reconstructInvalidVectors(5);
+//                    }
+//                }
+//            }
+//        }
+//        if (Data.bRefine) {
+//            for (int i = 0; i < oGrid.oaContent.length; i++) {
+//                for (int j = 0; j < oGrid.oaContent[0].length; j++) {
+//                    oGrid.oaContent[i][j].refine();
+//                }
+//            }
+//            InterrGrid oRefine = oGrid.getRefinesGrid();
+//            oRefine.checkMask(Data);
+//
+//            if (Data.bMultipass || Data.bMultipass_BiLin) {
+//                for (int i = 0; i < Data.iMultipassCount; i++) {
+//                    if (Data.bMultipass_BiLin) {
+//                        oGrid.shiftAndRecalcSubPix(Data);
+//                    } else {
+//                        oGrid.shiftAndRecalc(Data);
+//                    }
+//                    oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
+//                    oRefine.reconstructInvalidVectors(5);
+//                }
+//            }
+//
+//            return oRefine;
+//
+//        }
+//
+//        return oGrid;
+//
+//    }
 
 }

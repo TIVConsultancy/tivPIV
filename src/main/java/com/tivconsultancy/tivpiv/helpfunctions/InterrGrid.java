@@ -12,6 +12,7 @@ import com.tivconsultancy.opentiv.math.exceptions.EmptySetException;
 import com.tivconsultancy.opentiv.math.grids.CellRec;
 import com.tivconsultancy.opentiv.math.interfaces.Grid;
 import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
+import com.tivconsultancy.opentiv.math.sets.Set1D;
 import com.tivconsultancy.opentiv.math.specials.EnumObject;
 import com.tivconsultancy.opentiv.physics.vectors.VelocityVec;
 import com.tivconsultancy.opentiv.postproc.vector.PaintVectors;
@@ -47,13 +48,13 @@ public class InterrGrid implements Grid, Serializable {
         }
     }
 
-    public VelocityGrid getVeloGrid() {
+    public VelocityGrid getVeloGrid(int iFactor) {
         VelocityGrid oGrid = new VelocityGrid(oaContent[0][0].oIntervalX.dLeftBorder,
-                                              oaContent[0][oaContent[0].length - 1].oIntervalX.dRightBorder,
-                                              oaContent[oaContent.length - 1][0].oIntervalY.dRightBorder,
-                                              oaContent[0][0].oIntervalY.dLeftBorder,
-                                              oaContent[0].length,
-                                              oaContent.length);
+                oaContent[0][oaContent[0].length - 1].oIntervalX.dRightBorder,
+                oaContent[oaContent.length - 1][0].oIntervalY.dRightBorder,
+                oaContent[0][0].oIntervalY.dLeftBorder,
+                oaContent[0].length * iFactor,
+                oaContent.length * iFactor);
         for (InterrArea[] oa : oaContent) {
             for (InterrArea o : oa) {
                 if (!o.bMasked) {
@@ -64,8 +65,8 @@ public class InterrGrid implements Grid, Serializable {
                             oCellX.refine();
                             oCellY.refine();
 
-                            for (int i = 0; i < 2; i++) {
-                                for (int j = 0; j < 2; j++) {
+                            for (int i = 0; i < iFactor; i++) {
+                                for (int j = 0; j < iFactor; j++) {
                                     oGrid.GridVeloX.addContent(new OrderedPair(o.oRefinedAreas[i][j].oIntervalX.getCenter(), o.oRefinedAreas[i][j].oIntervalY.getCenter(), o.oRefinedAreas[i][j].getVeloX()));
                                     oGrid.GridVeloY.addContent(new OrderedPair(o.oRefinedAreas[i][j].oIntervalX.getCenter(), o.oRefinedAreas[i][j].oIntervalY.getCenter(), o.oRefinedAreas[i][j].getVeloY()));
                                 }
@@ -159,11 +160,11 @@ public class InterrGrid implements Grid, Serializable {
         try {
             EnumObject o = Sorting.getMaxCharacteristic(oVecChecked, new Sorting.Characteristic() {
 
-                                                    @Override
-                                                    public Double getCharacteristicValue(Object pParameter) {
-                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                                                    }
-                                                });
+                @Override
+                public Double getCharacteristicValue(Object pParameter) {
+                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                }
+            });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -217,11 +218,11 @@ public class InterrGrid implements Grid, Serializable {
         try {
             EnumObject o = Sorting.getMaxCharacteristic(oVecChecked, new Sorting.Characteristic() {
 
-                                                    @Override
-                                                    public Double getCharacteristicValue(Object pParameter) {
-                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                                                    }
-                                                });
+                @Override
+                public Double getCharacteristicValue(Object pParameter) {
+                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                }
+            });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -292,11 +293,11 @@ public class InterrGrid implements Grid, Serializable {
         try {
             EnumObject o = Sorting.getMaxCharacteristic(oVeloVecs, new Sorting.Characteristic() {
 
-                                                    @Override
-                                                    public Double getCharacteristicValue(Object pParameter) {
-                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                                                    }
-                                                });
+                @Override
+                public Double getCharacteristicValue(Object pParameter) {
+                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                }
+            });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -341,11 +342,11 @@ public class InterrGrid implements Grid, Serializable {
         try {
             EnumObject o = Sorting.getMaxCharacteristic(oVeloVecs, new Sorting.Characteristic() {
 
-                                                    @Override
-                                                    public Double getCharacteristicValue(Object pParameter) {
-                                                        return ((VelocityVec) pParameter).opUnitTangent.dValue;
-                                                    }
-                                                });
+                @Override
+                public Double getCharacteristicValue(Object pParameter) {
+                    return ((VelocityVec) pParameter).opUnitTangent.dValue;
+                }
+            });
             if (Data.AutoStretch) {
                 dStretch = (this.getCellSize() / o.dEnum * Data.AutoStretchFactor);
             }
@@ -464,6 +465,9 @@ public class InterrGrid implements Grid, Serializable {
     public void shiftAndRecalc(DataPIV Data) {
         for (int i = 0; i < oaContent.length; i++) {
             for (int j = 0; j < oaContent[0].length; j++) {
+                if (!oaContent[i][j].bMasked && oaContent[i][j].dVx == null && oaContent[i][j].dVy == null) {
+                    oaContent[i][j].getDisplacement(Data);
+                }
                 oaContent[i][j].shiftSecond(Data);
                 oaContent[i][j].getDisplacement(Data);
                 oaContent[i][j].resetshiftSecond(Data);
@@ -475,6 +479,9 @@ public class InterrGrid implements Grid, Serializable {
 
         for (int i = 0; i < oaContent.length; i++) {
             for (int j = 0; j < oaContent[0].length; j++) {
+                if (!oaContent[i][j].bMasked && oaContent[i][j].dVx == null && oaContent[i][j].dVy == null) {
+                    oaContent[i][j].getDisplacement(Data);
+                }
                 if (!oaContent[i][j].bMasked && oaContent[i][j].dVx != null && oaContent[i][j].dVy != null) {
                     oaContent[i][j].getDisplacement(new OrderedPair(oaContent[i][j].dVx, oaContent[i][j].dVy), Data);
                 }
@@ -504,44 +511,72 @@ public class InterrGrid implements Grid, Serializable {
         return oGrid;
     }
 
-    public InterrGrid getRefinesGrid() {
-        InterrArea[][] oaRefinedGrid = new InterrArea[oaContent.length * 2][oaContent[0].length * 2];
+    public InterrGrid getRefinesGrid(DataPIV Data) {
+        int iFactor = Data.bOverlap ? 3 : 2;
+
+        int PIV_columns = (int) ((Data.iaReadInFirst[0].length - 1) / (Data.PIV_WindowSize / 2));
+        int PIV_rows = (int) ((Data.iaReadInFirst.length - 1) / (Data.PIV_WindowSize / 2));
+        InterrArea[][] oaRefinedGrid = new InterrArea[((iFactor) * PIV_rows)-iFactor][((iFactor) * PIV_columns)-iFactor];
+
         int iRefinedGrid = 0;
+        int lastJref = 0;
         for (int i = 0; i < oaContent.length; i++) {
             int jRefinedGrid = 0;
             for (int j = 0; j < oaContent[0].length; j++) {
-                oaRefinedGrid[iRefinedGrid][jRefinedGrid] = oaContent[i][j].oRefinedAreas[0][0];
-                oaRefinedGrid[iRefinedGrid][jRefinedGrid + 1] = oaContent[i][j].oRefinedAreas[0][1];
-                oaRefinedGrid[iRefinedGrid + 1][jRefinedGrid] = oaContent[i][j].oRefinedAreas[1][0];
-                oaRefinedGrid[iRefinedGrid + 1][jRefinedGrid + 1] = oaContent[i][j].oRefinedAreas[1][1];
-                jRefinedGrid = jRefinedGrid + 2;
+                for (int k = 0; k < iFactor; k++) {
+                    for (int l = 0; l < iFactor; l++) {
+                        oaRefinedGrid[iRefinedGrid + k][jRefinedGrid + l] = oaContent[i][j].oRefinedAreas[k][l];
+                    }
+                }
+                jRefinedGrid = jRefinedGrid + iFactor;
             }
-            iRefinedGrid = iRefinedGrid + 2;
+            lastJref = jRefinedGrid;
+            iRefinedGrid = iRefinedGrid + iFactor;
         }
 
-        iRefinedGrid = 0;
-        for (int i = 0; i < oaContent.length; i++) {
-            int jMultipass = 0;
-            for (int j = 0; j < oaContent[0].length; j++) {
-                oaRefinedGrid[iRefinedGrid][jMultipass].dVx = oaContent[i][j].oRefinedAreas[0][0].getVeloX();
-                oaRefinedGrid[iRefinedGrid][jMultipass].dVy = oaContent[i][j].oRefinedAreas[0][0].getVeloY();
-
-                oaRefinedGrid[iRefinedGrid][jMultipass + 1].dVx = oaContent[i][j].oRefinedAreas[0][1].getVeloX();
-                oaRefinedGrid[iRefinedGrid][jMultipass + 1].dVy = oaContent[i][j].oRefinedAreas[0][1].getVeloY();
-
-                oaRefinedGrid[iRefinedGrid + 1][jMultipass].dVx = oaContent[i][j].oRefinedAreas[1][0].getVeloX();
-                oaRefinedGrid[iRefinedGrid + 1][jMultipass].dVy = oaContent[i][j].oRefinedAreas[1][0].getVeloY();
-
-                oaRefinedGrid[iRefinedGrid + 1][jMultipass + 1].dVx = oaContent[i][j].oRefinedAreas[1][1].getVeloX();
-                oaRefinedGrid[iRefinedGrid + 1][jMultipass + 1].dVy = oaContent[i][j].oRefinedAreas[1][1].getVeloY();
-
-                jMultipass = jMultipass + 2;
+        double dYStartOrg = oaRefinedGrid[iRefinedGrid - 1][lastJref - 1].oIntervalY.getCenter();
+        double dXStartOrg = oaRefinedGrid[iRefinedGrid - 1][lastJref - 1].oIntervalX.getCenter();
+        if (oaContent.length * iFactor < oaRefinedGrid.length) {
+            double dYStart = dYStartOrg;
+            for (int i = iRefinedGrid; i < oaRefinedGrid.length; i++) {
+                dYStart = dYStart + (Data.PIV_WindowSize / (iFactor + iFactor % 2));
+                double dYR = dYStart + (Data.PIV_WindowSize / 2);
+                for (int j = 0; j < lastJref; j++) {
+                    double dXL = oaRefinedGrid[0][j].oIntervalX.dLeftBorder;
+                    double dXR = dXL + (Data.PIV_WindowSize / 2);
+                    oaRefinedGrid[i][j] = new InterrArea(new Set1D(dXL, dXR), new Set1D(dYStart, dYR));
+                }
+                double dXStart = dXStartOrg;
+                for (int j = lastJref; j < oaRefinedGrid[0].length; j++) {
+                    dXStart = dXStart + (Data.PIV_WindowSize / (iFactor + iFactor % 2));
+                    double dXR = dXStart + (Data.PIV_WindowSize / 2);
+                    oaRefinedGrid[i][j] = new InterrArea(new Set1D(dXStart, dXR), new Set1D(dYStart, dYR));
+                }
             }
-            iRefinedGrid = iRefinedGrid + 2;
+
         }
 
-        InterrGrid oMultipass = new InterrGrid(oaRefinedGrid);
+        if (oaContent[0].length * iFactor < oaRefinedGrid[0].length) {
+            double dXStart = dXStartOrg;
+            for (int i = lastJref; i < oaRefinedGrid[0].length; i++) {
+                dXStart = dXStart + (Data.PIV_WindowSize / (iFactor + iFactor % 2));
+                double dXR = dXStart + (Data.PIV_WindowSize / 2);
+                for (int j = 0; j < iRefinedGrid; j++) {
+                    double dYL = oaRefinedGrid[j][0].oIntervalY.dLeftBorder;
+                    double dYR = dYL + (Data.PIV_WindowSize / 2);
+                    oaRefinedGrid[j][i] = new InterrArea(new Set1D(dXStart, dXR), new Set1D(dYL, dYR));
+                }
+                double dYStart = dYStartOrg;
+                for (int j = iRefinedGrid; j < oaRefinedGrid.length; j++) {
+                    dYStart = dYStart + (Data.PIV_WindowSize / (iFactor + iFactor % 2));
+                    double dYR = dYStart + (Data.PIV_WindowSize / 2);
+                    oaRefinedGrid[j][i] = new InterrArea(new Set1D(dXStart, dXR), new Set1D(dYStart, dYR));
+                }
+            }
 
+        }
+//
+ InterrGrid oMultipass = new InterrGrid(oaRefinedGrid);
         return oMultipass;
     }
 
@@ -551,22 +586,26 @@ public class InterrGrid implements Grid, Serializable {
     }
 
     @Override
-    public Double getValue(int i, int j) {
+    public Double getValue(int i, int j
+    ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Double setValue(int i, int j) {
+    public Double setValue(int i, int j
+    ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Double getdfdx(int i, int j) {
+    public Double getdfdx(int i, int j
+    ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Double getdfdy(int i, int j) {
+    public Double getdfdy(int i, int j
+    ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

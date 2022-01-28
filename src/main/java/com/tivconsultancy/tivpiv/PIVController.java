@@ -279,11 +279,12 @@ public class PIVController extends BasicController implements ControllerWithImag
             @Override
             public void run() {
                 try {
+                    neglect_prevStep=true;
                     startNewIndexStep();
                     getCurrentMethod().run();
                     data.setRes(getSelecedName(), database1Step);
                     subViews.update();
-                    neglect_prevStep=true;
+                    
                 } catch (Exception ex) {
                     StaticReferences.getlog().log(Level.SEVERE, "Unable to run : " + ex.getMessage(), ex);
                 }

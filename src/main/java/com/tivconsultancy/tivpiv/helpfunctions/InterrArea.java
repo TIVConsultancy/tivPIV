@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * InterrArea is by default a rectangular shape by extending the CellRec class
+ *
  * @author Thomas Ziegenhein
  */
 public class InterrArea extends CellRec implements Area, Serializable {
@@ -100,7 +101,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
         for (int i = (int) oIntervalY.dLeftBorder + iPixelShiftY; i < oIntervalY.dRightBorder + iPixelShiftY; i++) {
             int jSub = 0;
             for (int j = (int) oIntervalX.dLeftBorder + iPixelShiftX; j < oIntervalX.dRightBorder + iPixelShiftX; j++) {
-                if (i < 0 || i+1 >= iaData.length || j < 0 || j+1 >= iaData[0].length) {
+                if (i < 0 || i + 1 >= iaData.length || j < 0 || j + 1 >= iaData[0].length) {
                     iaSub[iSub][jSub] = 0.0;
                 } else {
                     if (dSubPixelShiftX == 0 && dSubPixelShiftY == 0) {
@@ -223,19 +224,19 @@ public class InterrArea extends CellRec implements Area, Serializable {
                 oOverlapRight = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder + this.oIntervalX.getSize() / iDivider, this.oIntervalX.dRightBorder + this.oIntervalX.getSize() / iDivider), new Set1D(this.oIntervalY.dLeftBorder, this.oIntervalY.dRightBorder));
                 oOverlapRight.checkIfMasked(Data);
             }
-            
+
             InterrArea oOverlapLeft = null;
             if (this.oIntervalX.dLeftBorder - this.oIntervalX.getSize() / iDivider > 0) {
                 oOverlapLeft = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder - this.oIntervalX.getSize() / iDivider, this.oIntervalX.dRightBorder - this.oIntervalX.getSize() / iDivider), new Set1D(this.oIntervalY.dLeftBorder, this.oIntervalY.dRightBorder));
                 oOverlapLeft.checkIfMasked(Data);
             }
-            
+
             InterrArea oOverlappTop = null;
             if (this.oIntervalY.dLeftBorder - this.oIntervalX.getSize() / iDivider > 0) {
                 oOverlappTop = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder - this.oIntervalY.getSize() / iDivider, this.oIntervalY.dRightBorder - this.oIntervalX.getSize() / iDivider));
                 oOverlappTop.checkIfMasked(Data);
             }
-            
+
             InterrArea oOverlappBottom = null;
             if (this.oIntervalY.dRightBorder + this.oIntervalX.getSize() / iDivider < Data.iaGreyIntensity1.length) {
                 oOverlappBottom = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder + this.oIntervalY.getSize() / iDivider, this.oIntervalY.dRightBorder + this.oIntervalX.getSize() / iDivider));
@@ -299,8 +300,8 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
             getDataDouble dIntensity2 = () -> Data.iaGreyIntensity2;
 
-            double iDivider = Data.Hart1998Divider;            
-            
+            double iDivider = Data.Hart1998Divider;
+
             if (Data.Hart1998) {
                 InterrArea oOverlappEast = null;
                 if (this.oIntervalX.dRightBorder + this.oIntervalX.getSize() / iDivider < Data.iaGreyIntensity1[0].length) {
@@ -323,36 +324,36 @@ public class InterrArea extends CellRec implements Area, Serializable {
                     oOverlappSouth.checkIfMasked(Data);
                 }
 
-                boolean bValidWest = oOverlappWest!= null && !oOverlappWest.bMasked &&  oOverlappWest.oIntervalX.dLeftBorder >= 0;
-                boolean bValidEast = oOverlappEast!= null && !oOverlappEast.bMasked && oOverlappEast.oIntervalX.dRightBorder < Data.iaGreyIntensity1[0].length;
-                boolean bValidNorth = oOverlappNorth!= null && !oOverlappNorth.bMasked && oOverlappNorth.oIntervalY.dLeftBorder >= 0 && oOverlappNorth.oIntervalY.dRightBorder >= 0;
-                boolean bValidSouth = oOverlappSouth!= null && !oOverlappSouth.bMasked && oOverlappSouth.oIntervalY.dLeftBorder < Data.iaGreyIntensity1.length && oOverlappSouth.oIntervalY.dRightBorder < Data.iaGreyIntensity1.length;
-                
+                boolean bValidWest = oOverlappWest != null && !oOverlappWest.bMasked && oOverlappWest.oIntervalX.dLeftBorder >= 0;
+                boolean bValidEast = oOverlappEast != null && !oOverlappEast.bMasked && oOverlappEast.oIntervalX.dRightBorder < Data.iaGreyIntensity1[0].length;
+                boolean bValidNorth = oOverlappNorth != null && !oOverlappNorth.bMasked && oOverlappNorth.oIntervalY.dLeftBorder >= 0 && oOverlappNorth.oIntervalY.dRightBorder >= 0;
+                boolean bValidSouth = oOverlappSouth != null && !oOverlappSouth.bMasked && oOverlappSouth.oIntervalY.dLeftBorder < Data.iaGreyIntensity1.length && oOverlappSouth.oIntervalY.dRightBorder < Data.iaGreyIntensity1.length;
+
                 double[][] dIntensity1N = null;
                 double[][] dIntensity2N = null;
-                
+
                 double[][] dIntensity1E = null;
                 double[][] dIntensity2E = null;
-                
+
                 double[][] dIntensity1S = null;
                 double[][] dIntensity2S = null;
-                
+
                 double[][] dIntensity1W = null;
                 double[][] dIntensity2W = null;
-                
-                if (bValidNorth){
+
+                if (bValidNorth) {
                     dIntensity1N = (double[][]) oOverlappNorth.getValuesInAreaDouble(dIntensity1);
                     dIntensity2N = oOverlappNorth.oAreaSecFrame.getValuesInAreaDouble(dIntensity2, opSubPixShift);
                 }
-                if (bValidEast){                    
+                if (bValidEast) {
                     dIntensity1E = (double[][]) oOverlappEast.getValuesInAreaDouble(dIntensity1);
                     dIntensity2E = oOverlappEast.oAreaSecFrame.getValuesInAreaDouble(dIntensity2, opSubPixShift);
                 }
-                if (bValidSouth){
+                if (bValidSouth) {
                     dIntensity1S = (double[][]) oOverlappSouth.getValuesInAreaDouble(dIntensity1);
                     dIntensity2S = oOverlappSouth.oAreaSecFrame.getValuesInAreaDouble(dIntensity2, opSubPixShift);
                 }
-                if (bValidWest){
+                if (bValidWest) {
                     dIntensity1W = (double[][]) oOverlappWest.getValuesInAreaDouble(dIntensity1);
                     dIntensity2W = oOverlappWest.oAreaSecFrame.getValuesInAreaDouble(dIntensity2, opSubPixShift);
                 }
@@ -373,29 +374,43 @@ public class InterrArea extends CellRec implements Area, Serializable {
         }
     }
 
-    public void refine() {
-        oRefinedAreas = new InterrArea[2][2];
-        oRefinedAreas[0][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
-        oRefinedAreas[0][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
-        oRefinedAreas[1][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
-        oRefinedAreas[1][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
+    public void refine(boolean bOverlap) {
+        if (!bOverlap) {
+            oRefinedAreas = new InterrArea[2][2];
+            oRefinedAreas[0][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
+            oRefinedAreas[0][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
+            oRefinedAreas[1][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
+            oRefinedAreas[1][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
 
-        if (!bMasked && this.dVx != null && this.dVy != null) {
-            oRefinedAreas[0][0].dVx = this.getVeloX();
-            oRefinedAreas[0][0].dVy = this.getVeloY();
+            if (!bMasked && this.dVx != null && this.dVy != null) {
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        oRefinedAreas[i][j].dVx = this.getVeloX();
+                        oRefinedAreas[i][j].dVy = this.getVeloY();
+                    }
+                }
+            }
+        } else {
+            oRefinedAreas = new InterrArea[3][3];
+            double dSize = this.oIntervalX.dRightBorder - (int) this.oIntervalX.getCenter();
+            oRefinedAreas[0][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
+            oRefinedAreas[0][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), dSize / 2, dSize / 2), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
+            oRefinedAreas[0][2] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D(this.oIntervalY.dLeftBorder, (int) this.oIntervalY.getCenter()));
+            oRefinedAreas[1][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D((int) this.oIntervalY.getCenter(), dSize / 2, dSize / 2));
+            oRefinedAreas[1][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), dSize / 2, dSize / 2), new Set1D((int) this.oIntervalY.getCenter(), dSize / 2, dSize / 2));
+            oRefinedAreas[1][2] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D((int) this.oIntervalY.getCenter(), dSize / 2, dSize / 2));
+            oRefinedAreas[2][0] = new InterrArea(new Set1D(this.oIntervalX.dLeftBorder, (int) this.oIntervalX.getCenter()), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
+            oRefinedAreas[2][1] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), dSize / 2, dSize / 2), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
+            oRefinedAreas[2][2] = new InterrArea(new Set1D((int) this.oIntervalX.getCenter(), this.oIntervalX.dRightBorder), new Set1D((int) this.oIntervalY.getCenter(), this.oIntervalY.dRightBorder));
 
-            oRefinedAreas[0][1].dVx = this.getVeloX();
-            oRefinedAreas[0][1].dVy = this.getVeloY();
-
-            oRefinedAreas[1][0].dVx = this.getVeloX();
-            oRefinedAreas[1][0].dVy = this.getVeloY();
-
-            oRefinedAreas[1][1].dVx = this.getVeloX();
-            oRefinedAreas[1][1].dVy = this.getVeloY();
-//            oRefinedAreas[0][0].oAreaSecFrame.shift(new MatrixEntry(this.dVy.intValue(), this.dVx.intValue()));
-//            oRefinedAreas[0][1].oAreaSecFrame.shift(new MatrixEntry(this.dVy.intValue(), this.dVx.intValue()));
-//            oRefinedAreas[1][0].oAreaSecFrame.shift(new MatrixEntry(this.dVy.intValue(), this.dVx.intValue()));
-//            oRefinedAreas[1][1].oAreaSecFrame.shift(new MatrixEntry(this.dVy.intValue(), this.dVx.intValue()));
+            if (!bMasked && this.dVx != null && this.dVy != null) {
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        oRefinedAreas[i][j].dVx = this.getVeloX();
+                        oRefinedAreas[i][j].dVy = this.getVeloY();
+                    }
+                }
+            }
         }
 
         this.bRefined = true;
@@ -411,10 +426,10 @@ public class InterrArea extends CellRec implements Area, Serializable {
     }
 
     public boolean checkIfMasked(DataPIV Data) {
-
+        int iFactor = Data.bOverlap ? 3 : 2;
         if (bRefined) {
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 2; j++) {
+            for (int i = 0; i < iFactor; i++) {
+                for (int j = 0; j < iFactor; j++) {
                     oRefinedAreas[i][j].checkIfMasked(Data);
                 }
             }

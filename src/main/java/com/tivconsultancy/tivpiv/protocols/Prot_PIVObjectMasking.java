@@ -95,7 +95,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
             PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
             System.out.println("Mask generation using "+this.getSettingsValue("Mask"));
             //Get ML generated mask from SQL database
-            if (this.getSettingsValue("Mask") == "ReadfromDirectory" && method.bReadFromSQL) {
+            if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory")  && method.bReadFromSQL) {
                 try {
                     mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, oF1.getName(), mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
                     mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, oF2.getName(), mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
@@ -107,12 +107,12 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
                 mask1 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask1);
                 mask2 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask2);
                 //Get ML generated mask from directory
-            } else if (this.getSettingsValue("Mask") == "ReadfromDirectory" && !method.bReadFromSQL) {
+            } else if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && !method.bReadFromSQL) {
                 PIVController control = (PIVController) StaticReferences.controller;
                 String sPath = control.getCurrentFileSelected().getParent();
                 String sName = oF1.getName().substring(0, oF1.getName().indexOf("."));
                 String sName2 = oF2.getName().substring(0, oF2.getName().indexOf("."));
-                if (this.getSettingsValue("mask_Path") == "Directory") {
+                if (this.getSettingsValue("mask_Path").toString().contains("Directory")) {
                     List<String> lsMask = Crawler.crawlFolder(sPath, 0, "Mask", false);
                     if (lsMask.size() == 1) {
                         this.setSettingsValue("mask_Path", lsMask.get(0));
@@ -133,7 +133,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
                     Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-            } else if (this.getSettingsValue("Mask") == "Hessenkemper2018") {
+            } else if (this.getSettingsValue("Mask").toString().contains("Hessenkemper2018")) {
                 //Generate Ziegenhein Mask
                 mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[0], this));
                 mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[1], this));
@@ -221,7 +221,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
     }
 
     private void initSettins() {
-        this.loSettings.add(new SettingObject("Bubble Mask", "Mask", "Hessenkemper2018", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Bubble Mask", "Mask", "Default(Hessenkemper2018)", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Threshold", "thresh", "100", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Erosion setps", "ero", "3", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Dilation steps", "dila", "3", SettingObject.SettingsType.String));
@@ -241,7 +241,7 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
     @Override
     public List<SettingObject> getHints() {
         List<SettingObject> ls = super.getHints();
-//        ls.add(new SettingObject("Bubble Mask", "Mask", "Hessenkemper2018", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Bubble Mask", "Mask", "Hessenkemper2018", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Bubble Mask", "Mask", "ReadfromDirectory", SettingObject.SettingsType.String));
 
         return ls;

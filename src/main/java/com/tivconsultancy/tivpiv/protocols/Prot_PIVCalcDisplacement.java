@@ -25,7 +25,6 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
 
     private String name = "Displacement";
 
-
     public Prot_PIVCalcDisplacement() {
         super();
         initSettins();
@@ -36,7 +35,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
     private void buildLookUp() {
 //        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, img);
     }
-    
+
     @Override
     public NameSpaceProtocolResults1D[] get1DResultsNames() {
         return new NameSpaceProtocolResults1D[0];
@@ -45,7 +44,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
     @Override
     public List<String> getIdentForViews() {
         return new ArrayList<>();
-    }    
+    }
 
     @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
@@ -70,7 +69,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         data.sValidationType = getSettingsValue("tivPIVValidationType").toString();
         data.dValidationThreshold = Double.valueOf(getSettingsValue("tivPIVValThreshold").toString());
         data.bInterpolation = Boolean.valueOf(getSettingsValue("tivPIVValidateInterpol").toString());
-
+        data.bOverlap = ((PIVController) StaticReferences.controller).getCurrentMethod().getProtocol("inter areas").getSettingsValue("PIV_GridType").toString().equals("50Overlap");
         /*
          Calculate displacement
          */
@@ -83,9 +82,9 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
 
         buildLookUp();
     }
-    
+
     @Override
-    public void setImage(BufferedImage bi){        
+    public void setImage(BufferedImage bi) {
     }
 
     @Override
@@ -117,34 +116,33 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
     @Override
     public void buildClusters() {
         SettingsCluster IMGMultipass = new SettingsCluster("Multipass",
-                                                           new String[]{"tivPIVMultipass", "tivPIVMultipassCount"}, this);
+                new String[]{"tivPIVMultipass", "tivPIVMultipassCount"}, this);
         IMGMultipass.setDescription("Multiple runs of the displacements");
         lsClusters.add(IMGMultipass);
 
         SettingsCluster SubPixel = new SettingsCluster("Sub Pixel Accuracy",
-                                                       new String[]{"tivPIVSubPixelType", "tivPIVMultipass_BiLin"}, this);
+                new String[]{"tivPIVSubPixelType", "tivPIVMultipass_BiLin"}, this);
         SubPixel.setDescription("Improving the accuracy with sub pixel interpolation");
         lsClusters.add(SubPixel);
 
         SettingsCluster improvements = new SettingsCluster("Improvements",
-                                                           new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine"}, this);
+                new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine"}, this);
         improvements.setDescription("Other strategies to improve the results");
         lsClusters.add(improvements);
-        
+
         SettingsCluster leap = new SettingsCluster("Leap&Burst",
-                                                           new String[]{"tivPIVInternalLeap", "tivPIVBurstLength"}, this);
+                new String[]{"tivPIVInternalLeap", "tivPIVBurstLength"}, this);
         leap.setDescription("Control the Leaps of the Displacement calculations");
         lsClusters.add(leap);
-        
+
         SettingsCluster validation = new SettingsCluster("Validation",
-                                                           new String[]{"tivPIVValidateVectors", "tivPIVValidationType" , "tivPIVValThreshold", "tivPIVValidateInterpol"}, this);
+                new String[]{"tivPIVValidateVectors", "tivPIVValidationType", "tivPIVValThreshold", "tivPIVValidateInterpol"}, this);
         validation.setDescription("Validation of output vectors");
         lsClusters.add(validation);
-        
 
     }
-    
-    public List<SettingObject> getHints(){
+
+    public List<SettingObject> getHints() {
         List<SettingObject> ls = super.getHints();
         ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "None", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Parabolic", SettingObject.SettingsType.String));
@@ -153,8 +151,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianLength", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Type", "tivPIVValidationType", "VecDiff", SettingObject.SettingsType.String));
-        
-        
+
         return ls;
     }
 
@@ -187,20 +184,20 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
             }
         }
         if (Data.bRefine) {
+
             for (int i = 0; i < oGrid.oaContent.length; i++) {
                 for (int j = 0; j < oGrid.oaContent[0].length; j++) {
-                    oGrid.oaContent[i][j].refine();
+                    oGrid.oaContent[i][j].refine(Data.bOverlap);
                 }
             }
-            InterrGrid oRefine = oGrid.getRefinesGrid();
+            InterrGrid oRefine = oGrid.getRefinesGrid(Data);
             oRefine.checkMask(Data);
-
             if (Data.bMultipass || Data.bMultipass_BiLin) {
                 for (int i = 0; i < Data.iMultipassCount; i++) {
                     if (Data.bMultipass_BiLin) {
-                        oGrid.shiftAndRecalcSubPix(Data);
+                        oRefine.shiftAndRecalcSubPix(Data);
                     } else {
-                        oGrid.shiftAndRecalc(Data);
+                        oRefine.shiftAndRecalc(Data);
                     }
                     oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
                     oRefine.reconstructInvalidVectors(5);

@@ -85,7 +85,7 @@ public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAbl
     public int iMultipassCount = 3;
     //Refine
     public boolean bRefine = false;
-
+    public boolean bOverlap = false;
     //PostPIV
     //Vector Validation
     public boolean bValidate = true;
