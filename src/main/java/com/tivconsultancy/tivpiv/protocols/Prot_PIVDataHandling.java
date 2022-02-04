@@ -83,7 +83,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         double refM_Z = Double.valueOf(getSettingsValue("data_refposMZ").toString());
         double fps = Integer.valueOf(getSettingsValue("data_FPS").toString());
         boolean bUPSERT = Boolean.valueOf(getSettingsValue("sql_upsert").toString());
-        double dResolution = Double.valueOf(getSettingsValue("data_Resolution").toString()) / 100000.0;
+        double dResolution = Double.valueOf(getSettingsValue("data_Resolution").toString()) / 1000000.0;
         boolean activateSQL = Boolean.valueOf(this.getSettingsValue("sql_activation").toString());
 
         try {
@@ -128,15 +128,14 @@ public class Prot_PIVDataHandling extends PIVProtocol {
             if (Boolean.valueOf(this.getSettingsValue("data_csvExport").toString())) {
 //                mache export csv
                 List<String[]> lsOut = new ArrayList<>();
-                int time = (int) getTimeStamp();
+                float time = (float) getTimeStamp();
                 String sExportPath = this.getSettingsValue("data_csvExportPath").toString();
-                if (sExportPath == "Directory") {
-                    String sDir = ((PIVController) StaticReferences.controller).getCurrentFileSelected().getParent();
-                    sExportPath = sDir + System.getProperty("file.separator") + data.sOutputFolder;
-                    File oF = new File(sExportPath);
-                    if (!oF.exists()) {
-                        oF.mkdir();
-                    }
+                if (sExportPath.contains("Directory")) {
+                    sExportPath = (String) ((PIVController) StaticReferences.controller).getCurrentFileSelected().getParent() + System.getProperty("file.separator") + "Results";
+                }
+                File oFile = new File(sExportPath);
+                if (!oFile.exists()) {
+                    oFile.mkdir();
                 }
 
                 for (Vector v : data.oGrid.getVectors()) {
@@ -225,7 +224,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 //        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
 //        return data.oGrid.getVeloGrid();
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        ImageInt oSourceImage = new ImageInt(data.iaReadInFirst);
+        ImageInt oSourceImage = new ImageInt(data.iaPreProcFirst);
         double dSize = data.oGrid.getCellSize();
         int iOffSet = 0;
         if ("50Overlap".equals(data.sGridType)) {
@@ -254,7 +253,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         int fps = Integer.valueOf(getSettingsValue("data_FPS").toString());
         if (data.iBurstLength > 1) {
-            int burstFreq = Integer.valueOf(getSettingsValue("data_BurstFreq").toString());
+            double burstFreq = Double.valueOf(getSettingsValue("data_BurstFreq").toString());
             double dBurstTime = ((int) (index / data.iBurstLength)) * (1.0 / burstFreq);
             double dRestTime = (index - (((int) (index / data.iBurstLength)) * data.iBurstLength)) * (1.0 / fps);
             System.out.println("Burst Time" + dBurstTime);

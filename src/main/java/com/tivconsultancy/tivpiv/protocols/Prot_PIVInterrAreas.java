@@ -77,9 +77,9 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         data.PIV_WindowSize = Integer.valueOf(getSettingsValue("PIV_WindowSize").toString());
         data.sGridType = getSettingsValue("PIV_GridType").toString();
         
-        InterrArea.setImage(new ImageInt(data.iaReadInFirst).getBuffImage());
+        InterrArea.setImage(new ImageInt(data.iaPreProcFirst).getBuffImage());
         data.oGrid = getGrid(InterrArea, data);
-        InterrArea.setImage(checkPIVMasking(data.oGrid, new ImageInt(data.iaReadInFirst), data).getBuffImage());
+        InterrArea.setImage(checkPIVMasking(data.oGrid, new ImageInt(data.iaPreProcFirst), data).getBuffImage());
         buildLookUp();
     }
 

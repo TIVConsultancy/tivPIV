@@ -96,6 +96,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         List<String> RunEntries = new ArrayList<>();
         RunEntries.add(dictionary(MenuEntries.OneStep));
         RunEntries.add(dictionary(MenuEntries.RunAll));
+        RunEntries.add(dictionary(MenuEntries.RunPreProc));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Run), RunEntries));
 
         List<String> dataEntries = new ArrayList<>();
@@ -178,6 +179,20 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
             @Override
             public void handle(ActionEvent t) {
                 StaticReferences.controller.runCurrentStep();
+            }
+        };
+        
+        EventHandler<ActionEvent> runPreProc = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                try {
+                    StaticReferences.controller.getCurrentMethod().runParts("preproc");
+                    
+//                    StaticReferences.controller.
+//                StaticReferences.controller.getCurrentMethod().getProtocol("").run(input);
+                } catch (Exception ex) {
+                    Logger.getLogger(tivPIVSubControllerMenu.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
 
@@ -311,6 +326,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.ExportSettingsSQL), exportSettingsSQL));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.OneStep), runOneStep));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.RunAll), runAll));
+        actionEvents.add(new NameObject<>(dictionary(MenuEntries.RunPreProc), runPreProc));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.SQL), sql));
         actionEvents.add(new NameObject<>(dictionary(MenuEntries.CutImage), imageTools_Cut));
 //        actionEvents.add(new NameObject<>(dictionary(MenuEntries.ImportCSVtoSQL), importcsvtosql));
@@ -353,7 +369,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
     }
 
     private enum MenuEntries {
-        New, Load, OneStep, RunAll, ImportSettings, ImportSettingsSQL, ExportSettings, ExportSettingsSQL, SQL, CutImage, LoadSQL
+        New, Load, OneStep, RunAll, RunPreProc, ImportSettings, ImportSettingsSQL, ExportSettings, ExportSettingsSQL, SQL, CutImage, LoadSQL
     }
 
     private String dictionary(Enum e) {
@@ -368,6 +384,9 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         }
         if (e == MenuEntries.RunAll) {
             return "All";
+        }
+        if (e == MenuEntries.RunPreProc) {
+            return "Only Preproc";
         }
         if (e == MenuEntries.CutImage) {
             return "Cut Image";

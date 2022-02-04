@@ -62,7 +62,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         data.bMultipass = Boolean.valueOf(getSettingsValue("tivPIVMultipass").toString());
         data.bMultipass_BiLin = Boolean.valueOf(getSettingsValue("tivPIVMultipass_BiLin").toString());
         data.iMultipassCount = Integer.valueOf(getSettingsValue("tivPIVMultipassCount").toString());
-        data.bRefine = Boolean.valueOf(getSettingsValue("tivPIVInterrAreaRefine").toString());
+        data.sRefine = getSettingsValue("tivPIVInterrAreaRefine").toString();
         data.iLeap = Integer.valueOf(getSettingsValue("tivPIVInternalLeap").toString());
         data.iBurstLength = Integer.valueOf(getSettingsValue("tivPIVBurstLength").toString());
         data.bValidate = Boolean.valueOf(getSettingsValue("tivPIVValidateVectors").toString());
@@ -104,7 +104,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         this.loSettings.add(new SettingObject("Multipass", "tivPIVMultipass", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Multipass BiLinear", "tivPIVMultipass_BiLin", true, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Multipass Count", "tivPIVMultipassCount", 3, SettingObject.SettingsType.Integer));
-        this.loSettings.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", "Disable", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Leap", "tivPIVInternalLeap", 1, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Burst Length", "tivPIVBurstLength", -1, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Validate", "tivPIVValidateVectors", true, SettingObject.SettingsType.Boolean));
@@ -151,6 +151,9 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Type", "tivPIVValidationType", "MedianLength", SettingObject.SettingsType.String));
         ls.add(new SettingObject("Type", "tivPIVValidationType", "VecDiff", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", "Disable", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", "Once", SettingObject.SettingsType.String));
+        ls.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", "MultiPassRefinement", SettingObject.SettingsType.String));
 
         return ls;
     }
@@ -183,15 +186,10 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
                 }
             }
         }
-        if (Data.bRefine) {
+        
+        if (Data.sRefine.contains("Once")) {
 
-            for (int i = 0; i < oGrid.oaContent.length; i++) {
-                for (int j = 0; j < oGrid.oaContent[0].length; j++) {
-                    oGrid.oaContent[i][j].refine(Data.bOverlap);
-                }
-            }
-            InterrGrid oRefine = oGrid.getRefinesGrid(Data);
-            oRefine.checkMask(Data);
+            InterrGrid oRefine = refinement(oGrid, Data);
             if (Data.bMultipass || Data.bMultipass_BiLin) {
                 for (int i = 0; i < Data.iMultipassCount; i++) {
                     if (Data.bMultipass_BiLin) {
@@ -201,15 +199,38 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
                     }
                     oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
                     oRefine.reconstructInvalidVectors(5);
+
                 }
             }
-
+            Data.PIV_WindowSize = Data.PIV_WindowSize / 2;
             return oRefine;
-
+        } else if (Data.sRefine.contains("MultiPassRefinement")) {
+            InterrGrid oRefine = refinement(oGrid, Data);
+            if (Data.bMultipass || Data.bMultipass_BiLin) {
+                for (int i = 0; i < Data.iMultipassCount; i++) {
+                    if (Data.bMultipass_BiLin) {
+                        oRefine.shiftAndRecalcSubPix(Data);
+                    } else {
+                        oRefine.shiftAndRecalc(Data);
+                    }
+                    oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
+                    oRefine.reconstructInvalidVectors(5);
+                    Data.PIV_WindowSize = Data.PIV_WindowSize / 2;
+                    if (i < Data.iMultipassCount - 1) {
+                        oRefine = refinement(oRefine, Data);
+                    }
+                }
+            }
+            return oRefine;
         }
-
         return oGrid;
 
+    }
+
+    public static InterrGrid refinement(InterrGrid oGrid, DataPIV Data) {
+        InterrGrid oRefine = oGrid.getRefinedGrid(oGrid, Data);
+        oRefine.checkMask(Data);
+        return oRefine;
     }
 
 }

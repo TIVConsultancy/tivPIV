@@ -72,7 +72,7 @@ public class SettingsPIV extends Settings {
         Data.bMultipass_BiLin = Boolean.valueOf(this.getSettingsValue("bMultipass_BiLin").toString());
         Data.dValidationThreshold = Double.valueOf(this.getSettingsValue("dValidationThreshold").toString());
         Data.bInterpolation = Boolean.valueOf(this.getSettingsValue("bInterpolation").toString());
-        Data.bRefine = Boolean.valueOf(this.getSettingsValue("bRefine").toString());
+        Data.sRefine = this.getSettingsValue("bRefine").toString();
         Data.Hart1998 = Boolean.valueOf(this.getSettingsValue("Hart1998").toString());
         Data.Hart1998Divider = Double.valueOf(this.getSettingsValue("Hart1998Divider").toString());
         Data.iMultipassCount  = Integer.valueOf(this.getSettingsValue("iMultipassCount").toString());

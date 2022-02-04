@@ -6,7 +6,6 @@
 package com.tivconsultancy.tivpiv.protocols;
 
 import com.tivconsultancy.opentiv.helpfunctions.io.Crawler;
-import com.tivconsultancy.opentiv.helpfunctions.matrix.MatrixEntry;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
 import com.tivconsultancy.opentiv.helpfunctions.settings.Settings;
 import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
@@ -14,7 +13,6 @@ import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.imageproc.algorithms.algorithms.BasicIMGOper;
 import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Reader;
-import com.tivconsultancy.opentiv.imageproc.img_io.IMG_Writer;
 import com.tivconsultancy.opentiv.imageproc.primitives.ImageInt;
 import com.tivconsultancy.opentiv.masking.main.OpenTIV_Masking;
 import com.tivconsultancy.opentiv.preprocessor.OpenTIV_PreProc;
@@ -23,11 +21,11 @@ import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.PIVMethod;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.tivPIVSubControllerSQL;
+import delete.com.tivconsultancy.opentiv.devgui.main.ImagePath;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -87,39 +85,47 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
 
     @Override
     public void run(Object... input) throws UnableToRunException {
-        if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
-            ImageInt mask1 = (ImageInt) input[0];
-            ImageInt mask2 = (ImageInt) input[1];
-            File oF1 = (File) input[2];
-            File oF2 = (File) input[3];
+//        if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
+            
+//            ImageInt mask1 = (ImageInt) input[0];
+//            ImageInt mask2 = (ImageInt) input[1];
+            PIVController controller = ((PIVController) StaticReferences.controller);
+            
+            DataPIV data = controller.getDataPIV();
+            ImageInt[] input1 = new ImageInt[]{new ImageInt(data.iaReadInFirst),new ImageInt(data.iaReadInSecond)};
+            ImageInt mask1 = new ImageInt(data.iaReadInFirst);
+            ImageInt mask2 = new ImageInt(data.iaReadInSecond);
+            List<ImagePath> sNames = controller.getCurrentMethod().getInputImages();
+            String sF1 = sNames.get(0).toString();
+            String sF2 = sNames.get(1).toString();
             PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
-            System.out.println("Mask generation using "+this.getSettingsValue("Mask"));
+            System.out.println("Mask generation using " + this.getSettingsValue("Mask"));
             //Get ML generated mask from SQL database
-            if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory")  && method.bReadFromSQL) {
+            if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && method.bReadFromSQL) {
                 try {
-                    mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, oF1.getName(), mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
-                    mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, oF2.getName(), mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+                    mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF1, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+                    mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF2, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
                 } catch (SQLException ex) {
                     Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                mask1 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask1);
-                mask2 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask2);
+//                mask1 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask1);
+//                mask2 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask2);
                 //Get ML generated mask from directory
             } else if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && !method.bReadFromSQL) {
                 PIVController control = (PIVController) StaticReferences.controller;
                 String sPath = control.getCurrentFileSelected().getParent();
-                String sName = oF1.getName().substring(0, oF1.getName().indexOf("."));
-                String sName2 = oF2.getName().substring(0, oF2.getName().indexOf("."));
+                String sName = sF1.substring(0, sNames.get(1).toString().indexOf("."));
+                String sName2 = sF2.substring(0, sNames.get(1).toString().indexOf("."));
                 if (this.getSettingsValue("mask_Path").toString().contains("Directory")) {
                     List<String> lsMask = Crawler.crawlFolder(sPath, 0, "Mask", false);
                     if (lsMask.size() == 1) {
                         this.setSettingsValue("mask_Path", lsMask.get(0));
                     } else {
                         this.setSettingsValue("Mask", "Ziegenhein2018");
-                        mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[0], this));
-                        mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[1], this));
+                        mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[0], this));
+                        mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[1], this));
 
                         System.err.println("Warning, incorrect mask path! Switch to default mask generation.");
                     }
@@ -127,42 +133,56 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
                 try {
                     mask1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + ".png")));
                     mask2.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + ".png")));
-                    mask1 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask1);
-                    mask2 = OpenTIV_PreProc.performTransformation((Settings) input[4], mask2);
+
                 } catch (IOException ex) {
                     Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             } else if (this.getSettingsValue("Mask").toString().contains("Hessenkemper2018")) {
                 //Generate Ziegenhein Mask
-                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[0], this));
-                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[1], this));
+                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking( input1[1], this));
 
             } else {
                 //Generate default mask
                 this.setSettingsValue("Mask", "Ziegenhein2018");
-                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[0], this));
-                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input[1], this));
+                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[1], this));
             }
 
             if (mask1 == null) {
-                mask1 = new ImageInt(((ImageInt) input[0]).iaPixels.length, ((ImageInt) input[0]).iaPixels[0].length, 255);
-                mask1.baMarker = new boolean[((ImageInt) input[0]).iaPixels.length][((ImageInt) input[0]).iaPixels[0].length];
+                mask1 = new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255);
+                mask1.baMarker = new boolean[((ImageInt) input[0]).iaPixels.length][((ImageInt) input1[0]).iaPixels[0].length];
             }
             if (mask2 == null) {
-                mask2 = new ImageInt(((ImageInt) input[1]).iaPixels.length, ((ImageInt) input[1]).iaPixels[0].length, 255);
-                mask2.baMarker = new boolean[((ImageInt) input[1]).iaPixels.length][((ImageInt) input[1]).iaPixels[0].length];
+                mask2 = new ImageInt(input1[1].iaPixels.length, input1[1].iaPixels[0].length, 255);
+                mask2.baMarker = new boolean[input1[1].iaPixels.length][ input1[1].iaPixels[0].length];
             }
 
             if (checkMask(mask1) || checkMask(mask2)) {
                 throw new UnableToRunException("Wrong Mask ", new IOException());
             }
+            List<SettingObject> lsc1 = controller.getCurrentMethod().getProtocol("preproc").getAllSettings();
+            Settings oSet = new Settings() {
+                @Override
+                public String getType() {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+
+                @Override
+                public void buildClusters() {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            };
+            oSet.loSettings.addAll(lsc1);
+            mask1 = OpenTIV_PreProc.performTransformation(oSet, mask1);
+            mask2 = OpenTIV_PreProc.performTransformation(oSet, mask2);
             masking1.setImage(mask1.getBuffImage());
             masking1.setBoolean(mask1.baMarker);
             masking2.setImage(mask2.getBuffImage());
             masking2.setBoolean(mask2.baMarker);
 
-            totMask.setImage(new ImageInt(((ImageInt) input[0]).iaPixels.length, ((ImageInt) input[0]).iaPixels[0].length, 255).getBuffImage());
+            totMask.setImage(new ImageInt( input1[0].iaPixels.length,  input1[0].iaPixels[0].length, 255).getBuffImage());
 
             for (int i = 0; i < Math.min(masking1.iaPixels.length, masking2.iaPixels.length); i++) {
                 for (int j = 0; j < Math.min(masking1.iaPixels[0].length, masking2.iaPixels[0].length); j++) {
@@ -179,11 +199,11 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
                     }
                 }
             }
-        } else {
-            throw new UnableToRunException("Wrong input", new Exception());
-        }
+//        } else {
+//            throw new UnableToRunException("Wrong input", new Exception());
+//        }
 
-        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+//        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         data.baMask = totMask.baMarker;
         buildLookUp();
     }

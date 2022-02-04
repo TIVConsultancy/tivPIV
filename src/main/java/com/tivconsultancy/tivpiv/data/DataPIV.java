@@ -36,6 +36,8 @@ public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAbl
     public Result1D results1D;
 
     //Data
+    public int[][] iaPreProcFirst;
+    public int[][] iaPreProcSecond;
     public int[][] iaReadInFirst;
     public int[][] iaReadInSecond;
     public double[][] iaGreyIntensity1;
@@ -84,7 +86,7 @@ public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAbl
     public boolean bMultipass_BiLin = true;
     public int iMultipassCount = 3;
     //Refine
-    public boolean bRefine = false;
+    public String sRefine = "Disable";
     public boolean bOverlap = false;
     //PostPIV
     //Vector Validation

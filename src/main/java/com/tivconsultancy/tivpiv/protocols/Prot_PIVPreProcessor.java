@@ -28,7 +28,6 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     ImageInt preproc;
     ImageInt preproc2;
-    Settings oSet;
     private String name = "Image Correction";
 
     public Prot_PIVPreProcessor(String name) {
@@ -40,17 +39,6 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         super();
         preproc = new ImageInt(50, 50, 150);
         preproc2 = new ImageInt(50, 50, 150);
-        oSet=new Settings() {
-            @Override
-            public String getType() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void buildClusters() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        };
         buildLookUp();
         initSettings();
         buildClusters();
@@ -87,11 +75,15 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
 
             try {
+                DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
                 preproc.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[0]).getBuffImage());
                 preproc2.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[1]).getBuffImage());
-
+                data.iaReadInFirst = preproc.iaPixels;
+                data.iaReadInSecond = preproc2.iaPixels;
                 preproc.setImage((OpenTIV_PreProc.performPreProc(this, preproc.clone())).getBuffImage());
                 preproc2.setImage((OpenTIV_PreProc.performPreProc(this, preproc2.clone())).getBuffImage());
+                data.iaPreProcFirst = preproc.iaPixels;
+                data.iaPreProcSecond = preproc2.iaPixels;
             } catch (Exception ex) {
                 throw new UnableToRunException("Cannot transform image:", ex);
             }
@@ -100,23 +92,8 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
             throw new UnableToRunException("Wrong input", new Exception());
         }
         buildLookUp();
-        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        data.iaReadInFirst = preproc.iaPixels;
-        data.iaReadInSecond = preproc2.iaPixels;
-        SettingsCluster CutImage = new SettingsCluster("Cut Image",
-                new String[]{"BcutyTop", "cutyTop", "BcutyBottom",
-                    "cutyBottom", "BcutxLeft", "cutxLeft", "BcutxRight",
-                    "cutxRight"}, this);
-        CutImage.setDescription("Cut image");
-        oSet.lsClusters.add(CutImage);
-        oSet.loSettings.add(new SettingObject("Cut Top", "BcutyTop", this.getSettingsValue("BcutyTop"), SettingObject.SettingsType.Boolean));
-        oSet.loSettings.add(new SettingObject("Value", "cutyTop", this.getSettingsValue("cutyTop"), SettingObject.SettingsType.Integer));
-        oSet.loSettings.add(new SettingObject("Cut Bottom", "BcutyBottom", this.getSettingsValue("BcutyBottom"), SettingObject.SettingsType.Boolean));
-        oSet.loSettings.add(new SettingObject("Value", "cutyBottom", this.getSettingsValue("cutyBottom"), SettingObject.SettingsType.Integer));
-        oSet.loSettings.add(new SettingObject("Cut Left", "BcutxLeft", this.getSettingsValue("BcutxLeft"), SettingObject.SettingsType.Boolean));
-        oSet.loSettings.add(new SettingObject("Value", "cutxLeft", this.getSettingsValue("cutxLeft"), SettingObject.SettingsType.Integer));
-        oSet.loSettings.add(new SettingObject("Cut Right", "BcutxRight", this.getSettingsValue("BcutxRight"), SettingObject.SettingsType.Boolean));
-        oSet.loSettings.add(new SettingObject("Value", "cutxRight", this.getSettingsValue("cutxRight"), SettingObject.SettingsType.Integer));
+        
+        
     }
 
     @Override
@@ -126,7 +103,7 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     @Override
     public Object[] getResults() {
-            return new Object[]{preproc.clone(), preproc2.clone(),this.oSet};
+            return new Object[]{preproc.clone(), preproc2.clone()};
         }
 
     public void buildClusters() {

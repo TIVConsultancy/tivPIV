@@ -114,9 +114,9 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
             throw new UnableToRunException("Input is not a file", new IOException());
         }
         buildLookUp();
-        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        data.iaReadInFirst = imgRead.iaPixels;
-        data.iaReadInSecond = imgRead2.iaPixels;
+//        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+//        data.iaReadInFirst = imgRead.iaPixels;
+//        data.iaReadInSecond = imgRead2.iaPixels;
     }
 
     private void runSQL(Object... input) throws UnableToRunException {
@@ -140,9 +140,9 @@ public class Prot_PIVRead2IMGFiles extends PIVProtocol {
             }
         }
         buildLookUp();
-        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        data.iaReadInFirst = imgRead.iaPixels;
-        data.iaReadInSecond = imgRead2.iaPixels;
+//        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+//        data.iaPreProcFirst = imgRead.iaPixels;
+//        data.iaPreProcSecond = imgRead2.iaPixels;
     }
 
     @Override

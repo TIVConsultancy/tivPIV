@@ -28,18 +28,18 @@ public class PIVStaticReferences {
      */
     public static void calcIntensityValues(DataPIV Data) {
         
-        Data.iaGreyIntensity1 = new double[Data.iaReadInFirst.length][Data.iaReadInFirst[0].length];
-        Data.iaGreyIntensity2 = new double[Data.iaReadInSecond.length][Data.iaReadInSecond[0].length];
+        Data.iaGreyIntensity1 = new double[Data.iaPreProcFirst.length][Data.iaPreProcFirst[0].length];
+        Data.iaGreyIntensity2 = new double[Data.iaPreProcSecond.length][Data.iaPreProcSecond[0].length];
 
         for (int i = 0; i < Data.iaGreyIntensity1.length; i++) {
             for (int j = 0; j < Data.iaGreyIntensity1[0].length; j++) {
-                Data.iaGreyIntensity1[i][j] = (double) Data.iaReadInFirst[i][j];
+                Data.iaGreyIntensity1[i][j] = (double) Data.iaPreProcFirst[i][j];
             }
         }
 
         for (int i = 0; i < Data.iaGreyIntensity2.length; i++) {
             for (int j = 0; j < Data.iaGreyIntensity2[0].length; j++) {
-                Data.iaGreyIntensity2[i][j] = (double) Data.iaReadInSecond[i][j];
+                Data.iaGreyIntensity2[i][j] = (double) Data.iaPreProcSecond[i][j];
             }
         }
 

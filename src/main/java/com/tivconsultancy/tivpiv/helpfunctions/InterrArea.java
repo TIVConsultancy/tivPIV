@@ -455,7 +455,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
             @Override
             public int[][] getfield() {
-                return Data.iaReadInFirst;
+                return Data.iaPreProcFirst;
             }
         });
 
@@ -463,7 +463,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
             @Override
             public int[][] getfield() {
-                return Data.iaReadInSecond;
+                return Data.iaPreProcSecond;
             }
         });
 
