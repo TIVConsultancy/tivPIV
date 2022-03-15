@@ -70,6 +70,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         data.dValidationThreshold = Double.valueOf(getSettingsValue("tivPIVValThreshold").toString());
         data.bInterpolation = Boolean.valueOf(getSettingsValue("tivPIVValidateInterpol").toString());
         data.bOverlap = ((PIVController) StaticReferences.controller).getCurrentMethod().getProtocol("inter areas").getSettingsValue("PIV_GridType").toString().equals("50Overlap");
+        data.iStampSize = Integer.valueOf(getSettingsValue("tivPIVValStampSize").toString());
         /*
          Calculate displacement
          */
@@ -110,6 +111,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         this.loSettings.add(new SettingObject("Validate", "tivPIVValidateVectors", true, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Threshold", "tivPIVValThreshold", 2.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("StampSize", "tivPIVValStampSize", 2, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Interpolate New Values", "tivPIVValidateInterpol", true, SettingObject.SettingsType.Boolean));
     }
 
@@ -136,7 +138,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         lsClusters.add(leap);
 
         SettingsCluster validation = new SettingsCluster("Validation",
-                new String[]{"tivPIVValidateVectors", "tivPIVValidationType", "tivPIVValThreshold", "tivPIVValidateInterpol"}, this);
+                new String[]{"tivPIVValidateVectors", "tivPIVValidationType", "tivPIVValThreshold","tivPIVValStampSize", "tivPIVValidateInterpol"}, this);
         validation.setDescription("Validation of output vectors");
         lsClusters.add(validation);
 

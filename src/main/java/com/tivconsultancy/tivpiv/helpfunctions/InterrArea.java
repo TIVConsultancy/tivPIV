@@ -480,12 +480,15 @@ public class InterrArea extends CellRec implements Area, Serializable {
         if (!bMasked) {
             int iCountViolationTimes = 0;
             int iNeighbors = 0;
-
-            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
+            int iIncorrectNeighbors = 0;
+            List<InterrArea> lIA = oGrid.getNeighbors(this, iStampSize);
+            for (InterrArea o : lIA) {
                 if (o.bMasked) {
+                    iIncorrectNeighbors++;
                     continue;
                 }
                 if (o.bOutlier) {
+                    iIncorrectNeighbors++;
                     continue;
                 }
                 double dDeltaVX = this.getVeloX() - o.getVeloX();
@@ -494,6 +497,27 @@ public class InterrArea extends CellRec implements Area, Serializable {
                 iNeighbors++;
                 if (dNorm > dthreshold) {
                     iCountViolationTimes++;
+                }
+            }
+            if (lIA.size() - iIncorrectNeighbors < 3) {
+                lIA = oGrid.getNeighbors(this, iStampSize * 2);
+                iCountViolationTimes = 0;
+                iNeighbors = 0;
+
+                for (InterrArea o : lIA) {
+                    if (o.bMasked) {
+                        continue;
+                    }
+                    if (o.bOutlier) {
+                        continue;
+                    }
+                    double dDeltaVX = this.getVeloX() - o.getVeloX();
+                    double dDeltaVY = this.getVeloY() - o.getVeloY();
+                    double dNorm = Math.sqrt(dDeltaVX * dDeltaVX + dDeltaVY * dDeltaVY);
+                    iNeighbors++;
+                    if (dNorm > dthreshold) {
+                        iCountViolationTimes++;
+                    }
                 }
             }
             if (iCountViolationTimes < iNeighbors / 2) {

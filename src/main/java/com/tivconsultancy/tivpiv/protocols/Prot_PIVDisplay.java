@@ -76,7 +76,7 @@ public class Prot_PIVDisplay extends PIVProtocol {
 
     @Override
     public void run(Object... input) throws UnableToRunException {
-        if ((boolean) StaticReferences.controller.getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataStore")) {
+        if ((boolean) StaticReferences.controller.getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataDraw")) {
             PIVController controller = (PIVController) StaticReferences.controller;
             DataPIV data = controller.getDataPIV();
 
@@ -102,7 +102,7 @@ public class Prot_PIVDisplay extends PIVProtocol {
 //                } else {
 //                    VectorDisplay = data.oGrid.paintVecs(iaBackground, getColorbar(), oOutputGrid, );
 //                }
-                Colorbar oColBar2 = new Colorbar.StartEndLinearColorBar(0.0, (double) data.PIV_WindowSize, getColorbar(), new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
+                Colorbar oColBar2 = new Colorbar.StartEndLinearColorBar(0.0, (Double) this.getSettingsValue("MaxDisp"), getColorbar(), new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
 
                 VectorDisplay=PaintVectors.paintOnImage(data.oGrid.getVectors(), oColBar2, iaBackground, null, data.dStretch);
                 String sFileName = controller.getCurrentFileSelected().getName().substring(0, controller.getCurrentFileSelected().getName().indexOf("."));
@@ -207,13 +207,14 @@ public class Prot_PIVDisplay extends PIVProtocol {
         this.loSettings.add(new SettingObject("Background Gray Value", "BlanckBackgroundGrayValue", 0, SettingObject.SettingsType.Integer));
         this.loSettings.add(new SettingObject("Colorbar", "tivPICColorBar", "ColdToWarmRainbow2", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Vector Stretch Factor", "VecStretch", 5.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("Max Pixel Displacement Coloring", "MaxDisp", 5.0, SettingObject.SettingsType.Double));
 //        this.loSettings.add(new SettingObject("Background Gray Value", "MaxVec", 0, SettingObject.SettingsType.Integer));
     }
 
     @Override
     public void buildClusters() {
         SettingsCluster IMGFilter = new SettingsCluster("Display",
-                new String[]{"tivPIVGreyValueVec", "tivBlankBackground", "BlanckBackgroundGrayValue", "tivPICColorBar", "VecStretch"}, this);
+                new String[]{"tivPIVGreyValueVec", "tivBlankBackground", "BlanckBackgroundGrayValue", "tivPICColorBar", "VecStretch", "MaxDisp"}, this);
         IMGFilter.setDescription("Masks objects in pictures based on edge detecting");
         lsClusters.add(IMGFilter);
 

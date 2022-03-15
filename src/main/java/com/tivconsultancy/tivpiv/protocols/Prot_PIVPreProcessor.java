@@ -154,6 +154,12 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         Contrast.setDescription("Increase the contrast by normalizing to the "
                 + "possible black and white values");
         lsClusters.add(Contrast);
+        
+        SettingsCluster Sharpen = new SettingsCluster("Sharpen",
+                new String[]{"Sharpen","SharpenThresh", "HistMin"}, this);
+        Sharpen.setDescription("Increase the contrast of sharp particles "
+                );
+        lsClusters.add(Sharpen);
 
 //        SettingsCluster HGBlackStretch = new SettingsCluster("Black Stretch",
 //                                                             new String[]{"HGBlackStretch", "BlackStretchFactor"}, this);
@@ -221,6 +227,11 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         this.loSettings.add(new SettingObject("Curve Correction", "CurveCorrection", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Old Values", "GreyOldValues", "0, 75, 255", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("New Values", "GreyNewValues", "0, 150, 255", SettingObject.SettingsType.String));
+        
+//        this.loSettings.add(new SettingObject("SharpAlgorithm", "NRType", "Simple1", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Sharpen", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("SharpenThresh", 50, SettingObject.SettingsType.Integer));
+        this.loSettings.add(new SettingObject("HistMin", 50, SettingObject.SettingsType.Integer));
     }
 
 }

@@ -20,12 +20,15 @@ import com.tivconsultancy.opentiv.postproc.vector.PaintVectors;
 import com.tivconsultancy.opentiv.velocimetry.helpfunctions.VelocityGrid;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -515,9 +518,9 @@ public class InterrGrid implements Grid, Serializable {
                     if (!pParameter.bMasked && pParameter.dVx == null && pParameter.dVy == null) {
                         pParameter.getDisplacement(Data);
                     }
-                pParameter.shiftSecond(Data);
-                pParameter.getDisplacement(Data);
-                pParameter.resetshiftSecond(Data);
+                    pParameter.shiftSecond(Data);
+                    pParameter.getDisplacement(Data);
+                    pParameter.resetshiftSecond(Data);
                 }
 
             });
@@ -565,6 +568,27 @@ public class InterrGrid implements Grid, Serializable {
             }
         }
         return oGrid;
+    }
+
+    public BufferedImage paintOnImage(ImageInt oGrid) {
+        BufferedImage imgOrg=oGrid.getBuffImage();
+        int height = oGrid.iaPixels.length;
+        int width = oGrid.iaPixels[0].length;
+        BufferedImage imgResult = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2Result = imgResult.createGraphics();
+        g2Result.drawImage(imgOrg, 0,0, null);
+        g2Result.setColor(Color.GREEN);
+        for (int i = 0; i < oaContent.length; i++) {
+            for (int j = 0; j < oaContent[0].length; j++) {
+                if (oaContent[i][j].bMasked) {
+                    continue;
+                }
+                int iWindowSize = (int) (double) this.getCellSize();
+                g2Result.drawRect((int) (double) oaContent[i][j].oIntervalX.dLeftBorder, (int) (double) oaContent[i][j].oIntervalY.dLeftBorder, iWindowSize, iWindowSize);
+            }
+        }
+        g2Result.dispose();
+        return imgResult;
     }
 
     public ImageInt paintOnImageGridSecondGrid(ImageInt oGrid, int iValue) {

@@ -23,10 +23,14 @@ import com.tivconsultancy.tivpiv.data.DataPIV;
 import com.tivconsultancy.tivpiv.helpfunctions.InterrArea;
 import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -35,18 +39,21 @@ import java.util.List;
 public class Prot_PIVInterrAreas extends PIVProtocol {
 
     ImageInt InterrArea;
+    BufferedImage Buff;
 
     private String name = "Areas";
 
     public Prot_PIVInterrAreas() {
         InterrArea = new ImageInt(50, 50, 0);
+        Buff = InterrArea.getBuffImage();
         buildLookUp();
         initSettins();
         buildClusters();
     }
 
     private void buildLookUp() {
-        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, InterrArea.getBuffImage());
+//        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, InterrArea.getBuffImage());
+        ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, Buff);
     }
 
     @Override
@@ -63,9 +70,9 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
         return null;
     }
-    
+
     @Override
-    public void setImage(BufferedImage bi){
+    public void setImage(BufferedImage bi) {
         InterrArea = new ImageInt(bi);
         buildLookUp();
     }
@@ -73,13 +80,13 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     @Override
     public void run(Object... input) throws UnableToRunException {
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        
+
         data.PIV_WindowSize = Integer.valueOf(getSettingsValue("PIV_WindowSize").toString());
         data.sGridType = getSettingsValue("PIV_GridType").toString();
-        
+
         InterrArea.setImage(new ImageInt(data.iaPreProcFirst).getBuffImage());
         data.oGrid = getGrid(InterrArea, data);
-        InterrArea.setImage(checkPIVMasking(data.oGrid, new ImageInt(data.iaPreProcFirst), data).getBuffImage());
+        Buff = (checkPIVMaskingBuff(data.oGrid, new ImageInt(data.iaPreProcFirst), data));
         buildLookUp();
     }
 
@@ -102,7 +109,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     @Override
     public void buildClusters() {
         SettingsCluster IMGFilter = new SettingsCluster("Interrogation Area",
-                                                        new String[]{"PIV_WindowSize", "PIV_GridType","PIV_Interrogation"}, this);
+                new String[]{"PIV_WindowSize", "PIV_GridType", "PIV_Interrogation"}, this);
         IMGFilter.setDescription("Masks objects in pictures based on edge detecting");
         lsClusters.add(IMGFilter);
     }
@@ -203,11 +210,11 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
 
                     ImageGrid.setPoint(oGrid, new Set2D(new Set1D(dXL, dXR), new Set1D(dYL, dYR)), new ImageGrid.setIMGPoint() {
 
-                                   @Override
-                                   public void setPoint(ImageGrid oGrid, ImagePoint op) {
-                                       oGrid.oa[op.i].bMarker = true;
-                                   }
-                               }
+                        @Override
+                        public void setPoint(ImageGrid oGrid, ImagePoint op) {
+                            oGrid.oa[op.i].bMarker = true;
+                        }
+                    }
                     );
 
                 }
@@ -245,11 +252,11 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
 
                     ImageGrid.setPoint(oGrid, new Set2D(new Set1D(dXL, dXR), new Set1D(dYL, dYR)), new ImageGrid.setIMGPoint() {
 
-                                   @Override
-                                   public void setPoint(ImageGrid oGrid, ImagePoint op) {
-                                       oGrid.oa[op.i].bMarker = true;
-                                   }
-                               }
+                        @Override
+                        public void setPoint(ImageGrid oGrid, ImagePoint op) {
+                            oGrid.oa[op.i].bMarker = true;
+                        }
+                    }
                     );
 
                 }
@@ -281,6 +288,13 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
 
         oPIVGrid.checkMask(oDataPIV);
         return oPIVGrid.paintOnImageGrid(oSourceImage.clone(), 255);
+
+    }
+
+    public BufferedImage checkPIVMaskingBuff(InterrGrid oPIVGrid, ImageInt oSourceImage, DataPIV oDataPIV) {
+
+        oPIVGrid.checkMask(oDataPIV);
+        return oPIVGrid.paintOnImage(oSourceImage.clone());
 
     }
 

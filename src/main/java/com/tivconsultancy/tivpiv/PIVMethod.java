@@ -139,6 +139,8 @@ public class PIVMethod implements Method {
             getProtocol("preproc").run(getProtocol("read").getResults());
             Object[] prepr = getProtocol("preproc").getResults();
             getProtocol("mask").run(new Object[]{prepr[0], prepr[1]});
+            PIVStaticReferences.calcIntensityValues(((PIVController) StaticReferences.controller).getDataPIV());
+            getProtocol("inter areas").run();
             StaticReferences.controller.getViewController(null).update();
         }
     }
