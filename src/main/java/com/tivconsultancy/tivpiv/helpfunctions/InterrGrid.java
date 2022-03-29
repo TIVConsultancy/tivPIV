@@ -269,7 +269,7 @@ public class InterrGrid implements Grid, Serializable {
         return PaintVectors.paintOnImage(oVecChecked, oColBar, iaBlackBoard, sFileOut, dStretch);
     }
 
-    public List<VelocityVec> getVectors() {
+    public List<VelocityVec> getVectors(boolean bPaint) {
         List<VelocityVec> oVeloVecs = new ArrayList<>();
 
         for (InterrArea[] oa : oaContent) {
@@ -286,6 +286,9 @@ public class InterrGrid implements Grid, Serializable {
                 } else {
                     if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
                         oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
+                    } else {
+                        if (!bPaint)
+                        oVeloVecs.add(new VelocityVec(0.0, 0.0, o.getCenter()));
                     }
                 }
 

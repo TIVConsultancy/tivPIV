@@ -62,7 +62,7 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
         
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         
-        List<VelocityVec> loVec = data.oGrid.getVectors();
+        List<VelocityVec> loVec = data.oGrid.getVectors(false);
         
         double avgx = Averaging.getMeanAverage(loVec, new Value<Object>() {
             @Override

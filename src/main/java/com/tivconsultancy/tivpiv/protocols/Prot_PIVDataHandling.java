@@ -90,11 +90,11 @@ public class Prot_PIVDataHandling extends PIVProtocol {
             if (activateSQL) {
                 tivPIVSubControllerSQL sql_Control = (tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null);
                 sql_Control.setTimeStamp(getTimeStamp());
-                dResolution = sql_Control.getResolution(expName) / 100000.0;
+//                dResolution = sql_Control.getResolution(expName) / 100000.0;
                 List<sqlEntryPIV> entries = new ArrayList<>();
-                for (Vector v : data.oGrid.getVectors()) {
+                for (Vector v : data.oGrid.getVectors(false)) {
                     double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
-                    double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
+                    double dPosY = -(v.getPosY() - refPX_Y) * dResolution + refM_Y;
                     double dPosZ = refM_Z;
                     double dVX = v.getX() * dResolution * fps;
                     double dVY = v.getY() * dResolution * fps * -1.0;
@@ -138,25 +138,25 @@ public class Prot_PIVDataHandling extends PIVProtocol {
                     oFile.mkdir();
                 }
 
-                for (Vector v : data.oGrid.getVectors()) {
+                for (Vector v : data.oGrid.getVectors(false)) {
                     double dPosX = (v.getPosX() - refPX_X) * dResolution + refM_X;
-                    double dPosY = (v.getPosY() - refPX_Y) * dResolution + refM_Y;
+                    double dPosY = -(v.getPosY() - refPX_Y) * dResolution + refM_Y;
 //                    double dPosYPx = v.getPosY();
 //                    double dPosXPx = v.getPosX();
                     double dPosZ = refM_Z;
                     double dVX = v.getX() * dResolution * fps;
                     double dVY = -1.0 * v.getY() * dResolution * fps;
-                    String[] sOut = new String[5];
+                    String[] sOut = new String[4];
                     sOut[0] = String.valueOf(dPosX);
                     sOut[1] = String.valueOf(dPosY);
-                    sOut[2] = String.valueOf(dPosZ);
-                    sOut[3] = String.valueOf(dVX);
-                    sOut[4] = String.valueOf(dVY);
+//                    sOut[2] = String.valueOf(dPosZ);
+                    sOut[2] = String.valueOf(dVX);
+                    sOut[3] = String.valueOf(dVY);
 //                    sOut[5] = String.valueOf(dPosXPx);
 //                    sOut[6] = String.valueOf(dPosYPx);
                     lsOut.add(sOut);
                 }
-                lsOut.add(0, new String[]{"Position X [m]", "Position Y [m]", "Position Z [m]", "Velocity X [m/s]", "Velocity Y [m/s]" });
+                lsOut.add(0, new String[]{"Position X [m]", "Position Y [m]", "Velocity X [m/s]", "Velocity Y [m/s]" });
                 Writer oWrite = new Writer(sExportPath + System.getProperty("file.separator") + "LiqVelo" + time + ".csv");
                 oWrite.writels(lsOut, ",");
                 lsOut.clear();
@@ -172,7 +172,7 @@ public class Prot_PIVDataHandling extends PIVProtocol {
 
         DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
 
-        List<VelocityVec> loVec = data.oGrid.getVectors();
+        List<VelocityVec> loVec = data.oGrid.getVectors(false);
 
         double avgx = Averaging.getMeanAverage(loVec, new Value<Object>() {
             @Override

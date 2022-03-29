@@ -103,8 +103,8 @@ public class Prot_PIVDisplay extends PIVProtocol {
 //                    VectorDisplay = data.oGrid.paintVecs(iaBackground, getColorbar(), oOutputGrid, );
 //                }
                 Colorbar oColBar2 = new Colorbar.StartEndLinearColorBar(0.0, (Double) this.getSettingsValue("MaxDisp"), getColorbar(), new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
-
-                VectorDisplay=PaintVectors.paintOnImage(data.oGrid.getVectors(), oColBar2, iaBackground, null, data.dStretch);
+                
+                VectorDisplay=PaintVectors.paintOnImage(data.oGrid.getVectors(true), oColBar2, iaBackground, null, data.dStretch);
                 String sFileName = controller.getCurrentFileSelected().getName().substring(0, controller.getCurrentFileSelected().getName().indexOf("."));
                 File oPath = new File(controller.getCurrentFileSelected().getParent() + System.getProperty("file.separator") + "ResultImages");
                 if (!oPath.exists()) {
