@@ -287,8 +287,9 @@ public class InterrGrid implements Grid, Serializable {
                     if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
                         oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
                     } else {
-                        if (!bPaint)
-                        oVeloVecs.add(new VelocityVec(0.0, 0.0, o.getCenter()));
+                        if (!bPaint) {
+                            oVeloVecs.add(new VelocityVec(0.0, 0.0, o.getCenter()));
+                        }
                     }
                 }
 
@@ -574,12 +575,12 @@ public class InterrGrid implements Grid, Serializable {
     }
 
     public BufferedImage paintOnImage(ImageInt oGrid) {
-        BufferedImage imgOrg=oGrid.getBuffImage();
+        BufferedImage imgOrg = oGrid.getBuffImage();
         int height = oGrid.iaPixels.length;
         int width = oGrid.iaPixels[0].length;
         BufferedImage imgResult = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2Result = imgResult.createGraphics();
-        g2Result.drawImage(imgOrg, 0,0, null);
+        g2Result.drawImage(imgOrg, 0, 0, null);
         g2Result.setColor(Color.GREEN);
         for (int i = 0; i < oaContent.length; i++) {
             for (int j = 0; j < oaContent[0].length; j++) {
@@ -608,8 +609,8 @@ public class InterrGrid implements Grid, Serializable {
         int PIV_WindowSize = Data.PIV_WindowSize / 2;
         int PIV_columns = (int) ((Data.iaPreProcFirst[0].length - 1) / (PIV_WindowSize));
         int PIV_rows = (int) ((Data.iaPreProcFirst.length - 1) / (PIV_WindowSize));
-        InterrArea[][] oaReturnGrid = new InterrArea[((iFactor - 1) * PIV_rows) - iFactor % 2][((iFactor - 1) * PIV_columns)
-                - iFactor % 2];
+        InterrArea[][] oaReturnGrid = new InterrArea[((iFactor - 1) * PIV_rows) - iFactor % 2 - 1][((iFactor - 1) * PIV_columns)
+                - iFactor % 2 - 1];
         Double[][][] dVelo = new Double[((iFactor - 1) * PIV_rows) - iFactor % 2][((iFactor - 1) * PIV_columns)
                 - iFactor % 2][2];
         Integer[][] iCounter = new Integer[((iFactor - 1) * PIV_rows) - iFactor % 2][((iFactor - 1) * PIV_columns)
@@ -619,9 +620,9 @@ public class InterrGrid implements Grid, Serializable {
                 if (i < oGrid.oaContent.length && j < oGrid.oaContent[0].length) {
                     oGrid.oaContent[i][j].refine(Data.bOverlap);
                 }
-                double dXL = j * PIV_WindowSize / 2.0;
+                double dXL = (j + 1) * PIV_WindowSize / 2.0;
                 double dXR = dXL + PIV_WindowSize;
-                double dYL = i * PIV_WindowSize / 2.0;
+                double dYL = (i + 1) * PIV_WindowSize / 2.0;
                 double dYR = dYL + PIV_WindowSize;
                 oaReturnGrid[i][j] = new InterrArea(new Set1D(dXL, dXR), new Set1D(dYL, dYR));
                 dVelo[i][j][0] = 0.0;
@@ -639,9 +640,11 @@ public class InterrGrid implements Grid, Serializable {
                             double dVeloy = oaContent[i][j].oRefinedAreas[k][l].dVy;
                             int iPos = (int) (oaContent[i][j].oRefinedAreas[k][l].oIntervalY.dLeftBorder / (PIV_WindowSize / 2.0));
                             int jPos = (int) (oaContent[i][j].oRefinedAreas[k][l].oIntervalX.dLeftBorder / (PIV_WindowSize / 2.0));
+                            if (dVelo[iPos][jPos][0]!=null){
                             dVelo[iPos][jPos][0] += dVelox;
                             dVelo[iPos][jPos][1] += dVeloy;
                             iCounter[iPos][jPos] += 1;
+                            }
                         }
                     }
                 }

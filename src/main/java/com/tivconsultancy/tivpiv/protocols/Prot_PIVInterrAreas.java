@@ -174,13 +174,13 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         data.PIV_columns = (int) ((iaReadIn[0].length - 1) / PIV_WindowSize);
         data.PIV_rows = (int) ((iaReadIn.length - 1) / PIV_WindowSize);
 
-        InterrGrid oGrid = new InterrGrid(new InterrArea[(2 * data.PIV_rows) - 1][(2 * data.PIV_columns) - 1]);
+        InterrGrid oGrid = new InterrGrid(new InterrArea[(2 * data.PIV_rows) - 2][(2 * data.PIV_columns) - 2]);
 
-        for (int i = 0; i < (2 * data.PIV_rows) - 1; i++) {
-            for (int j = 0; j < (2 * data.PIV_columns) - 1; j++) {
-                double dXL = j * PIV_WindowSize / 2.0;
+        for (int i = 0; i < (2 * data.PIV_rows) - 2; i++) {
+            for (int j = 0; j < (2 * data.PIV_columns) - 2; j++) {
+                double dXL = (j+1) * PIV_WindowSize / 2.0;
                 double dXR = dXL + PIV_WindowSize;
-                double dYL = i * PIV_WindowSize / 2.0;
+                double dYL = (i+1) * PIV_WindowSize / 2.0;
                 double dYR = dYL + PIV_WindowSize;
                 oGrid.oaContent[i][j] = new InterrArea(new Set1D(dXL, dXR), new Set1D(dYL, dYR));
             }
