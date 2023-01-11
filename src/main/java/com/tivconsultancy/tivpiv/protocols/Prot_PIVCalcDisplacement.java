@@ -12,6 +12,7 @@ import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
+import com.tivconsultancy.tivpiv.helpfunctions.InterrArea;
 import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -24,6 +25,10 @@ import java.util.List;
 public class Prot_PIVCalcDisplacement extends PIVProtocol {
 
     private String name = "Displacement";
+    
+    public Prot_PIVCalcDisplacement(String Snull) {
+//        initSettins();
+    }
 
     public Prot_PIVCalcDisplacement() {
         super();
@@ -61,6 +66,8 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         data.sSubPixelType = getSettingsValue("tivPIVSubPixelType").toString();
         data.bMultipass = Boolean.valueOf(getSettingsValue("tivPIVMultipass").toString());
         data.bMultipass_BiLin = Boolean.valueOf(getSettingsValue("tivPIVMultipass_BiLin").toString());
+        data.Smoothing = Boolean.valueOf(getSettingsValue("tivPIVSmoothing").toString());
+        data.SmoothFactor = Double.valueOf(getSettingsValue("tivPIVHart1998Divider").toString());
         data.iMultipassCount = Integer.valueOf(getSettingsValue("tivPIVMultipassCount").toString());
         data.sRefine = getSettingsValue("tivPIVInterrAreaRefine").toString();
         data.iLeap = Integer.valueOf(getSettingsValue("tivPIVInternalLeap").toString());
@@ -83,6 +90,46 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
 
         buildLookUp();
     }
+    
+
+    public void runSkript(PIVController input) throws UnableToRunException {
+
+        DataPIV data = input.getDataPIV();
+
+        data.Hart1998 = Boolean.valueOf(getSettingsValue("tivPIVHart1998").toString());
+        data.Hart1998Divider = Double.valueOf(getSettingsValue("tivPIVHart1998Divider").toString());
+        data.sSubPixelType = getSettingsValue("tivPIVSubPixelType").toString();
+        data.bMultipass = Boolean.valueOf(getSettingsValue("tivPIVMultipass").toString());
+        data.bMultipass_BiLin = Boolean.valueOf(getSettingsValue("tivPIVMultipass_BiLin").toString());
+        data.Smoothing = Boolean.valueOf(getSettingsValue("tivPIVSmoothing").toString());
+        data.SmoothFactor = Double.valueOf(getSettingsValue("tivPIVHart1998Divider").toString());
+        data.iMultipassCount = Integer.valueOf(getSettingsValue("tivPIVMultipassCount").toString());
+        data.sRefine = getSettingsValue("tivPIVInterrAreaRefine").toString();
+        data.iLeap = Integer.valueOf(getSettingsValue("tivPIVInternalLeap").toString());
+        data.iBurstLength = Integer.valueOf(getSettingsValue("tivPIVBurstLength").toString());
+        data.bValidate = Boolean.valueOf(getSettingsValue("tivPIVValidateVectors").toString());
+        data.sValidationType = getSettingsValue("tivPIVValidationType").toString();
+        data.dValidationThreshold = Double.valueOf(getSettingsValue("tivPIVValThreshold").toString());
+        data.bInterpolation = Boolean.valueOf(getSettingsValue("tivPIVValidateInterpol").toString());
+        
+        if (Boolean.valueOf(getSettingsValue("PIV_GridType").toString().equals("50Overlap"))){
+            data.bOverlap=true;
+        }else{
+            data.bOverlap=false;
+        }
+        data.iStampSize = Integer.valueOf(getSettingsValue("tivPIVValStampSize").toString());
+        /*
+         Calculate displacement
+         */
+        data.oGrid.getFFT(data);
+
+        /*
+         Improve result
+         */
+        data.oGrid = posProc(data.oGrid, data);
+
+//        buildLookUp();
+    }
 
     @Override
     public void setImage(BufferedImage bi) {
@@ -102,6 +149,8 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         this.loSettings.add(new SettingObject("Hart1998", "tivPIVHart1998", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Hart1998Divider", "tivPIVHart1998Divider", 2.0, SettingObject.SettingsType.Double));
         this.loSettings.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Gaussian", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Smoothing", "tivPIVSmoothing", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Smooth Factor", "tivPIVSmoothFactor", 2.0, SettingObject.SettingsType.Double));
         this.loSettings.add(new SettingObject("Multipass", "tivPIVMultipass", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Multipass BiLinear", "tivPIVMultipass_BiLin", true, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Multipass Count", "tivPIVMultipassCount", 3, SettingObject.SettingsType.Integer));
@@ -128,7 +177,8 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         lsClusters.add(SubPixel);
 
         SettingsCluster improvements = new SettingsCluster("Improvements",
-                new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine"}, this);
+                new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine",
+                    "tivPIVSmoothing", "tivPIVSmoothFactor"}, this);
         improvements.setDescription("Other strategies to improve the results");
         lsClusters.add(improvements);
 
@@ -138,7 +188,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         lsClusters.add(leap);
 
         SettingsCluster validation = new SettingsCluster("Validation",
-                new String[]{"tivPIVValidateVectors", "tivPIVValidationType", "tivPIVValThreshold","tivPIVValStampSize", "tivPIVValidateInterpol"}, this);
+                new String[]{"tivPIVValidateVectors", "tivPIVValidationType", "tivPIVValThreshold", "tivPIVValStampSize", "tivPIVValidateInterpol"}, this);
         validation.setDescription("Validation of output vectors");
         lsClusters.add(validation);
 
@@ -168,7 +218,7 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
         if (Data.bValidate) {
             oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
             if (Data.bInterpolation) {
-                oGrid.reconstructInvalidVectors(5);
+                oGrid.reconstructInvalidVectors(Data.iStampSize);
             }
         }
 
@@ -183,12 +233,12 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
                 if (Data.bValidate) {
                     oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
                     if (Data.bInterpolation) {
-                        oGrid.reconstructInvalidVectors(5);
+                        oGrid.reconstructInvalidVectors(Data.iStampSize);
                     }
                 }
             }
         }
-        
+
         if (Data.sRefine.contains("Once")) {
 
             InterrGrid oRefine = refinement(oGrid, Data);
@@ -200,12 +250,12 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
                         oRefine.shiftAndRecalc(Data);
                     }
                     oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-                    oRefine.reconstructInvalidVectors(5);
+                    oRefine.reconstructInvalidVectors(Data.iStampSize);
 
                 }
             }
             Data.PIV_WindowSize = Data.PIV_WindowSize / 2;
-            return oRefine;
+            return smoothing(oRefine, Data, true);
         } else if (Data.sRefine.contains("MultiPassRefinement")) {
             InterrGrid oRefine = refinement(oGrid, Data);
             if (Data.bMultipass || Data.bMultipass_BiLin) {
@@ -216,17 +266,27 @@ public class Prot_PIVCalcDisplacement extends PIVProtocol {
                         oRefine.shiftAndRecalc(Data);
                     }
                     oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-                    oRefine.reconstructInvalidVectors(5);
+                    oRefine.reconstructInvalidVectors(Data.iStampSize);
                     Data.PIV_WindowSize = Data.PIV_WindowSize / 2;
                     if (i < Data.iMultipassCount - 1) {
                         oRefine = refinement(oRefine, Data);
                     }
                 }
             }
-            return oRefine;
+            return smoothing(oRefine, Data, true);
         }
-        return oGrid;
+        return smoothing(oGrid, Data, false);
 
+    }
+
+    public static InterrGrid smoothing(InterrGrid oGrid, DataPIV Data, boolean bRefine) {
+        if (!Data.Smoothing) {
+            return oGrid;
+        } else {
+            InterrGrid oGridcopy = new InterrGrid(oGrid,Data);
+
+            return oGridcopy;
+        }
     }
 
     public static InterrGrid refinement(InterrGrid oGrid, DataPIV Data) {

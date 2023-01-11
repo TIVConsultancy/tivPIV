@@ -45,6 +45,74 @@ public class InterrGrid implements Grid, Serializable {
         this.oaContent = oaContent;
     }
 
+    public InterrGrid(InterrGrid oGrid, DataPIV Data) {
+        this.oaContent = oGrid.oaContent;
+        for (int i = 0; i < this.oaContent.length; i++) {
+            for (int j = 0; j < this.oaContent[0].length; j++) {
+
+//                if (oaContent[i][j].bRefined) {
+//                    for (int k = 0; k < 2; k++) {
+//                        for (int l = 0; l < 2; l++) {
+//                            if (!oaContent[i][j].oRefinedAreas[k][l].bMasked) {
+//                                oaContent[i][j].oRefinedAreas[k][l].reconstruct(oGrid, Data.iStampSize);
+//                                oaContent[i][j].oRefinedAreas[k][l].dVx = (oaContent[i][j].oRefinedAreas[k][l].dVx * Data.SmoothFactor + oGrid.oaContent[i][j].oRefinedAreas[k][l].dVx) / (1.0 + Data.SmoothFactor);
+//                                oaContent[i][j].oRefinedAreas[k][l].dVy = (oaContent[i][j].oRefinedAreas[k][l].dVy * Data.SmoothFactor + oGrid.oaContent[i][j].oRefinedAreas[k][l].dVy) / (1.0 + Data.SmoothFactor);
+//                            }
+//                        }
+//                    }
+//                } else {
+                if (!oaContent[i][j].bMasked) {
+                    oaContent[i][j].reconstruct(oGrid, Data.iStampSize);
+                    oaContent[i][j].dVx = (oaContent[i][j].dVx * Data.SmoothFactor + oGrid.oaContent[i][j].dVx) / (1.0 + Data.SmoothFactor);
+                    oaContent[i][j].dVy = (oaContent[i][j].dVy * Data.SmoothFactor + oGrid.oaContent[i][j].dVy) / (1.0 + Data.SmoothFactor);
+                }
+//                    double xvel = 0.0;
+//                    double yvel = 0.0;
+//                    double distWeightx = 0.0;
+//                    double distWeighty = 0.0;
+//                    int counter = 0;
+//                    for (InterrArea o : oGrid.getNeighbors(oGrid.oaContent[i][j], 5)) {
+//                        if (o != null && !o.bMasked && !o.bOutlier) {//&& !o.bManualMask) {                          
+//                            double dDistancex = Math.abs(o.getCenter().x - oGrid.oaContent[i][j].getCenter().x);
+//                            double dDistancey = Math.abs(o.getCenter().y - oGrid.oaContent[i][j].getCenter().y);
+//                            double dDistance = Math.sqrt(dDistancex * dDistancex + dDistancey * dDistancey);
+//                            xvel += (o.getVeloX() / dDistance);
+//                            yvel += (o.getVeloY() / dDistance);
+//                            distWeightx += (1 / dDistance);
+//                            distWeighty += (1 / dDistance);
+//                            counter++;
+//                        }
+//                    }
+//                    if (counter > 0) {
+//                        oaContent[i][j].dVx = xvel / distWeightx;
+//                        oaContent[i][j].dVy = yvel / distWeighty;
+//                    }
+//                }
+            }
+            // System.out.println(oaContent[i][j].bMasked);
+//                this.oaContent[i][j] = new InterrArea(oaContent[i][j].oIntervalX, oaContent[i][j].oIntervalY);
+//                this.oaContent[i][j].bMasked = oaContent[i][j].bMasked;
+//                this.oaContent[i][j].mePosInGrid = oaContent[i][j].mePosInGrid;
+//                this.oaContent[i][j].dVx = oaContent[i][j].dVx;
+//                this.oaContent[i][j].dVy = oaContent[i][j].dVy;
+//                this.oaContent[i][j].bRefined=oaContent[i][j].bRefined;
+//                this.oaContent[i][j].bOutlier=oaContent[i][j].bOutlier;
+//                if (oaContent[i][j].bRefined) {                  
+//                    for (int k = 0; k < 2; k++) {
+//                        for (int l = 0; l < 2; l++) {
+//                            this.oaContent[i][j].oRefinedAreas[k][l].bOutlier=oaContent[i][j].oRefinedAreas[k][l].bOutlier;
+//                            this.oaContent[i][j].oRefinedAreas[k][l] = new InterrArea(oaContent[i][j].oRefinedAreas[k][l].oIntervalX, oaContent[i][j].oRefinedAreas[k][l].oIntervalY);
+//                            this.oaContent[i][j].oRefinedAreas[k][l].bMasked = oaContent[i][j].oRefinedAreas[k][l].bMasked;
+//                            this.oaContent[i][j].oRefinedAreas[k][l].mePosInGrid = oaContent[i][j].oRefinedAreas[k][l].mePosInGrid;
+//                            this.oaContent[i][j].oRefinedAreas[k][l].dVx = oaContent[i][j].oRefinedAreas[k][l].dVx;
+//                            this.oaContent[i][j].oRefinedAreas[k][l].dVy = oaContent[i][j].oRefinedAreas[k][l].dVy;
+//                        }
+//                    }
+//                }
+//            }
+        }
+    }
+
     public void getFFT(DataPIV Data) {
 //        for (InterrArea[] oContent : oaContent) {
 //            for (InterrArea Content : oContent) {
@@ -274,24 +342,26 @@ public class InterrGrid implements Grid, Serializable {
 
         for (InterrArea[] oa : oaContent) {
             for (InterrArea o : oa) {
-                if (o.bRefined) {
-                    for (int i = 0; i < 2; i++) {
-                        for (int j = 0; j < 2; j++) {
-                            InterrArea oR = o.oRefinedAreas[i][j];
-                            if (oR != null && oR.getVeloX() != null && oR.getVeloY() != null) {
-                                oVeloVecs.add(new VelocityVec(oR.getVeloX(), oR.getVeloY(), oR.getCenter()));
-                            }
-                        }
-                    }
+//                if (bRefine) {
+//                    if (o.bRefined) {
+//                        for (int i = 0; i < 2; i++) {
+//                            for (int j = 0; j < 2; j++) {
+//                                InterrArea oR = o.oRefinedAreas[i][j];
+//                                if (oR != null && oR.getVeloX() != null && oR.getVeloY() != null && !oR.bMasked) {
+//                                    oVeloVecs.add(new VelocityVec(oR.getVeloX(), oR.getVeloY(), oR.getCenter()));
+//                                }
+//                            }
+//                        }
+////                    }
+//                } else {
+                if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
+                    oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
                 } else {
-                    if (o != null && o.getVeloX() != null && o.getVeloY() != null && !o.bOutlier) {
-                        oVeloVecs.add(new VelocityVec(o.getVeloX(), o.getVeloY(), o.getCenter()));
-                    } else {
-                        if (!bPaint) {
-                            oVeloVecs.add(new VelocityVec(0.0, 0.0, o.getCenter()));
-                        }
+                    if (!bPaint) {
+                        oVeloVecs.add(new VelocityVec(0.0, 0.0, o.getCenter()));
                     }
                 }
+//                }
 
             }
         }
@@ -410,19 +480,30 @@ public class InterrGrid implements Grid, Serializable {
         }
     }
 
+    public boolean checkMask(int i, int j) {
+        return this.oaContent[i][j].bMasked;
+    }
+
     public void validateVectors(int iStampSize, double threshold, String sOption) {
         for (InterrArea[] oa : this.oaContent) {
             for (InterrArea o : oa) {
+                List<List<Double>> llsBV = o.get_Velocities(iStampSize, this);
+                List<Double> lsBVx = llsBV.get(0);
+                List<Double> lsBVy = llsBV.get(1);
+                if (lsBVx.isEmpty()) {
+                    
+                    continue;
+                }
                 if (sOption == null || sOption.isEmpty() || sOption.contains("NormMedian")) {
-                    o.validateNormMedian(iStampSize, threshold, this);
+                    o.bOutlier=o.validateNormMedian(lsBVx,lsBVy, threshold);
                 } else if (sOption.contains("MedianComp")) {
-                    o.validateMedianComponent(iStampSize, threshold, this);
+                    o.validateMedianComponent(lsBVx,lsBVy, threshold);
                 } else if (sOption.contains("MedianLength")) {
-                    o.validateMedianLength(iStampSize, threshold, this);
+                    o.validateMedianLength(lsBVx,lsBVy, threshold);
                 } else if (sOption.contains("VecDiff")) {
                     o.validateVectorDifference(iStampSize, threshold, this);
                 } else {
-                    o.validateNormMedian(iStampSize, threshold, this);
+                    o.validateNormMedian(lsBVx,lsBVy, threshold);
                 }
             }
         }
@@ -640,10 +721,10 @@ public class InterrGrid implements Grid, Serializable {
                             double dVeloy = oaContent[i][j].oRefinedAreas[k][l].dVy;
                             int iPos = (int) (oaContent[i][j].oRefinedAreas[k][l].oIntervalY.dLeftBorder / (PIV_WindowSize / 2.0));
                             int jPos = (int) (oaContent[i][j].oRefinedAreas[k][l].oIntervalX.dLeftBorder / (PIV_WindowSize / 2.0));
-                            if (dVelo[iPos][jPos][0]!=null){
-                            dVelo[iPos][jPos][0] += dVelox;
-                            dVelo[iPos][jPos][1] += dVeloy;
-                            iCounter[iPos][jPos] += 1;
+                            if (dVelo[iPos][jPos][0] != null) {
+                                dVelo[iPos][jPos][0] += dVelox;
+                                dVelo[iPos][jPos][1] += dVeloy;
+                                iCounter[iPos][jPos] += 1;
                             }
                         }
                     }

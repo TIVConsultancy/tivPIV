@@ -58,6 +58,18 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
         buildClusters();
     }
 
+    public Prot_PIVObjectMasking(String sNull) {
+//        super();
+        masking1 = new ImageInt(50, 50, 0);
+        masking2 = new ImageInt(50, 50, 0);
+//        intersec1 = new ImageInt(50, 50, 0);
+//        intersec2 = new ImageInt(50, 50, 0);
+        totMask = new ImageInt(50, 50, 0);
+//        buildLookUp();
+//        initSettins();
+//        buildClusters();
+    }
+
     private void buildLookUp() {
         ((PIVController) StaticReferences.controller).getDataPIV().setImage(name, totMask.getBuffImage());
     }
@@ -86,119 +98,143 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
     @Override
     public void run(Object... input) throws UnableToRunException {
 //        if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
-            
+
 //            ImageInt mask1 = (ImageInt) input[0];
 //            ImageInt mask2 = (ImageInt) input[1];
-            PIVController controller = ((PIVController) StaticReferences.controller);
-            
-            DataPIV data = controller.getDataPIV();
-            ImageInt[] input1 = new ImageInt[]{new ImageInt(data.iaReadInFirst),new ImageInt(data.iaReadInSecond)};
-            ImageInt mask1 = new ImageInt(data.iaReadInFirst);
-            ImageInt mask2 = new ImageInt(data.iaReadInSecond);
-            List<ImagePath> sNames = controller.getCurrentMethod().getInputImages();
-            String sF1 = sNames.get(0).toString();
-            String sF2 = sNames.get(1).toString();
-            PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
-            System.out.println("Mask generation using " + this.getSettingsValue("Mask"));
-            //Get ML generated mask from SQL database
-            if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && method.bReadFromSQL) {
-                try {
-                    mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF1, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
-                    mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF2, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
-                } catch (SQLException ex) {
-                    Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        PIVController controller = ((PIVController) StaticReferences.controller);
+
+        DataPIV data = controller.getDataPIV();
+        ImageInt[] input1 = new ImageInt[]{new ImageInt(data.iaReadInFirst), new ImageInt(data.iaReadInSecond)};
+        ImageInt mask1 = new ImageInt(data.iaReadInFirst);
+        ImageInt mask1_1 = new ImageInt(2, 2, 0);
+        ImageInt mask2 = new ImageInt(data.iaReadInSecond);
+        ImageInt mask2_1 = new ImageInt(2, 2, 0);
+        List<ImagePath> sNames = controller.getCurrentMethod().getInputImages();
+        String sF1 = sNames.get(0).toString();
+        String sF2 = sNames.get(1).toString();
+        PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
+        System.out.println("Mask generation using " + this.getSettingsValue("Mask"));
+        //Get ML generated mask from SQL database
+        if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && method.bReadFromSQL) {
+            try {
+                mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF1, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+                mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF2, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+            } catch (SQLException ex) {
+                Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+            }
 //                mask1 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask1);
 //                mask2 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask2);
-                //Get ML generated mask from directory
-            } else if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && !method.bReadFromSQL) {
-                PIVController control = (PIVController) StaticReferences.controller;
-                String sPath = control.getCurrentFileSelected().getParent();
-                String sName = sF1.substring(0, sNames.get(1).toString().indexOf("."));
-                String sName2 = sF2.substring(0, sNames.get(1).toString().indexOf("."));
-                if (this.getSettingsValue("mask_Path").toString().contains("Directory")) {
-                    List<String> lsMask = Crawler.crawlFolder(sPath, 0, "Mask", false);
-                    if (lsMask.size() == 1) {
-                        this.setSettingsValue("mask_Path", lsMask.get(0));
-                    } else {
-                        this.setSettingsValue("Mask", "Ziegenhein2018");
-                        mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[0], this));
-                        mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[1], this));
+            //Get ML generated mask from directory
+        } else if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && !method.bReadFromSQL) {
+            PIVController control = (PIVController) StaticReferences.controller;
+            String sPath = control.getCurrentFileSelected().getParent();
+            String sName = sF1.substring(0, sNames.get(1).toString().indexOf("."));
+            String sName2 = sF2.substring(0, sNames.get(1).toString().indexOf("."));
+            if (this.getSettingsValue("mask_Path").toString().contains("Directory")) {
+                List<String> lsMask = Crawler.crawlFolder(sPath, 0, "Mask", false);
+                if (lsMask.size() == 1) {
+                    this.setSettingsValue("mask_Path", lsMask.get(0));
+                } else {
+                    this.setSettingsValue("Mask", "Ziegenhein2018");
+                    mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[0], this));
+                    mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[1], this));
 
-                        System.err.println("Warning, incorrect mask path! Switch to default mask generation.");
+                    System.err.println("Warning, incorrect mask path! Switch to default mask generation.");
+                }
+            }
+            try {
+                mask1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + ".png")));
+                if (new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + "extended.png").exists()) {
+                    mask1_1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + "extended.png")));
+                }
+                mask2.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + ".png")));
+                if (new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + "extended.png").exists()) {
+                    mask2_1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + "extended.png")));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else if (this.getSettingsValue("Mask").toString().contains("Hessenkemper2018")) {
+            //Generate Ziegenhein Mask
+            mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+            mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[1], this));
+
+        } else {
+            //Generate default mask
+            this.setSettingsValue("Mask", "Ziegenhein2018");
+            mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+            mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[1], this));
+        }
+
+        if (mask1 == null) {
+            mask1 = new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255);
+            mask1.baMarker = new boolean[((ImageInt) input[0]).iaPixels.length][((ImageInt) input1[0]).iaPixels[0].length];
+        }
+        if (mask2 == null) {
+            mask2 = new ImageInt(input1[1].iaPixels.length, input1[1].iaPixels[0].length, 255);
+            mask2.baMarker = new boolean[input1[1].iaPixels.length][input1[1].iaPixels[0].length];
+        }
+
+        if (checkMask(mask1) || checkMask(mask2)) {
+            throw new UnableToRunException("Wrong Mask ", new IOException());
+        }
+        List<SettingObject> lsc1 = controller.getCurrentMethod().getProtocol("preproc").getAllSettings();
+        Settings oSet = new Settings() {
+            @Override
+            public String getType() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void buildClusters() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+        oSet.loSettings.addAll(lsc1);
+        mask1 = OpenTIV_PreProc.performTransformation(oSet, mask1);
+        mask2 = OpenTIV_PreProc.performTransformation(oSet, mask2);
+        masking1.setImage(mask1.getBuffImage());
+        masking1.setBoolean(mask1.baMarker);
+        if (mask1_1.iaPixels.length > 2) {
+            mask1_1 = OpenTIV_PreProc.performTransformation(oSet, mask1_1);
+            for (int i = 0; i < mask1_1.iaPixels.length; i++) {
+                for (int j = 0; j < mask1_1.iaPixels[0].length; j++) {
+                    if (mask1_1.iaPixels[i][j]>0)
+                    masking1.iaPixels[i][j] = mask1_1.iaPixels[i][j] + 254;
+                }
+            }
+        }
+        masking2.setImage(mask2.getBuffImage());
+        masking2.setBoolean(mask2.baMarker);
+        if (mask2_1.iaPixels.length > 2) {
+            mask2_1 = OpenTIV_PreProc.performTransformation(oSet, mask2_1);
+            for (int i = 0; i < mask2_1.iaPixels.length; i++) {
+                for (int j = 0; j < mask2_1.iaPixels[0].length; j++) {
+                    if (mask2_1.iaPixels[i][j]>0)
+                    masking2.iaPixels[i][j] = mask2_1.iaPixels[i][j] + 254;
+                }
+            }
+        }
+        totMask.setImage(new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255).getBuffImage());
+
+        for (int i = 0; i < Math.min(masking1.iaPixels.length, masking2.iaPixels.length); i++) {
+            for (int j = 0; j < Math.min(masking1.iaPixels[0].length, masking2.iaPixels[0].length); j++) {
+                totMask.baMarker[i][j] = false;
+                if (masking1.iaPixels[i][j] >= 1 || masking2.iaPixels[i][j] >= 1) {
+                    if (masking1.iaPixels[i][j] >= 1) {
+                        totMask.iaPixels[i][j] = 0;
+                        totMask.baMarker[i][j] = true;
+                    }
+                    if (masking2.iaPixels[i][j] >= 1) {
+                        totMask.iaPixels[i][j] = 127;
+                        totMask.baMarker[i][j] = true;
                     }
                 }
-                try {
-                    mask1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + ".png")));
-                    mask2.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + ".png")));
-
-                } catch (IOException ex) {
-                    Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            } else if (this.getSettingsValue("Mask").toString().contains("Hessenkemper2018")) {
-                //Generate Ziegenhein Mask
-                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
-                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking( input1[1], this));
-
-            } else {
-                //Generate default mask
-                this.setSettingsValue("Mask", "Ziegenhein2018");
-                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
-                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[1], this));
             }
-
-            if (mask1 == null) {
-                mask1 = new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255);
-                mask1.baMarker = new boolean[((ImageInt) input[0]).iaPixels.length][((ImageInt) input1[0]).iaPixels[0].length];
-            }
-            if (mask2 == null) {
-                mask2 = new ImageInt(input1[1].iaPixels.length, input1[1].iaPixels[0].length, 255);
-                mask2.baMarker = new boolean[input1[1].iaPixels.length][ input1[1].iaPixels[0].length];
-            }
-
-            if (checkMask(mask1) || checkMask(mask2)) {
-                throw new UnableToRunException("Wrong Mask ", new IOException());
-            }
-            List<SettingObject> lsc1 = controller.getCurrentMethod().getProtocol("preproc").getAllSettings();
-            Settings oSet = new Settings() {
-                @Override
-                public String getType() {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public void buildClusters() {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-            };
-            oSet.loSettings.addAll(lsc1);
-            mask1 = OpenTIV_PreProc.performTransformation(oSet, mask1);
-            mask2 = OpenTIV_PreProc.performTransformation(oSet, mask2);
-            masking1.setImage(mask1.getBuffImage());
-            masking1.setBoolean(mask1.baMarker);
-            masking2.setImage(mask2.getBuffImage());
-            masking2.setBoolean(mask2.baMarker);
-
-            totMask.setImage(new ImageInt( input1[0].iaPixels.length,  input1[0].iaPixels[0].length, 255).getBuffImage());
-
-            for (int i = 0; i < Math.min(masking1.iaPixels.length, masking2.iaPixels.length); i++) {
-                for (int j = 0; j < Math.min(masking1.iaPixels[0].length, masking2.iaPixels[0].length); j++) {
-                    totMask.baMarker[i][j] = false;
-                    if (masking1.iaPixels[i][j] >= 1 || masking2.iaPixels[i][j] >= 1) {
-                        if (masking1.iaPixels[i][j] >= 1) {
-                            totMask.iaPixels[i][j] = 0;
-                            totMask.baMarker[i][j] = true;
-                        }
-                        if (masking2.iaPixels[i][j] >= 1) {
-                            totMask.iaPixels[i][j] = 127;
-                            totMask.baMarker[i][j] = true;
-                        }
-                    }
-                }
-            }
+        }
 //        } else {
 //            throw new UnableToRunException("Wrong input", new Exception());
 //        }
@@ -206,6 +242,157 @@ public class Prot_PIVObjectMasking extends PIVProtocol {
 //        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
         data.baMask = totMask.baMarker;
         buildLookUp();
+    }
+
+    public ImageInt[] runSkript(Object... input) throws UnableToRunException {
+//        if (input != null && input.length >= 2 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt) {
+
+//            ImageInt mask1 = (ImageInt) input[0];
+//            ImageInt mask2 = (ImageInt) input[1];
+        PIVController controller = ((PIVController) input[3]);
+        DataPIV data = controller.getDataPIV();
+        ImageInt[] input1 = new ImageInt[]{new ImageInt(data.iaReadInFirst), new ImageInt(data.iaReadInSecond)};
+        ImageInt mask1 = new ImageInt(data.iaReadInFirst);
+        ImageInt mask1_1 = new ImageInt(2, 2, 0);
+        ImageInt mask2 = new ImageInt(data.iaReadInSecond);
+        ImageInt mask2_1 = new ImageInt(2, 2, 0);
+//            List<ImagePath> sNames = controller.getCurrentMethod().getInputImages();
+//            String sF1 = sNames.get(0).toString();
+//            String sF2 = sNames.get(1).toString();
+//            PIVMethod method = ((PIVMethod) StaticReferences.controller.getCurrentMethod());
+//            System.out.println("Mask generation using " + this.getSettingsValue("Mask"));
+        //Get ML generated mask from SQL database
+//            if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && method.bReadFromSQL) {
+//                try {
+//                    mask1 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF1, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+//                    mask2 = ((tivPIVSubControllerSQL) StaticReferences.controller.getSQLControler(null)).readPredictionFromSQL(method.experimentSQL, sF2, mask1.iaPixels.length, mask1.iaPixels[0].length)[0];
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+////                mask1 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask1);
+////                mask2 = OpenTIV_PreProc.performTransformation((Settings) input1[4], mask2);
+//                //Get ML generated mask from directory
+//            } else if (this.getSettingsValue("Mask").toString().contains("ReadfromDirectory") && !method.bReadFromSQL) {
+//                PIVController control = (PIVController) StaticReferences.controller;
+        String sPath = (String) input[0];
+        String sName = ((String) input[1]).substring(0, ((String) input[1]).indexOf("."));
+        String sName2 = ((String) input[2]).substring(0, ((String) input[2]).indexOf("."));
+//                if (this.getSettingsValue("mask_Path").toString().contains("Directory")) {
+        List<String> lsMask = Crawler.crawlFolder(sPath, 0, "Mask", false);
+//                    if (lsMask.size() == 1) {
+        this.setSettingsValue("mask_Path", lsMask.get(0));
+//                    } else {
+//                        this.setSettingsValue("Mask", "Ziegenhein2018");
+//                        mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[0], this));
+//                        mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking((ImageInt) input1[1], this));
+//
+//                        System.err.println("Warning, incorrect mask path! Switch to default mask generation.");
+//                    }
+//                }
+        try {
+            mask1.setImage(IMG_Reader.readImageGrayScale(new File(this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + ".png")));
+            if (new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + "extended.png").exists()) {
+                    mask1_1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName + "extended.png")));
+                }
+            mask2.setImage(IMG_Reader.readImageGrayScale(new File(this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + ".png")));
+            if (new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + "extended.png").exists()) {
+                    mask2_1.setImage(IMG_Reader.readImageGrayScale(new File(sPath + System.getProperty("file.separator") + this.getSettingsValue("mask_Path") + System.getProperty("file.separator") + sName2 + "extended.png")));
+                }
+        } catch (IOException ex) {
+            Logger.getLogger(Prot_PIVObjectMasking.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+//            } else if (this.getSettingsValue("Mask").toString().contains("Hessenkemper2018")) {
+//                //Generate Ziegenhein Mask
+//                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+//                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking( input1[1], this));
+//
+//            } else {
+//                //Generate default mask
+//                this.setSettingsValue("Mask", "Ziegenhein2018");
+//                mask1 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[0], this));
+//                mask2 = BasicIMGOper.invert(OpenTIV_Masking.performMasking(input1[1], this));
+//            }
+        if (mask1 == null) {
+            mask1 = new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255);
+            mask1.baMarker = new boolean[((ImageInt) input[0]).iaPixels.length][((ImageInt) input1[0]).iaPixels[0].length];
+        }
+        if (mask2 == null) {
+            mask2 = new ImageInt(input1[1].iaPixels.length, input1[1].iaPixels[0].length, 255);
+            mask2.baMarker = new boolean[input1[1].iaPixels.length][input1[1].iaPixels[0].length];
+        }
+
+        if (checkMask(mask1) || checkMask(mask2)) {
+            throw new UnableToRunException("Wrong Mask ", new IOException());
+        }
+//            List<SettingObject> lsc1 = controller.getCurrentMethod().getProtocol("preproc").getAllSettings();
+        Settings oSet = new Settings() {
+            @Override
+            public String getType() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void buildClusters() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+        oSet.loSettings.addAll(this.loSettings);
+        mask1 = OpenTIV_PreProc.performTransformation(oSet, mask1);
+        mask2 = OpenTIV_PreProc.performTransformation(oSet, mask2);
+        masking1.setImage(mask1.getBuffImage());
+        masking1.setBoolean(mask1.baMarker);
+        if (mask1_1.iaPixels.length > 2) {
+            mask1_1 = OpenTIV_PreProc.performTransformation(oSet, mask1_1);
+            for (int i = 0; i < mask1_1.iaPixels.length; i++) {
+                for (int j = 0; j < mask1_1.iaPixels[0].length; j++) {
+                    if (mask1_1.iaPixels[i][j]>0)
+                    masking1.iaPixels[i][j] = mask1_1.iaPixels[i][j] + 254;
+                }
+            }
+        }
+        masking2.setImage(mask2.getBuffImage());
+        masking2.setBoolean(mask2.baMarker);
+        if (mask2_1.iaPixels.length > 2) {
+            mask2_1 = OpenTIV_PreProc.performTransformation(oSet, mask2_1);
+            for (int i = 0; i < mask2_1.iaPixels.length; i++) {
+                for (int j = 0; j < mask2_1.iaPixels[0].length; j++) {
+                    if (mask2_1.iaPixels[i][j]>0)
+                    masking2.iaPixels[i][j] = mask2_1.iaPixels[i][j] + 254;
+                }
+            }
+        }
+
+        totMask.setImage(new ImageInt(input1[0].iaPixels.length, input1[0].iaPixels[0].length, 255).getBuffImage());
+
+        for (int i = 0; i < Math.min(masking1.iaPixels.length, masking2.iaPixels.length); i++) {
+            for (int j = 0; j < Math.min(masking1.iaPixels[0].length, masking2.iaPixels[0].length); j++) {
+                totMask.baMarker[i][j] = false;
+                if (masking1.iaPixels[i][j] >= 1 || masking2.iaPixels[i][j] >= 1) {
+                    if (masking1.iaPixels[i][j] >= 1) {
+                        totMask.iaPixels[i][j] = 0;
+                        totMask.baMarker[i][j] = true;
+                    }
+                    if (masking2.iaPixels[i][j] >= 1) {
+                        totMask.iaPixels[i][j] = 127;
+                        totMask.baMarker[i][j] = true;
+                    }
+                }
+            }
+        }
+//        } else {
+//            throw new UnableToRunException("Wrong input", new Exception());
+//        }
+
+//        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
+        data.baMask = totMask.baMarker;
+//        buildLookUp();
+        ImageInt[] ret = new ImageInt[2];
+        ret[0] = masking1;
+        ret[1] = masking2;
+        return ret;
     }
 
     public static boolean checkMask(ImageInt img) {

@@ -81,6 +81,8 @@ public class DataPIV implements DataBaseEntry, Serializable, ResultsImageShowAbl
     public boolean Hart1998 = false;
     public double Hart1998Divider = 2.0;
     public String sSubPixelType = "Gaussian";
+    public boolean Smoothing = false;
+    public double SmoothFactor = 2.0;
     //Multipass
     public boolean bMultipass = false;
     public boolean bMultipass_BiLin = true;

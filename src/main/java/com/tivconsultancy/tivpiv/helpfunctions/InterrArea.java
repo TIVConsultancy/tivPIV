@@ -42,7 +42,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
     public boolean bOutlier = false;
     public boolean bOnceValidated = false;
     public AreaInSecondFrame oAreaSecFrame = null;
-    InterrArea[][] oRefinedAreas;
+    public InterrArea[][] oRefinedAreas;
 
     public InterrArea(Set1D oIntervalX, Set1D oIntervalY) {
         super(oIntervalX, oIntervalY);
@@ -471,6 +471,27 @@ public class InterrArea extends CellRec implements Area, Serializable {
         IMG_Writer.PaintGreyPNG(new ImageGrid(ia2), new File(sFile2));
     }
 
+    public List<List<Double>> get_Velocities(int iStampSize, InterrGrid oGrid) {
+        List<Double> lsBVx = new ArrayList<>();
+        List<Double> lsBVy = new ArrayList<>();
+        List<List<Double>> llsBV = new ArrayList<>();
+        if (!bMasked) {
+            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
+                if (o.bMasked) {
+                    continue;
+                }
+                if (o.bOutlier) {
+                    continue;
+                }
+                lsBVx.add(o.getVeloX());
+                lsBVy.add(o.getVeloY());
+            }
+        }
+        llsBV.add(lsBVx);
+        llsBV.add(lsBVy);
+        return llsBV;
+    }
+
     public boolean validateVectorDifference(int iStampSize, double dthreshold, InterrGrid oGrid) {
         /*
          Raffel Particle Image Velocimetry A Practical Guide Third Edition
@@ -531,30 +552,14 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
     }
 
-    public boolean validateMedianComponent(int iStampSize, double dthreshold, InterrGrid oGrid) {
+    public boolean validateMedianComponent(List<Double> lsBVx,List<Double> lsBVy, double dthreshold) {
         /*
          Raffel Particle Image Velocimetry A Practical Guide Third Edition
          Section 7.1.2
          */
 
         if (!bMasked) {
-            List<Double> lsBVx = new ArrayList<>();
-            List<Double> lsBVy = new ArrayList<>();
-
-            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
-                if (o.bMasked) {
-                    continue;
-                }
-                if (o.bOutlier) {
-                    continue;
-                }
-                lsBVx.add(o.getVeloX());
-                lsBVy.add(o.getVeloY());
-            }
-
-            if (lsBVx.isEmpty()) {
-                return bOutlier;
-            }
+            
             if (Math.abs(median(lsBVx) - this.getVeloX()) < dthreshold && Math.abs(median(lsBVy) - this.getVeloY()) < dthreshold) {
                 bOutlier = false;
             } else {
@@ -566,7 +571,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
     }
 
-    public boolean validateMedianLength(int iStampSize, double dthreshold, InterrGrid oGrid) {
+    public boolean validateMedianLength( List<Double> lsBVx,List<Double> lsBVy, double dthreshold) {
         /*
          Raffel Particle Image Velocimetry A Practical Guide Third Edition
          Section 7.1.2
@@ -574,16 +579,10 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
         if (!bMasked) {
             List<Double> lsLength = new ArrayList<>();
-
-            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
-                if (o.bMasked) {
-                    continue;
-                }
-                if (o.bOutlier) {
-                    continue;
-                }
-                lsLength.add(o.getVeloX() * o.getVeloX() + o.getVeloY() * o.getVeloY());
+            for (int i = 0; i < lsBVx.size(); i++) {
+                lsLength.add(lsBVx.get(i) * lsBVx.get(i) + lsBVy.get(i) * lsBVy.get(i));
             }
+
             double dThislength = Math.sqrt(this.getVeloX() * this.getVeloX() + this.getVeloY() * this.getVeloY());
             if (lsLength.isEmpty()) {
                 return bOutlier;
@@ -602,7 +601,7 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
     }
 
-    public boolean validateNormMedian(int iStampSize, double dthreshold, InterrGrid oGrid) {
+    public boolean validateNormMedian(List<Double> lsBVx,List<Double> lsBVy, double dthreshold) {
         /*
          Raffel Particle Image Velocimetry A Practical Guide Third Edition
          Section 7.1.2
@@ -611,19 +610,6 @@ public class InterrArea extends CellRec implements Area, Serializable {
         double eps_0 = 0.1;
 
         if (!bMasked) {
-            List<Double> lsBVx = new ArrayList<>();
-            List<Double> lsBVy = new ArrayList<>();
-
-            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
-                if (o.bMasked) {
-                    continue;
-                }
-                if (o.bOutlier) {
-                    continue;
-                }
-                lsBVx.add(o.getVeloX());
-                lsBVy.add(o.getVeloY());
-            }
 
             Double dMedVx = median(lsBVx);
             Double dMedVy = median(lsBVy);
@@ -634,15 +620,9 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
             List<Double> lsMedDiff = new ArrayList<>();
 
-            for (InterrArea o : oGrid.getNeighbors(this, iStampSize)) {
-                if (o.bMasked) {
-                    continue;
-                }
-                if (o.bOutlier) {
-                    continue;
-                }
-                double dDeltaVx = dMedVx - o.getVeloX();
-                double dDeltaVy = dMedVy - o.getVeloY();
+            for (int i = 0; i < lsBVx.size(); i++) {                
+                double dDeltaVx = dMedVx - lsBVx.get(i);
+                double dDeltaVy = dMedVy - lsBVy.get(i);
                 lsMedDiff.add(dDeltaVx * dDeltaVx + dDeltaVy * dDeltaVy);
             }
 
@@ -797,6 +777,26 @@ public class InterrArea extends CellRec implements Area, Serializable {
 
     }
 
+//    public void smoothing(InterrGrid oGrid, DataPIV Data, int i, int j) {
+//        if (bMasked) {
+//            bOutlier = true;
+//            if (!bRefined) {
+//                Reconstruct_Hessenkemper2018(oGrid, Data.iStampSize);
+//                this.dVx = (this.dVx * Data.SmoothFactor + oGrid.oaContent[i][j].dVx) / (1.0 + Data.SmoothFactor);
+//                this.dVy = (this.dVy * Data.SmoothFactor + oGrid.oaContent[i][j].dVy) / (1.0 + Data.SmoothFactor);
+//            } else {
+//                for (int ii = 0; ii < 2; ii++) {
+//                    for (int jj = 0; jj < 2; jj++) {
+//                        oRefinedAreas[ii][jj].Reconstruct_Hessenkemper2018(oGrid, Data.iStampSize);
+//                        oRefinedAreas[ii][jj].dVx = (this.dVx * Data.SmoothFactor + oGrid.oaContent[i][j].dVx) / (1.0 + Data.SmoothFactor);
+//                        this.dVy = (this.dVy * Data.SmoothFactor + oGrid.oaContent[i][j].dVy) / (1.0 + Data.SmoothFactor);
+//                    }
+//                }
+//            }
+//            //System.out.println(oGridcopy.oaContent[i][j].dVx+" "+oGridcopy.oaContent[i][j].dVy);
+//        }
+//
+//    }
     public void Reconstruct_Hessenkemper2018(InterrGrid oGrid, int iStampSize) {
         if (bRefined) {
             for (int i = 0; i < 2; i++) {
@@ -809,6 +809,11 @@ public class InterrArea extends CellRec implements Area, Serializable {
         if (bMasked || !bOutlier) {
             return;
         }
+        reconstruct(oGrid, iStampSize);
+        bOnceValidated = true;
+    }
+
+    public void reconstruct(InterrGrid oGrid, int iStampSize) {
         double xvel = 0.0;
         double yvel = 0.0;
         double distWeightx = 0.0;
@@ -830,7 +835,6 @@ public class InterrArea extends CellRec implements Area, Serializable {
             this.dVx = xvel / distWeightx;
             this.dVy = yvel / distWeighty;
         }
-        bOnceValidated = true;
     }
 
     @Override

@@ -78,13 +78,21 @@ public class Prot_PIVDisplay extends PIVProtocol {
     public void run(Object... input) throws UnableToRunException {
         if ((boolean) StaticReferences.controller.getCurrentMethod().getSystemSetting(null).getSettingsValue("tivGUI_dataDraw")) {
             PIVController controller = (PIVController) StaticReferences.controller;
-            DataPIV data = controller.getDataPIV();
+            DataPIV data = new DataPIV(0);
+            String sFileName = "";
+            if (input.length == 0) {
+                data = controller.getDataPIV();
+                sFileName = controller.getCurrentFileSelected().getName().substring(0, controller.getCurrentFileSelected().getName().indexOf("."));
+            } else {
+                data = (DataPIV) input[0];
+                sFileName = "Post" + (String) input[1];
+            }
 
             ImageInt oSourceImage = new ImageInt(data.iaReadInFirst);
-            int iGreyValueVec = Integer.valueOf(getSettingsValue("tivPIVGreyValueVec").toString());
+//            int iGreyValueVec = Integer.valueOf(getSettingsValue("tivPIVGreyValueVec").toString());
             boolean bBlankBackground = Boolean.valueOf(getSettingsValue("tivBlankBackground").toString());
             int iBackGroundValue = Integer.valueOf(getSettingsValue("BlanckBackgroundGrayValue").toString());
-            double dSize = data.oGrid.getCellSize();
+//            double dSize = data.oGrid.getCellSize();
             data.dStretch = (Double) this.getSettingsValue("VecStretch");
             try {
                 int[][] iaBackground = oSourceImage.iaPixels;
@@ -103,9 +111,9 @@ public class Prot_PIVDisplay extends PIVProtocol {
 //                    VectorDisplay = data.oGrid.paintVecs(iaBackground, getColorbar(), oOutputGrid, );
 //                }
                 Colorbar oColBar2 = new Colorbar.StartEndLinearColorBar(0.0, (Double) this.getSettingsValue("MaxDisp"), getColorbar(), new ColorSpaceCIEELab(), (Colorbar.StartEndLinearColorBar.ColorOperation<Double>) (Double pParameter) -> pParameter);
-                
-                VectorDisplay=PaintVectors.paintOnImage(data.oGrid.getVectors(true), oColBar2, iaBackground, null, data.dStretch);
-                String sFileName = controller.getCurrentFileSelected().getName().substring(0, controller.getCurrentFileSelected().getName().indexOf("."));
+
+                VectorDisplay = PaintVectors.paintOnImage(data.oGrid.getVectors(true), oColBar2, iaBackground, null, data.dStretch);
+
                 File oPath = new File(controller.getCurrentFileSelected().getParent() + System.getProperty("file.separator") + "ResultImages");
                 if (!oPath.exists()) {
                     oPath.mkdir();

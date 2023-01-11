@@ -42,6 +42,11 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     BufferedImage Buff;
 
     private String name = "Areas";
+    public Prot_PIVInterrAreas(String sNull) {
+        InterrArea = new ImageInt(50, 50, 0);
+        Buff = InterrArea.getBuffImage();
+//        initSettins();
+    }
 
     public Prot_PIVInterrAreas() {
         InterrArea = new ImageInt(50, 50, 0);
@@ -88,6 +93,18 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         data.oGrid = getGrid(InterrArea, data);
         Buff = (checkPIVMaskingBuff(data.oGrid, new ImageInt(data.iaPreProcFirst), data));
         buildLookUp();
+    }
+    
+        public void runSkript(PIVController input) throws UnableToRunException {
+        DataPIV data = input.getDataPIV();
+
+        data.PIV_WindowSize = Integer.valueOf(getSettingsValue("PIV_WindowSize").toString());
+        data.sGridType = getSettingsValue("PIV_GridType").toString();
+
+        InterrArea.setImage(new ImageInt(data.iaPreProcFirst).getBuffImage());
+        data.oGrid = getGrid(InterrArea, data);
+        Buff = (checkPIVMaskingBuff(data.oGrid, new ImageInt(data.iaPreProcFirst), data));
+//        buildLookUp();
     }
 
     @Override

@@ -5,6 +5,7 @@
  */
 package com.tivconsultancy.tivpiv;
 
+import com.tivconsultancy.opentiv.datamodels.overtime.Database;
 import delete.com.tivconsultancy.opentiv.devgui.main.ImagePath;
 import com.tivconsultancy.opentiv.helpfunctions.strings.StringWorker;
 import com.tivconsultancy.opentiv.highlevel.methods.Method;
@@ -14,6 +15,8 @@ import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.tivGUI.StaticReferences;
+import com.tivconsultancy.tivpiv.data.DataPIV;
+import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVCalcDisplacement;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVDataHandling;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVDisplay;
@@ -21,9 +24,11 @@ import com.tivconsultancy.tivpiv.protocols.Prot_PIVInterrAreas;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVObjectMasking;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVPreProcessor;
 import com.tivconsultancy.tivpiv.protocols.Prot_PIVRead2IMGFiles;
+import com.tivconsultancy.tivpiv.protocols.Prot_tivPIV1DPostProc;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -51,7 +56,7 @@ public class PIVMethod implements Method {
         methods.add(new NameObject<>("inter areas", new Prot_PIVInterrAreas()));
         methods.add(new NameObject<>("calculate", new Prot_PIVCalcDisplacement()));
         methods.add(new NameObject<>("display", new Prot_PIVDisplay()));
-//        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
+        methods.add(new NameObject<>("postproc", new Prot_tivPIV1DPostProc()));
         methods.add(new NameObject<>("data", new Prot_PIVDataHandling()));
         methods.add(new NameObject<>("system", new Prot_SystemSettings()));
     }
@@ -142,6 +147,20 @@ public class PIVMethod implements Method {
             PIVStaticReferences.calcIntensityValues(((PIVController) StaticReferences.controller).getDataPIV());
             getProtocol("inter areas").run();
             StaticReferences.controller.getViewController(null).update();
+        }
+        if (ident.equals("postproc")) {
+            getProtocol("postproc").run();
+            Database data = ((PIVController) StaticReferences.controller).getDataBase();
+            String sBase=((PIVController) StaticReferences.controller).getCurrentFileSelected().getParent();
+            Set<String> keys = data.getAllKeys();
+            for (String s : keys) {
+                DataPIV dataPIV = (DataPIV) data.getRes(s);
+                int index=((PIVController) StaticReferences.controller).getSelectedIndex(sBase+System.getProperty("file.separator")+s);
+                System.out.println(index);
+                getProtocol("data").run(new Object[]{dataPIV,index});
+                getProtocol("display").run(new Object[]{dataPIV,s});
+            }
+            int iph=0;
         }
     }
 

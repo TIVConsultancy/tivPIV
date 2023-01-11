@@ -17,6 +17,7 @@ import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,6 +43,13 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         buildLookUp();
         initSettings();
         buildClusters();
+    }
+
+    public Prot_PIVPreProcessor(File fNull) {
+
+        preproc = new ImageInt(50, 50, 150);
+        preproc2 = new ImageInt(50, 50, 150);
+//        initSettings();
     }
 
     private void buildLookUp() {
@@ -92,8 +100,32 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
             throw new UnableToRunException("Wrong input", new Exception());
         }
         buildLookUp();
-        
-        
+
+    }
+    
+    public void runSkript(Object... input) throws UnableToRunException {
+        if (input != null && input.length >= 3 && input[0] != null && input[1] != null && input[0] instanceof ImageInt && input[1] instanceof ImageInt
+                && input[2] != null && input[2] instanceof PIVController) {
+
+            try {
+                DataPIV data = ((PIVController) input[2]).getDataPIV();
+                preproc.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[0]).getBuffImage());
+                preproc2.setImage(OpenTIV_PreProc.performTransformation(this, (ImageInt) input[1]).getBuffImage());
+                data.iaReadInFirst = preproc.iaPixels;
+                data.iaReadInSecond = preproc2.iaPixels;
+                preproc.setImage((OpenTIV_PreProc.performPreProc(this, preproc.clone())).getBuffImage());
+                preproc2.setImage((OpenTIV_PreProc.performPreProc(this, preproc2.clone())).getBuffImage());
+                data.iaPreProcFirst = preproc.iaPixels;
+                data.iaPreProcSecond = preproc2.iaPixels;
+            } catch (Exception ex) {
+                throw new UnableToRunException("Cannot transform image:", ex);
+            }
+
+        } else {
+            throw new UnableToRunException("Wrong input", new Exception());
+        }
+//        buildLookUp();
+
     }
 
     @Override
@@ -103,8 +135,8 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
 
     @Override
     public Object[] getResults() {
-            return new Object[]{preproc.clone(), preproc2.clone()};
-        }
+        return new Object[]{preproc.clone(), preproc2.clone()};
+    }
 
     public void buildClusters() {
 
@@ -154,11 +186,11 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         Contrast.setDescription("Increase the contrast by normalizing to the "
                 + "possible black and white values");
         lsClusters.add(Contrast);
-        
+
         SettingsCluster Sharpen = new SettingsCluster("Sharpen",
-                new String[]{"Sharpen","SharpenThresh", "HistMin"}, this);
+                new String[]{"Sharpen", "SharpenThresh", "HistMin"}, this);
         Sharpen.setDescription("Increase the contrast of sharp particles "
-                );
+        );
         lsClusters.add(Sharpen);
 
 //        SettingsCluster HGBlackStretch = new SettingsCluster("Black Stretch",
@@ -227,7 +259,7 @@ public class Prot_PIVPreProcessor extends PIVProtocol {
         this.loSettings.add(new SettingObject("Curve Correction", "CurveCorrection", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("Old Values", "GreyOldValues", "0, 75, 255", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("New Values", "GreyNewValues", "0, 150, 255", SettingObject.SettingsType.String));
-        
+
 //        this.loSettings.add(new SettingObject("SharpAlgorithm", "NRType", "Simple1", SettingObject.SettingsType.String));
         this.loSettings.add(new SettingObject("Sharpen", false, SettingObject.SettingsType.Boolean));
         this.loSettings.add(new SettingObject("SharpenThresh", 50, SettingObject.SettingsType.Integer));

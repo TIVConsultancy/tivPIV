@@ -5,20 +5,32 @@
  */
 package com.tivconsultancy.tivpiv.protocols;
 
+import com.tivconsultancy.opentiv.datamodels.overtime.DataBaseEntry;
+import com.tivconsultancy.opentiv.datamodels.overtime.Database;
+import com.tivconsultancy.opentiv.helpfunctions.io.Writer;
+import com.tivconsultancy.opentiv.helpfunctions.settings.SettingObject;
+import com.tivconsultancy.opentiv.helpfunctions.settings.SettingsCluster;
 import com.tivconsultancy.opentiv.highlevel.protocols.NameSpaceProtocolResults1D;
 import com.tivconsultancy.opentiv.highlevel.protocols.Protocol;
 import com.tivconsultancy.opentiv.highlevel.protocols.UnableToRunException;
 import com.tivconsultancy.opentiv.math.algorithms.Averaging;
 import com.tivconsultancy.opentiv.math.interfaces.Value;
+import com.tivconsultancy.opentiv.math.primitives.OrderedPair;
 import com.tivconsultancy.opentiv.math.specials.LookUp;
 import com.tivconsultancy.opentiv.math.specials.NameObject;
 import com.tivconsultancy.opentiv.physics.vectors.VelocityVec;
 import com.tivconsultancy.tivGUI.StaticReferences;
 import com.tivconsultancy.tivpiv.PIVController;
 import com.tivconsultancy.tivpiv.data.DataPIV;
+import com.tivconsultancy.tivpiv.helpfunctions.InterrGrid;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -28,7 +40,6 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
 
     private String name = "Post Processor";
     LookUp<Double> results1D = new LookUp<>();
-    
 
     public Prot_tivPIV1DPostProc() {
         super();
@@ -52,43 +63,106 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
 
     @Override
     public Double getOverTimesResult(NameSpaceProtocolResults1D ident) {
-        return results1D.get(ident.toString());        
+        return results1D.get(ident.toString());
     }
 
     @Override
     public void run(Object... input) throws UnableToRunException {
+        System.out.println("Start post-proc in time");
+        Database data = ((PIVController) StaticReferences.controller).getDataBase();
+        Set<String> keys = data.getAllKeys();
+        List<InterrGrid> lsGrids = new ArrayList<>();
+        for (String s : keys) {
+            DataPIV dataPIV = (DataPIV) data.getRes(s);
+            lsGrids.add(dataPIV.oGrid);
+        }
+        // To save start and end point (in time) for each element according to masked or not masked
+        int[][][] iiStart = new int[lsGrids.get(0).oaContent.length][lsGrids.get(0).oaContent[0].length][lsGrids.size()];
+        int[][][] iiEnd = new int[lsGrids.get(0).oaContent.length][lsGrids.get(0).oaContent[0].length][lsGrids.size()];
+        int stampsize = Integer.valueOf(getSettingsValue("tivPIVValTimeStampSize").toString());
+        double dthreshold = Double.valueOf(getSettingsValue("tivPIVValThreshold").toString());
+        for (int i = 0; i < lsGrids.get(0).oaContent.length; i++) {
+            for (int j = 0; j < lsGrids.get(0).oaContent[0].length; j++) {
+                Double[] dVx = new Double[lsGrids.size()];
+                Double[] dVy = new Double[lsGrids.size()];
+                List<Integer> lsIValid = new ArrayList<>();
+                for (int k = 0; k < lsGrids.size(); k++) {
+                    if (!lsGrids.get(k).checkMask(i, j)) {
+                        dVx[k] = lsGrids.get(k).oaContent[i][j].dVx;
+                        dVy[k] = lsGrids.get(k).oaContent[i][j].dVy;
+                        lsIValid.add(k);
+                    }
+                }
+                if (!lsIValid.isEmpty()) {
+                    List<Integer> lsIOutlier = new ArrayList<>();
+                    List<List<Double>> ldVxVy = new ArrayList<>();
+                    ldVxVy.add(new ArrayList<>());
+                    ldVxVy.add(new ArrayList<>());
+                    for (Integer I : lsIValid) {
+                        List<Double> lsBVx = new ArrayList<>();
+                        List<Double> lsBVy = new ArrayList<>();
+                        List<Integer> lITimeDiff = new ArrayList<>();
+                        int iStart = I;
+                        int iEnd = I;
+                        for (int k = 1; k <= stampsize; k++) {
+                            if (I - k >= 0 && dVx[I - k] != null) {
+                                iStart = I - k;
+                            } else {
+                                break;
+                            }
+                        }
+                        for (int k = 1; k <= stampsize; k++) {
+                            if (I + k < dVx.length && dVx[I + k] != null) {
+                                iEnd = I + k;
+                            } else {
+                                break;
+                            }
+                        }
+                        iiStart[i][j][I] = iStart;
+                        iiEnd[i][j][I] = iEnd;
+                        for (int k = iStart; k <= iEnd; k++) {
+                            if (k != I) {
+                                lITimeDiff.add(Math.abs(I - k));
+                                lsBVx.add(dVx[k]);
+                                lsBVy.add(dVy[k]);
+                            }
+                        }
+                        if (!lsBVx.isEmpty()) {
+                            boolean bOutlier = lsGrids.get(I).oaContent[i][j].validateMedianComponent(lsBVx, lsBVy, dthreshold);
+                            if (bOutlier) {
+                                lsIOutlier.add(I);
+                                double xvel = 0.0;
+                                double yvel = 0.0;
+                                double distWeight = 0.0;
+                                for (int k = 0; k < lsBVx.size(); k++) {
+                                    double dDistance = (double) lITimeDiff.get(k);
+                                    xvel += (lsBVx.get(k) / dDistance);
+                                    yvel += (lsBVy.get(k) / dDistance);
+                                    distWeight += (1 / dDistance);
+                                }
+                                ldVxVy.get(0).add(xvel / distWeight);
+                                ldVxVy.get(1).add(yvel / distWeight);
+                            }
+                        }
+                    }
+                    for (int k = 0; k < lsIOutlier.size(); k++) {
+//                        System.out.println("Before "+lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVx+" "+lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVy);
+                        lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVx = ldVxVy.get(0).get(k);
+                        lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVy = ldVxVy.get(1).get(k);
+//                        System.out.println("After "+lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVx+" "+lsGrids.get(lsIOutlier.get(k)).oaContent[i][j].dVy);
+                    }
+                }
+            }
+        }
+        // Denoising 
 
-        results1D = new LookUp<>();
-        
-        DataPIV data = ((PIVController) StaticReferences.controller).getDataPIV();
-        
-        List<VelocityVec> loVec = data.oGrid.getVectors(false);
-        
-        double avgx = Averaging.getMeanAverage(loVec, new Value<Object>() {
-            @Override
-            public Double getValue(Object pParameter) {
-                return ((VelocityVec) pParameter).getVelocityX();
-            }
-        });
-        
-        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgx.toString(), avgx));
-        
-        double avgy = Averaging.getMeanAverage(loVec, new Value<Object>() {
-            @Override
-            public Double getValue(Object pParameter) {
-                return ((VelocityVec) pParameter).getVelocityY();
-            }
-        });
-        
-        results1D.addDuplFree(new NameObject<>(NameSpaceProtocol1DResults.avgy.toString(), avgy));
-        
-        
-        buildLookUp();
+        int ph = 0;
+//        buildLookUp();
     }
-    
+
     @Override
-    public void setImage(BufferedImage bi){
-        buildLookUp();
+    public void setImage(BufferedImage bi) {
+//        buildLookUp();
     }
 
     @Override
@@ -102,101 +176,23 @@ public class Prot_tivPIV1DPostProc extends PIVProtocol {
     }
 
     private void initSettins() {
-//        this.loSettings.add(new SettingObject("Hart1998", "tivPIVHart1998", false, SettingObject.SettingsType.Boolean));
-//        this.loSettings.add(new SettingObject("Hart1998Divider", "tivPIVHart1998Divider", 2.0, SettingObject.SettingsType.Double));
-//        this.loSettings.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Gaussian", SettingObject.SettingsType.String));
-//        this.loSettings.add(new SettingObject("Multipass", "tivPIVMultipass", false, SettingObject.SettingsType.Boolean));
-//        this.loSettings.add(new SettingObject("Multipass BiLinear", "tivPIVMultipass_BiLin", true, SettingObject.SettingsType.Boolean));
-//        this.loSettings.add(new SettingObject("Multipass Count", "tivPIVMultipassCount", 3, SettingObject.SettingsType.Integer));
-//        this.loSettings.add(new SettingObject("Refinement", "tivPIVInterrAreaRefine", false, SettingObject.SettingsType.Boolean));
+        this.loSettings.add(new SettingObject("Validate", "tivPIVValidateVectors", true, SettingObject.SettingsType.Boolean));
+//        this.loSettings.add(new SettingObject("Type", "tivPIVValidationType", "MedianComp", SettingObject.SettingsType.String));
+        this.loSettings.add(new SettingObject("Threshold", "tivPIVValThreshold", 1.0, SettingObject.SettingsType.Double));
+        this.loSettings.add(new SettingObject("StampSize", "tivPIVValTimeStampSize", 2, SettingObject.SettingsType.Integer));
     }
 
     @Override
     public void buildClusters() {
-//        SettingsCluster IMGMultipass = new SettingsCluster("Multipass",
-//                                                           new String[]{"tivPIVMultipass", "tivPIVMultipassCount"}, this);
-//        IMGMultipass.setDescription("Multiple runs of the displacements");
-//        lsClusters.add(IMGMultipass);
-//
-//        SettingsCluster SubPixel = new SettingsCluster("Sub Pixel Accuracy",
-//                                                       new String[]{"tivPIVSubPixelType", "tivPIVMultipass_BiLin"}, this);
-//        SubPixel.setDescription("Improving the accuracy with sub pixel interpolation");
-//        lsClusters.add(SubPixel);
-//
-//        SettingsCluster Improvements = new SettingsCluster("Improvements",
-//                                                           new String[]{"tivPIVHart1998", "tivPIVHart1998Divider", "tivPIVInterrAreaRefine"}, this);
-//        Improvements.setDescription("Other strategies to improve the results");
-//        lsClusters.add(Improvements);
+        SettingsCluster validation = new SettingsCluster("Validation",
+                new String[]{"tivPIVValidateVectors", "tivPIVValThreshold", "tivPIVValTimeStampSize"}, this);
+        validation.setDescription("Validation of output vectors");
+        lsClusters.add(validation);
 
     }
-    
-//    public List<SettingObject> getHints(){
-//        List<SettingObject> ls = super.getHints();
-//        ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "None", SettingObject.SettingsType.String));
-//        ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Parabolic", SettingObject.SettingsType.String));
-//        ls.add(new SettingObject("Sub Pixel Type", "tivPIVSubPixelType", "Centroid", SettingObject.SettingsType.String));
-//        return ls;
-//    }
 
-//    public static InterrGrid posProc(InterrGrid oGrid, DataPIV Data) {
-//        /*
-//         put everything that is used to improve the result after the standard FFT        
-//         */
-//
-//        if (Data.bValidate) {
-//            oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-//            if (Data.bInterpolation) {
-//                oGrid.reconstructInvalidVectors(5);
-//            }
-//        }
-//
-//        if (Data.bMultipass || Data.bMultipass_BiLin) {
-//            for (int i = 0; i < Data.iMultipassCount; i++) {
-////                oGrid.shiftAndRecalc();
-//                if (Data.bMultipass_BiLin) {
-//                    oGrid.shiftAndRecalcSubPix(Data);
-//                } else {
-//                    oGrid.shiftAndRecalc(Data);
-//                }
-//                if (Data.bValidate) {
-//                    oGrid.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-//                    if (Data.bInterpolation) {
-//                        oGrid.reconstructInvalidVectors(5);
-//                    }
-//                }
-//            }
-//        }
-//        if (Data.bRefine) {
-//            for (int i = 0; i < oGrid.oaContent.length; i++) {
-//                for (int j = 0; j < oGrid.oaContent[0].length; j++) {
-//                    oGrid.oaContent[i][j].refine();
-//                }
-//            }
-//            InterrGrid oRefine = oGrid.getRefinesGrid();
-//            oRefine.checkMask(Data);
-//
-//            if (Data.bMultipass || Data.bMultipass_BiLin) {
-//                for (int i = 0; i < Data.iMultipassCount; i++) {
-//                    if (Data.bMultipass_BiLin) {
-//                        oGrid.shiftAndRecalcSubPix(Data);
-//                    } else {
-//                        oGrid.shiftAndRecalc(Data);
-//                    }
-//                    oRefine.validateVectors(Data.iStampSize, Data.dValidationThreshold, Data.sValidationType);
-//                    oRefine.reconstructInvalidVectors(5);
-//                }
-//            }
-//
-//            return oRefine;
-//
-//        }
-//
-//        return oGrid;
-//
-//    }
-    
-    private enum NameSpaceProtocol1DResults implements NameSpaceProtocolResults1D{
-       avgx, avgy, tkeX, tkey
+    private enum NameSpaceProtocol1DResults implements NameSpaceProtocolResults1D {
+        avgx, avgy, tkeX, tkey
     }
 
 }
