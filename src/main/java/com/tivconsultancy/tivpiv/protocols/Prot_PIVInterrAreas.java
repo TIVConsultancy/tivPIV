@@ -42,6 +42,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
     BufferedImage Buff;
 
     private String name = "Areas";
+
     public Prot_PIVInterrAreas(String sNull) {
         InterrArea = new ImageInt(50, 50, 0);
         Buff = InterrArea.getBuffImage();
@@ -53,6 +54,7 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         Buff = InterrArea.getBuffImage();
         buildLookUp();
         initSettins();
+//        List<SettingsCluster> ls = ((PIVController) StaticReferences.controller).getCurrentMethod().getProtocol("preproc").lsClusters;
         buildClusters();
     }
 
@@ -94,8 +96,8 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
         Buff = (checkPIVMaskingBuff(data.oGrid, new ImageInt(data.iaPreProcFirst), data));
         buildLookUp();
     }
-    
-        public void runSkript(PIVController input) throws UnableToRunException {
+
+    public void runSkript(PIVController input) throws UnableToRunException {
         DataPIV data = input.getDataPIV();
 
         data.PIV_WindowSize = Integer.valueOf(getSettingsValue("PIV_WindowSize").toString());
@@ -195,9 +197,9 @@ public class Prot_PIVInterrAreas extends PIVProtocol {
 
         for (int i = 0; i < (2 * data.PIV_rows) - 2; i++) {
             for (int j = 0; j < (2 * data.PIV_columns) - 2; j++) {
-                double dXL = (j+1) * PIV_WindowSize / 2.0;
+                double dXL = (j + 1) * PIV_WindowSize / 2.0;
                 double dXR = dXL + PIV_WindowSize;
-                double dYL = (i+1) * PIV_WindowSize / 2.0;
+                double dYL = (i + 1) * PIV_WindowSize / 2.0;
                 double dYR = dYL + PIV_WindowSize;
                 oGrid.oaContent[i][j] = new InterrArea(new Set1D(dXL, dXR), new Set1D(dYL, dYR));
             }

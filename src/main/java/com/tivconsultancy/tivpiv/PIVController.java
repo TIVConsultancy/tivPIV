@@ -101,7 +101,9 @@ public class PIVController extends BasicController implements ControllerWithImag
                 if (f.isDirectory()) {
                     continue;
                 }
-                ReadInFile.add(f);
+                if (f.getName().contains("png") || f.getName().contains("jpg") || f.getName().contains("jpeg") || f.getName().contains("bmp")) {
+                    ReadInFile.add(f);
+                }
             }
             Collections.sort(ReadInFile);
         }
@@ -172,9 +174,9 @@ public class PIVController extends BasicController implements ControllerWithImag
         }
         return -1;
     }
-    
-    public int getSelectedIndex(String s){
-         return ReadInFile.indexOf(new File(s));
+
+    public int getSelectedIndex(String s) {
+        return ReadInFile.indexOf(new File(s));
     }
 
     private String getSelecedName() {

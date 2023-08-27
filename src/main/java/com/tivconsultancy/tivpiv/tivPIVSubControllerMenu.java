@@ -40,7 +40,7 @@ import javafx.stage.FileChooser;
  */
 public class tivPIVSubControllerMenu implements subControllerMenu {
 
-    LookUp<EventHandler<ActionEvent>> actionEvents;
+    public LookUp<EventHandler<ActionEvent>> actionEvents;
     LookUp<List<String>> subMenuEntries;
     LookUp<ImageView> icons;
     List<String> mainMenu;
@@ -106,6 +106,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
 
         List<String> toolsEntries = new ArrayList<>();
         toolsEntries.add(dictionary(MenuEntries.CutImage));
+        toolsEntries.add(dictionary(MenuEntries.VoidPath));
         subMenuEntries.add(new NameObject<>(dictionary(MainItems.Tools), toolsEntries));
 
     }
@@ -181,13 +182,13 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
                 StaticReferences.controller.runCurrentStep();
             }
         };
-        
+
         EventHandler<ActionEvent> runPreProc = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 try {
                     StaticReferences.controller.getCurrentMethod().runParts("preproc");
-                    
+
 //                    StaticReferences.controller.
 //                StaticReferences.controller.getCurrentMethod().getProtocol("").run(input);
                 } catch (Exception ex) {
@@ -369,7 +370,7 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
     }
 
     private enum MenuEntries {
-        New, Load, OneStep, RunAll, RunPreProc, ImportSettings, ImportSettingsSQL, ExportSettings, ExportSettingsSQL, SQL, CutImage, LoadSQL
+        New, Load, OneStep, RunAll, RunPreProc, ImportSettings, ImportSettingsSQL, ExportSettings, ExportSettingsSQL, SQL, CutImage, LoadSQL, VoidPath
     }
 
     private String dictionary(Enum e) {
@@ -408,6 +409,9 @@ public class tivPIVSubControllerMenu implements subControllerMenu {
         }
         if (e == MenuEntries.SQL) {
             return "Connect to SQL";
+        }
+        if (e == MenuEntries.VoidPath) {
+            return "Void and Path";
         }
 
 //        if (e == MenuEntries.ImportCSVtoSQL) {

@@ -162,6 +162,9 @@ public class PIVMethod implements Method {
             }
             int iph=0;
         }
+        if (ident.equals("void")) {
+            getProtocol("void").run();
+        }
     }
 
     public boolean checkBurst(int i) {
